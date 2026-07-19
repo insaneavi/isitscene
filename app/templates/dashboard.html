@@ -6,9 +6,14 @@
     <h1>Archive Health</h1>
     <p>Exact folder-name validation against SRRDB.</p>
   </div>
-  <form method="post" action="/scan">
-    <button id="scan-button">Scan Now</button>
-  </form>
+  <div class="scan-actions">
+    <form method="post" action="/scan/start">
+      <button id="start-button">Start Scan</button>
+    </form>
+    <form method="post" action="/scan/stop">
+      <button id="stop-button" class="secondary-button">Stop Scan</button>
+    </form>
+  </div>
 </section>
 
 <section class="notice">
@@ -203,7 +208,8 @@
   const notFound = document.getElementById("live-not-found");
   const apiErrors = document.getElementById("live-api-errors");
   const skipped = document.getElementById("live-skipped");
-  const scanButton = document.getElementById("scan-button");
+  const startButton = document.getElementById("start-button");
+  const stopButton = document.getElementById("stop-button");
 
   let wasRunning = {{ "true" if progress and progress.is_running else "false" }};
 
@@ -233,8 +239,11 @@
       notFound.textContent = data.not_found_count || 0;
       apiErrors.textContent = data.api_error_count || 0;
       skipped.textContent = data.skipped_count || 0;
-      scanButton.disabled = data.is_running;
-      scanButton.textContent = data.is_running ? "Scanning..." : "Scan Now";
+      const stopping = data.phase === "stopping";
+      startButton.disabled = data.is_running;
+      startButton.textContent = data.is_running ? "Scan Running" : "Start Scan";
+      stopButton.disabled = !data.is_running || stopping;
+      stopButton.textContent = stopping ? "Stopping..." : "Stop Scan";
 
       panel.classList.toggle("progress-idle", !data.is_running);
 

@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 
 from .config import APP_NAME
 from .database import Release, ScanProgress, ScanRun, SessionLocal, init_db
-from .scanner import run_scan
+from .scanner import recover_interrupted_scan, request_stop, run_scan
 from .settings_service import get_settings, save_settings
 
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +41,7 @@ def refresh_scheduler() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    recover_interrupted_scan()
     scheduler.start()
     refresh_scheduler()
     yield
@@ -243,9 +244,15 @@ def update_settings(
     return RedirectResponse("/settings?saved=1", status_code=303)
 
 
-@app.post("/scan")
-def scan_now(background_tasks: BackgroundTasks):
+@app.post("/scan/start")
+def start_scan(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_scan)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/scan/stop")
+def stop_scan():
+    request_stop()
     return RedirectResponse("/", status_code=303)
 
 

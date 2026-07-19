@@ -128,3 +128,20 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.65;
 }
+
+
+.scan-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.scan-actions form {
+  margin: 0;
+}
+
+.secondary-button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+}

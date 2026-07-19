@@ -1,7 +1,16 @@
-# iSiTSCENE v0.4.1
+# iSiTSCENE v0.4.2
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## v0.4.2 scanner recovery and controls
+
+- Recovers stale running state after a Docker or application restart.
+- Adds separate Start Scan and Stop Scan controls.
+- Cancels the active SRRDB HTTP request when Stop Scan is pressed.
+- Uses explicit network timeouts so an unresponsive release cannot block forever.
+- Saves completed verification results when a scan is stopped.
+- Leaves unfinished releases pending for the next scan.
 
 ## v0.4.1 search availability fix
 

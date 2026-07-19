@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.2
+
+- Added stale scan recovery during application startup.
+- Added Start Scan and Stop Scan dashboard actions.
+- Added cooperative cancellation during inventory, HTTP requests, and delays.
+- Added explicit SRRDB connect/read/write/pool timeouts.
+- Added stopped and interrupted scan states.
+
+
 ## v0.4.1
 
 - Split scanning into inventory and verification phases.

@@ -10,10 +10,12 @@ from sqlalchemy import select
 from .config import MOVIES_PATH, SYSTEM_FOLDERS
 from .database import Release, ScanProgress, ScanRun, SessionLocal
 from .settings_service import get_settings
-from .srrdb import check_exact_release
+from .srrdb import ScanCancelled, check_exact_release
 
 logger = logging.getLogger(__name__)
+
 _scan_lock = threading.Lock()
+_stop_event = threading.Event()
 
 
 def normalize(name: str) -> str:
@@ -40,6 +42,66 @@ def _get_progress(db) -> ScanProgress:
         db.add(progress)
         db.flush()
     return progress
+
+
+def recover_interrupted_scan() -> None:
+    """Clear stale running state left behind by a container restart."""
+    db = SessionLocal()
+    try:
+        progress = _get_progress(db)
+
+        if progress.is_running:
+            completed_at = datetime.utcnow()
+            progress.is_running = False
+            progress.phase = "interrupted"
+            progress.current_release = None
+            progress.completed_at = completed_at
+            progress.message = (
+                "The previous scan was interrupted by an application restart. "
+                "Press Start Scan to resume pending verification."
+            )
+
+            run = db.scalars(
+                select(ScanRun)
+                .where(ScanRun.status == "running")
+                .order_by(ScanRun.started_at.desc())
+                .limit(1)
+            ).first()
+
+            if run is not None:
+                run.status = "interrupted"
+                run.completed_at = completed_at
+                run.error_message = (
+                    "Application restarted while the scan was running."
+                )
+
+            db.commit()
+    finally:
+        db.close()
+
+
+def request_stop() -> bool:
+    if not _scan_lock.locked():
+        return False
+
+    _stop_event.set()
+
+    db = SessionLocal()
+    try:
+        progress = _get_progress(db)
+        if progress.is_running:
+            progress.phase = "stopping"
+            progress.message = "Stopping and cancelling the active request..."
+            db.commit()
+    finally:
+        db.close()
+
+    return True
+
+
+def _check_stop() -> None:
+    if _stop_event.is_set():
+        raise ScanCancelled("Scan stopped by user.")
 
 
 def _start_scan() -> int:
@@ -69,13 +131,12 @@ def _start_scan() -> int:
         db.close()
 
 
-def _inventory_archive(run_id: int) -> int:
+def _inventory_archive(run_id: int) -> None:
     settings = get_settings()
+    _check_stop()
 
     if not MOVIES_PATH.exists() or not MOVIES_PATH.is_dir():
-        raise RuntimeError(
-            f"Movie path is unavailable: {MOVIES_PATH}"
-        )
+        raise RuntimeError(f"Movie path is unavailable: {MOVIES_PATH}")
 
     all_directories = sorted(
         entry.name
@@ -110,17 +171,15 @@ def _inventory_archive(run_id: int) -> int:
         db.commit()
 
         releases = db.scalars(select(Release)).all()
-        by_name = {
-            release.folder_name: release
-            for release in releases
-        }
+        by_name = {release.folder_name: release for release in releases}
 
         new_count = 0
         missing_count = 0
 
         for index, name in enumerate(folder_names, start=1):
-            release = by_name.get(name)
+            _check_stop()
 
+            release = by_name.get(name)
             if release is None:
                 release = Release(
                     folder_name=name,
@@ -138,12 +197,12 @@ def _inventory_archive(run_id: int) -> int:
 
             progress.processed_count = index
 
-            # Commit in batches so large archives become searchable
-            # progressively even before inventory fully completes.
             if index % 250 == 0:
                 db.commit()
 
         for release in releases:
+            _check_stop()
+
             if (
                 release.folder_name not in current
                 and release.is_present
@@ -162,11 +221,9 @@ def _inventory_archive(run_id: int) -> int:
         progress.total_count = len(folder_names)
         progress.message = (
             f"Inventory complete. All {len(folder_names)} folders "
-            "are now searchable."
+            "are searchable."
         )
-
         db.commit()
-        return len(folder_names)
     finally:
         db.close()
 
@@ -195,28 +252,28 @@ async def _verify_releases(run_id: int) -> None:
         progress.message = (
             "No releases require verification."
             if not to_check_ids
-            else (
-                "Inventory is searchable. Checking releases "
-                "against SRRDB..."
-            )
+            else "Inventory is searchable. Checking releases against SRRDB..."
         )
         db.commit()
 
         for index, release_id in enumerate(to_check_ids, start=1):
+            _check_stop()
+
             release = db.get(Release, release_id)
             if release is None:
                 continue
 
             progress.current_release = release.folder_name
-            progress.message = (
-                "Inventory is searchable. Checking SRRDB..."
-            )
+            progress.message = "Checking SRRDB..."
             db.commit()
 
             status, matched, error = await check_exact_release(
                 release.folder_name,
                 settings.srrdb_delay_seconds,
+                stop_requested=_stop_event.is_set,
             )
+
+            _check_stop()
 
             release.status = status
             release.matched_release = matched
@@ -267,6 +324,31 @@ async def _verify_releases(run_id: int) -> None:
         db.close()
 
 
+def _record_stopped(run_id: int) -> None:
+    db = SessionLocal()
+    try:
+        completed_at = datetime.utcnow()
+        run = db.get(ScanRun, run_id)
+        progress = _get_progress(db)
+
+        if run is not None:
+            run.completed_at = completed_at
+            run.status = "stopped"
+            run.error_message = None
+
+        progress.is_running = False
+        progress.phase = "stopped"
+        progress.current_release = None
+        progress.completed_at = completed_at
+        progress.message = (
+            "Scan stopped. Saved results remain available; unfinished "
+            "releases will resume on the next scan."
+        )
+        db.commit()
+    finally:
+        db.close()
+
+
 def _record_failure(run_id: int, exc: Exception) -> None:
     db = SessionLocal()
     try:
@@ -295,21 +377,23 @@ async def _scan_async() -> None:
         return
 
     run_id: int | None = None
+    _stop_event.clear()
 
     try:
         run_id = _start_scan()
-
-        # Phase 1: Build and commit the complete searchable inventory.
         _inventory_archive(run_id)
-
-        # Phase 2: Use a fresh database session for slow SRRDB checks.
         await _verify_releases(run_id)
 
+    except ScanCancelled:
+        logger.info("Scan stopped by user.")
+        if run_id is not None:
+            _record_stopped(run_id)
     except Exception as exc:
         logger.exception("Scan failed")
         if run_id is not None:
             _record_failure(run_id, exc)
     finally:
+        _stop_event.clear()
         _scan_lock.release()
 
 
