@@ -1,7 +1,15 @@
-# iSiTSCENE v0.4.2
+# iSiTSCENE v0.4.3
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## v0.4.3 Releases search and branding fix
+
+- Fixes the Releases page template variable mismatch.
+- Releases can now be displayed and searched as soon as they enter inventory.
+- Adds the official iSiTSCENE icon to the repository.
+- Adds a browser favicon and header icon.
+- Adds the GitHub-hosted icon URL to the Unraid template.
 
 ## v0.4.2 scanner recovery and controls
 

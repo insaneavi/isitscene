@@ -145,3 +145,21 @@ button:disabled {
   border: 1px solid var(--line);
   color: var(--text);
 }
+
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.brand > img {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.brand-text {
+  display: inline;
+}

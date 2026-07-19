@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.3
+
+- Fixed the Releases page context variable so results render correctly.
+- Restored release filtering and searching during active verification.
+- Added official application icon assets.
+- Added favicon and header branding.
+- Added an Unraid template Icon URL.
+
+
 ## v0.4.2
 
 - Added stale scan recovery during application startup.

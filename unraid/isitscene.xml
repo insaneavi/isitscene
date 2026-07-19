@@ -7,6 +7,7 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/insaneavi/isitscene/issues</Support>
   <Project>https://github.com/insaneavi/isitscene</Project>
+  <Icon>https://raw.githubusercontent.com/insaneavi/isitscene/main/assets/icon.png</Icon>
   <Overview>Checks top-level movie release folder names against SRRDB.</Overview>
   <Category>MediaApp:Other</Category>
   <Config Name="Web UI Port" Target="8080" Default="8080" Mode="tcp" Type="Port">8080</Config>

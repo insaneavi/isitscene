@@ -210,7 +210,7 @@ def releases(request: Request, q: str = "", status: str = ""):
         return templates.TemplateResponse(
             request=request,
             name="releases.html",
-            context={"releases": items, "q": q, "status": status},
+            context={"items": items, "q": q, "status": status},
         )
     finally:
         db.close()
