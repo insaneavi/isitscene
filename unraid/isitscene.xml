@@ -1,1 +1,19 @@
-<?xml version="1.0"?><Container version="2"><Name>iSiTSCENE</Name><Repository>ghcr.io/insaneavi/isitscene:latest</Repository><Network>bridge</Network><WebUI>http://[IP]:[PORT:8080]</WebUI><Privileged>false</Privileged><Support>https://github.com/insaneavi/isitscene/issues</Support><Project>https://github.com/insaneavi/isitscene</Project><Overview>Checks top-level movie release folder names against SRRDB.</Overview><Category>MediaApp:Other</Category><Config Name="Web UI Port" Target="8080" Default="8080" Mode="tcp" Type="Port">8080</Config><Config Name="Movies" Target="/movies" Default="/mnt/user/movies" Mode="ro" Type="Path">/mnt/user/movies</Config><Config Name="Appdata" Target="/config" Default="/mnt/user/appdata/isitscene" Mode="rw" Type="Path">/mnt/user/appdata/isitscene</Config><Config Name="Timezone" Target="TZ" Default="America/New_York" Type="Variable">America/New_York</Config><Config Name="Scan Interval" Target="SCAN_INTERVAL_HOURS" Default="24" Type="Variable">24</Config><Config Name="SRRDB Delay" Target="SRRDB_DELAY_SECONDS" Default="1.5" Type="Variable">1.5</Config></Container>
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>iSiTSCENE</Name>
+  <Repository>ghcr.io/insaneavi/isitscene:latest</Repository>
+  <Network>bridge</Network>
+  <WebUI>http://[IP]:[PORT:8080]</WebUI>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/insaneavi/isitscene/issues</Support>
+  <Project>https://github.com/insaneavi/isitscene</Project>
+  <Overview>Checks top-level movie release folder names against SRRDB.</Overview>
+  <Category>MediaApp:Other</Category>
+  <Config Name="Web UI Port" Target="8080" Default="8080" Mode="tcp" Type="Port">8080</Config>
+  <Config Name="Movies" Target="/movies" Default="/mnt/user/movies" Mode="ro" Type="Path">/mnt/user/movies</Config>
+  <Config Name="Appdata" Target="/config" Default="/mnt/user/appdata/isitscene" Mode="rw" Type="Path">/mnt/user/appdata/isitscene</Config>
+  <Config Name="Timezone" Target="TZ" Default="America/New_York" Type="Variable">America/New_York</Config>
+  <Config Name="Scan Interval" Target="SCAN_INTERVAL_HOURS" Default="24" Type="Variable">24</Config>
+  <Config Name="SRRDB Delay" Target="SRRDB_DELAY_SECONDS" Default="1.5" Type="Variable">1.5</Config>
+  <Config Name="Skip Hidden/System Folders" Target="SKIP_HIDDEN_SYSTEM_FOLDERS" Default="true" Description="When true, skips dot-prefixed and common operating-system folders." Type="Variable" Display="always" Required="true" Mask="false">true</Config>
+</Container>

@@ -9,7 +9,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-
 RUN mkdir -p /config /movies
 
 EXPOSE 8080

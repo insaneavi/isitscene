@@ -1,40 +1,36 @@
-# iSiTSCENE
+# iSiTSCENE v0.2
 
-A small self-hosted application that inventories immediate folders under `/movies` and checks whether each exact folder name is registered in SRRDB.
+This version separates configuration, database, scanning, SRRDB access, and web routes into individual modules.
 
-## Unraid paths
+## Hidden/system folder toggle
 
-- `/mnt/user/movies` → `/movies` (read-only)
-- `/mnt/user/appdata/isitscene` → `/config` (read/write)
+Set the Unraid environment variable:
 
-## Push this repository
+```text
+SKIP_HIDDEN_SYSTEM_FOLDERS=true
+```
 
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/insaneavi/isitscene.git
+With `true`, the scanner skips all dot-prefixed folders and common system folders such as `.Recycle.Bin`, `$RECYCLE.BIN`, `System Volume Information`, `@eaDir`, and `lost+found`.
+
+Set it to `false` to include every immediate subfolder in the scan.
+
+## Upgrade from the first build
+
+Extract the ZIP and copy all contents into your existing local repository folder. Allow Windows to replace existing files. The ZIP contains no `.git` directory, so your Git history remains intact.
+
+Then run:
+
+```powershell
+git status
 git add .
-git commit -m "Initial iSiTSCENE MVP"
-git push -u origin main
+git commit -m "Refactor app and add hidden folder toggle"
+git push
 ```
 
-GitHub Actions publishes `ghcr.io/insaneavi/isitscene:latest`.
+After GitHub Actions finishes, update the container in Unraid and add:
 
-## Run on Unraid
-
-```bash
-docker run -d \
-  --name isitscene \
-  --restart unless-stopped \
-  -p 8080:8080 \
-  -e TZ=America/New_York \
-  -e SCAN_INTERVAL_HOURS=24 \
-  -e SRRDB_DELAY_SECONDS=1.5 \
-  -v /mnt/user/movies:/movies:ro \
-  -v /mnt/user/appdata/isitscene:/config \
-  ghcr.io/insaneavi/isitscene:latest
+```text
+Name: Skip Hidden/System Folders
+Key: SKIP_HIDDEN_SYSTEM_FOLDERS
+Value: true
 ```
-
-Open `http://192.168.49.5:8080` and click **Scan Now**.
-
-The application does not inspect, rename, delete, or alter movie files. It is not affiliated with SRRDB.
