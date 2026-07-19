@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.1
+
+- Split scanning into inventory and verification phases.
+- Made discovered folders searchable before SRRDB verification completes.
+- Added batch commits during inventory for large archives.
+- Added clearer inventory and verification progress messages.
+
+
 ## v0.4
 
 - Added persistent scan progress tracking.

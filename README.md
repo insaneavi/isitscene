@@ -1,7 +1,15 @@
-# iSiTSCENE v0.4
+# iSiTSCENE v0.4.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## v0.4.1 search availability fix
+
+- Inventory and SRRDB verification now run as separate phases.
+- The inventory is committed before slow verification begins.
+- Releases become searchable during an active scan.
+- Large inventories are committed in batches of 250 folders.
+- Scan progress clearly identifies inventory and verification phases.
 
 ## New in v0.4
 

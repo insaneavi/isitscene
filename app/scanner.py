@@ -42,73 +42,83 @@ def _get_progress(db) -> ScanProgress:
     return progress
 
 
-def _reset_progress(db, *, message: str | None = None) -> ScanProgress:
-    progress = _get_progress(db)
-    progress.is_running = True
-    progress.phase = "scanning"
-    progress.current_release = None
-    progress.processed_count = 0
-    progress.total_count = 0
-    progress.verified_count = 0
-    progress.not_found_count = 0
-    progress.api_error_count = 0
-    progress.skipped_count = 0
-    progress.started_at = datetime.utcnow()
-    progress.completed_at = None
-    progress.message = message
-    db.commit()
-    return progress
-
-
-async def _scan_async() -> None:
-    if not _scan_lock.acquire(blocking=False):
-        logger.info("A scan is already running; request ignored.")
-        return
-
+def _start_scan() -> int:
     db = SessionLocal()
-    run = ScanRun()
-    db.add(run)
-    db.commit()
-
-    progress = _reset_progress(db, message="Reading movie folders...")
-
     try:
-        if not MOVIES_PATH.exists() or not MOVIES_PATH.is_dir():
-            raise RuntimeError(f"Movie path is unavailable: {MOVIES_PATH}")
+        run = ScanRun()
+        db.add(run)
+        db.flush()
 
-        settings = get_settings()
+        progress = _get_progress(db)
+        progress.is_running = True
+        progress.phase = "inventory"
+        progress.current_release = None
+        progress.processed_count = 0
+        progress.total_count = 0
+        progress.verified_count = 0
+        progress.not_found_count = 0
+        progress.api_error_count = 0
+        progress.skipped_count = 0
+        progress.started_at = datetime.utcnow()
+        progress.completed_at = None
+        progress.message = "Reading movie folders..."
 
-        all_directories = sorted(
-            entry.name
-            for entry in MOVIES_PATH.iterdir()
-            if entry.is_dir()
+        db.commit()
+        return run.id
+    finally:
+        db.close()
+
+
+def _inventory_archive(run_id: int) -> int:
+    settings = get_settings()
+
+    if not MOVIES_PATH.exists() or not MOVIES_PATH.is_dir():
+        raise RuntimeError(
+            f"Movie path is unavailable: {MOVIES_PATH}"
         )
 
-        folder_names = [
-            name
-            for name in all_directories
-            if should_scan_folder(
-                name,
-                settings.skip_hidden_system_folders,
-            )
-        ]
+    all_directories = sorted(
+        entry.name
+        for entry in MOVIES_PATH.iterdir()
+        if entry.is_dir()
+    )
 
-        skipped_count = len(all_directories) - len(folder_names)
-        run.skipped_folders = skipped_count
+    folder_names = [
+        name
+        for name in all_directories
+        if should_scan_folder(
+            name,
+            settings.skip_hidden_system_folders,
+        )
+    ]
+
+    skipped_count = len(all_directories) - len(folder_names)
+    now = datetime.utcnow()
+    current = set(folder_names)
+
+    db = SessionLocal()
+    try:
+        run = db.get(ScanRun, run_id)
+        progress = _get_progress(db)
+
+        progress.phase = "inventory"
+        progress.total_count = len(folder_names)
+        progress.processed_count = 0
         progress.skipped_count = skipped_count
-        progress.message = "Updating archive inventory..."
+        progress.message = "Adding folders to the searchable inventory..."
+        run.skipped_folders = skipped_count
         db.commit()
 
-        now = datetime.utcnow()
-        current = set(folder_names)
-
         releases = db.scalars(select(Release)).all()
-        by_name = {release.folder_name: release for release in releases}
+        by_name = {
+            release.folder_name: release
+            for release in releases
+        }
 
         new_count = 0
         missing_count = 0
 
-        for name in folder_names:
+        for index, name in enumerate(folder_names, start=1):
             release = by_name.get(name)
 
             if release is None:
@@ -121,22 +131,55 @@ async def _scan_async() -> None:
                     status="pending",
                 )
                 db.add(release)
-                db.flush()
                 new_count += 1
             else:
                 release.last_seen = now
                 release.is_present = True
 
+            progress.processed_count = index
+
+            # Commit in batches so large archives become searchable
+            # progressively even before inventory fully completes.
+            if index % 250 == 0:
+                db.commit()
+
         for release in releases:
-            if release.folder_name not in current and release.is_present:
+            if (
+                release.folder_name not in current
+                and release.is_present
+            ):
                 release.is_present = False
                 release.status = "missing"
                 missing_count += 1
 
-        db.commit()
+        run.folders_found = len(folder_names)
+        run.new_folders = new_count
+        run.missing_folders = missing_count
 
-        to_check = db.scalars(
-            select(Release)
+        progress.phase = "inventory_complete"
+        progress.current_release = None
+        progress.processed_count = len(folder_names)
+        progress.total_count = len(folder_names)
+        progress.message = (
+            f"Inventory complete. All {len(folder_names)} folders "
+            "are now searchable."
+        )
+
+        db.commit()
+        return len(folder_names)
+    finally:
+        db.close()
+
+
+async def _verify_releases(run_id: int) -> None:
+    settings = get_settings()
+
+    db = SessionLocal()
+    try:
+        progress = _get_progress(db)
+
+        to_check_ids = db.scalars(
+            select(Release.id)
             .where(
                 Release.is_present.is_(True),
                 Release.ignored.is_(False),
@@ -146,17 +189,28 @@ async def _scan_async() -> None:
         ).all()
 
         progress.phase = "verifying"
-        progress.total_count = len(to_check)
+        progress.processed_count = 0
+        progress.total_count = len(to_check_ids)
+        progress.current_release = None
         progress.message = (
             "No releases require verification."
-            if not to_check
-            else "Checking releases against SRRDB..."
+            if not to_check_ids
+            else (
+                "Inventory is searchable. Checking releases "
+                "against SRRDB..."
+            )
         )
         db.commit()
 
-        for index, release in enumerate(to_check, start=1):
+        for index, release_id in enumerate(to_check_ids, start=1):
+            release = db.get(Release, release_id)
+            if release is None:
+                continue
+
             progress.current_release = release.folder_name
-            progress.message = "Checking SRRDB..."
+            progress.message = (
+                "Inventory is searchable. Checking SRRDB..."
+            )
             db.commit()
 
             status, matched, error = await check_exact_release(
@@ -187,12 +241,9 @@ async def _scan_async() -> None:
         ).all()
 
         completed_at = datetime.utcnow()
-
+        run = db.get(ScanRun, run_id)
         run.completed_at = completed_at
         run.status = "completed"
-        run.folders_found = len(folder_names)
-        run.new_folders = new_count
-        run.missing_folders = missing_count
         run.exact_matches = sum(
             release.status == "verified"
             for release in present_releases
@@ -212,14 +263,21 @@ async def _scan_async() -> None:
         progress.completed_at = completed_at
         progress.message = "Scan completed."
         db.commit()
+    finally:
+        db.close()
 
-    except Exception as exc:
-        logger.exception("Scan failed")
+
+def _record_failure(run_id: int, exc: Exception) -> None:
+    db = SessionLocal()
+    try:
         completed_at = datetime.utcnow()
+        run = db.get(ScanRun, run_id)
+        progress = _get_progress(db)
 
-        run.completed_at = completed_at
-        run.status = "failed"
-        run.error_message = str(exc)
+        if run is not None:
+            run.completed_at = completed_at
+            run.status = "failed"
+            run.error_message = str(exc)
 
         progress.is_running = False
         progress.phase = "failed"
@@ -229,6 +287,29 @@ async def _scan_async() -> None:
         db.commit()
     finally:
         db.close()
+
+
+async def _scan_async() -> None:
+    if not _scan_lock.acquire(blocking=False):
+        logger.info("A scan is already running; request ignored.")
+        return
+
+    run_id: int | None = None
+
+    try:
+        run_id = _start_scan()
+
+        # Phase 1: Build and commit the complete searchable inventory.
+        _inventory_archive(run_id)
+
+        # Phase 2: Use a fresh database session for slow SRRDB checks.
+        await _verify_releases(run_id)
+
+    except Exception as exc:
+        logger.exception("Scan failed")
+        if run_id is not None:
+            _record_failure(run_id, exc)
+    finally:
         _scan_lock.release()
 
 
