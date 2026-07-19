@@ -5,13 +5,13 @@ from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import BackgroundTasks, FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 
 from .config import APP_NAME
-from .database import Release, ScanRun, SessionLocal, init_db
+from .database import Release, ScanProgress, ScanRun, SessionLocal, init_db
 from .scanner import run_scan
 from .settings_service import get_settings, save_settings
 
@@ -114,6 +114,15 @@ def dashboard(request: Request):
             select(Release).order_by(Release.first_seen.desc()).limit(10)
         ).all()
 
+        recent_results = db.scalars(
+            select(Release)
+            .where(Release.last_checked.is_not(None))
+            .order_by(Release.last_checked.desc())
+            .limit(20)
+        ).all()
+
+        progress = db.get(ScanProgress, 1)
+
         return templates.TemplateResponse(
             request=request,
             name="dashboard.html",
@@ -121,8 +130,61 @@ def dashboard(request: Request):
                 "counts": counts,
                 "latest_scan": latest_scan,
                 "recent": recent,
+                "recent_results": recent_results,
+                "progress": progress,
                 "settings": get_settings(),
             },
+        )
+    finally:
+        db.close()
+
+
+@app.get("/api/scan-status")
+def scan_status():
+    db = SessionLocal()
+    try:
+        progress = db.get(ScanProgress, 1)
+        if progress is None:
+            return JSONResponse(
+                {
+                    "is_running": False,
+                    "phase": "idle",
+                    "current_release": None,
+                    "processed_count": 0,
+                    "total_count": 0,
+                    "verified_count": 0,
+                    "not_found_count": 0,
+                    "api_error_count": 0,
+                    "skipped_count": 0,
+                    "message": "No scan has run yet.",
+                    "started_at": None,
+                    "completed_at": None,
+                }
+            )
+
+        return JSONResponse(
+            {
+                "is_running": progress.is_running,
+                "phase": progress.phase,
+                "current_release": progress.current_release,
+                "processed_count": progress.processed_count,
+                "total_count": progress.total_count,
+                "verified_count": progress.verified_count,
+                "not_found_count": progress.not_found_count,
+                "api_error_count": progress.api_error_count,
+                "skipped_count": progress.skipped_count,
+                "message": progress.message,
+                "started_at": (
+                    progress.started_at.isoformat()
+                    if progress.started_at
+                    else None
+                ),
+                "completed_at": (
+                    progress.completed_at.isoformat()
+                    if progress.completed_at
+                    else None
+                ),
+            }
         )
     finally:
         db.close()

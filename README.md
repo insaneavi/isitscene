@@ -1,7 +1,17 @@
-# iSiTSCENE v0.3.1
+# iSiTSCENE v0.4
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.4
+
+- Live scan progress on the dashboard
+- Current release being checked
+- Processed and total counters
+- Live verified, not-found, API-error, and skipped counts
+- Automatic progress refresh every two seconds
+- Automatic dashboard refresh when a scan completes
+- Recent verification-results table
 
 ## v0.3.1 bug fix
 

@@ -47,3 +47,84 @@
 .settings-panel button {
   margin-top: 20px;
 }
+
+
+.progress-panel {
+  border-color: #31516f;
+}
+
+.progress-idle {
+  border-color: var(--line);
+}
+
+.progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.progress-heading p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.progress-heading > strong {
+  font-size: 22px;
+  white-space: nowrap;
+}
+
+.progress-track {
+  height: 12px;
+  margin: 18px 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #0a1017;
+  border: 1px solid var(--line);
+}
+
+.progress-bar {
+  height: 100%;
+  min-width: 0;
+  background: var(--accent);
+  transition: width 0.35s ease;
+}
+
+.current-release {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  overflow-wrap: anywhere;
+}
+
+.current-release span {
+  color: var(--muted);
+}
+
+.current-release code {
+  color: var(--text);
+}
+
+.progress-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.progress-stats span {
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #0d141c;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.progress-stats strong {
+  color: var(--text);
+  margin-left: 4px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}

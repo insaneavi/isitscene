@@ -1,1 +1,255 @@
-{% extends 'base.html' %}{% block content %}<section class="heading"><div><h1>Archive Health</h1><p>Exact folder-name validation against SRRDB.</p></div><form method="post" action="/scan"><button>Scan Now</button></form></section><section class="cards">{% for k,v in counts.items() %}<div class="card {{ k }}"><strong>{{ v }}</strong><span>{{ k.replace('_',' ') }}</span></div>{% endfor %}</section><section class="panel"><h2>Latest Scan</h2>{% if latest %}<p><b>{{ latest.status }}</b> · {{ latest.started_at.strftime('%Y-%m-%d %H:%M') }}</p><p>{{ latest.folders_found }} folders · {{ latest.new_folders }} new · {{ latest.missing_folders }} missing</p>{% if latest.error_message %}<p class="error">{{ latest.error_message }}</p>{% endif %}{% else %}<p>No scan has run yet.</p>{% endif %}</section>{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<section class="heading">
+  <div>
+    <h1>Archive Health</h1>
+    <p>Exact folder-name validation against SRRDB.</p>
+  </div>
+  <form method="post" action="/scan">
+    <button id="scan-button">Scan Now</button>
+  </form>
+</section>
+
+<section class="notice">
+  Hidden/system folders:
+  <strong>
+    {{ "Skipped" if settings.skip_hidden_system_folders else "Included" }}
+  </strong>
+</section>
+
+<section
+  id="scan-progress"
+  class="panel progress-panel {% if not progress or not progress.is_running %}progress-idle{% endif %}"
+>
+  <div class="progress-heading">
+    <div>
+      <h2 id="progress-title">
+        {% if progress and progress.is_running %}
+          Scan in progress
+        {% elif progress and progress.phase == "failed" %}
+          Last scan failed
+        {% else %}
+          Scan Status
+        {% endif %}
+      </h2>
+      <p id="progress-message">
+        {{ progress.message if progress and progress.message else "Ready to scan." }}
+      </p>
+    </div>
+    <strong id="progress-count">
+      {{ progress.processed_count if progress else 0 }}
+      /
+      {{ progress.total_count if progress else 0 }}
+    </strong>
+  </div>
+
+  <div class="progress-track">
+    <div
+      id="progress-bar"
+      class="progress-bar"
+      style="width:
+        {% if progress and progress.total_count %}
+          {{ (progress.processed_count / progress.total_count * 100) | round(1) }}%
+        {% else %}
+          0%
+        {% endif %}
+      "
+    ></div>
+  </div>
+
+  <p class="current-release">
+    <span>Current release:</span>
+    <code id="current-release">
+      {{ progress.current_release if progress and progress.current_release else "—" }}
+    </code>
+  </p>
+
+  <div class="progress-stats">
+    <span>Verified <strong id="live-verified">{{ progress.verified_count if progress else 0 }}</strong></span>
+    <span>Not Found <strong id="live-not-found">{{ progress.not_found_count if progress else 0 }}</strong></span>
+    <span>API Errors <strong id="live-api-errors">{{ progress.api_error_count if progress else 0 }}</strong></span>
+    <span>Skipped <strong id="live-skipped">{{ progress.skipped_count if progress else 0 }}</strong></span>
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card">
+    <strong>{{ counts.total }}</strong>
+    <span>Total</span>
+  </div>
+  <div class="card good">
+    <strong>{{ counts.verified }}</strong>
+    <span>Verified</span>
+  </div>
+  <div class="card warn">
+    <strong>{{ counts.not_found }}</strong>
+    <span>Not Found</span>
+  </div>
+  <div class="card">
+    <strong>{{ counts.pending }}</strong>
+    <span>Pending</span>
+  </div>
+  <div class="card bad">
+    <strong>{{ counts.api_error }}</strong>
+    <span>API Errors</span>
+  </div>
+  <div class="card">
+    <strong>{{ counts.missing }}</strong>
+    <span>Missing</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Latest Scan</h2>
+
+  {% if latest_scan %}
+    <p>
+      <span class="badge {{ latest_scan.status }}">
+        {{ latest_scan.status }}
+      </span>
+      Started {{ latest_scan.started_at.strftime("%Y-%m-%d %H:%M") }}
+    </p>
+    <p>
+      {{ latest_scan.folders_found }} scanned ·
+      {{ latest_scan.skipped_folders }} skipped ·
+      {{ latest_scan.new_folders }} new ·
+      {{ latest_scan.missing_folders }} missing
+    </p>
+
+    {% if latest_scan.error_message %}
+      <p class="error">{{ latest_scan.error_message }}</p>
+    {% endif %}
+  {% else %}
+    <p>No scan has run yet.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Recent Verification Results</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Release</th>
+        <th>Status</th>
+        <th>Matched Release</th>
+        <th>Checked</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for release in recent_results %}
+        <tr>
+          <td>{{ release.folder_name }}</td>
+          <td>
+            <span class="badge {{ release.status }}">
+              {{ release.status.replace("_", " ") }}
+            </span>
+          </td>
+          <td>{{ release.matched_release or "—" }}</td>
+          <td>
+            {{ release.last_checked.strftime("%Y-%m-%d %H:%M:%S") }}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4">No verification results yet.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="panel">
+  <h2>Recently Seen</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Release</th>
+        <th>Status</th>
+        <th>First Seen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for release in recent %}
+        <tr>
+          <td>{{ release.folder_name }}</td>
+          <td>
+            <span class="badge {{ release.status }}">
+              {{ release.status.replace("_", " ") }}
+            </span>
+          </td>
+          <td>{{ release.first_seen.strftime("%Y-%m-%d") }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="3">
+            Run the first scan to populate the archive.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<script>
+(() => {
+  const panel = document.getElementById("scan-progress");
+  const title = document.getElementById("progress-title");
+  const message = document.getElementById("progress-message");
+  const count = document.getElementById("progress-count");
+  const bar = document.getElementById("progress-bar");
+  const current = document.getElementById("current-release");
+  const verified = document.getElementById("live-verified");
+  const notFound = document.getElementById("live-not-found");
+  const apiErrors = document.getElementById("live-api-errors");
+  const skipped = document.getElementById("live-skipped");
+  const scanButton = document.getElementById("scan-button");
+
+  let wasRunning = {{ "true" if progress and progress.is_running else "false" }};
+
+  async function refreshProgress() {
+    try {
+      const response = await fetch("/api/scan-status", {
+        cache: "no-store"
+      });
+      if (!response.ok) return;
+
+      const data = await response.json();
+      const total = data.total_count || 0;
+      const processed = data.processed_count || 0;
+      const percent = total > 0 ? (processed / total) * 100 : 0;
+
+      title.textContent = data.is_running
+        ? "Scan in progress"
+        : data.phase === "failed"
+          ? "Last scan failed"
+          : "Scan Status";
+
+      message.textContent = data.message || "Ready to scan.";
+      count.textContent = `${processed} / ${total}`;
+      bar.style.width = `${Math.min(percent, 100)}%`;
+      current.textContent = data.current_release || "—";
+      verified.textContent = data.verified_count || 0;
+      notFound.textContent = data.not_found_count || 0;
+      apiErrors.textContent = data.api_error_count || 0;
+      skipped.textContent = data.skipped_count || 0;
+      scanButton.disabled = data.is_running;
+      scanButton.textContent = data.is_running ? "Scanning..." : "Scan Now";
+
+      panel.classList.toggle("progress-idle", !data.is_running);
+
+      if (wasRunning && !data.is_running) {
+        window.setTimeout(() => window.location.reload(), 700);
+      }
+
+      wasRunning = data.is_running;
+    } catch (error) {
+      console.debug("Unable to refresh scan progress", error);
+    }
+  }
+
+  refreshProgress();
+  window.setInterval(refreshProgress, 2000);
+})();
+</script>
+{% endblock %}

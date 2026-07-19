@@ -54,6 +54,24 @@ class ScanRun(Base):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class ScanProgress(Base):
+    __tablename__ = "scan_progress"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    is_running: Mapped[bool] = mapped_column(Boolean, default=False)
+    phase: Mapped[str] = mapped_column(String, default="idle")
+    current_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    processed_count: Mapped[int] = mapped_column(Integer, default=0)
+    total_count: Mapped[int] = mapped_column(Integer, default=0)
+    verified_count: Mapped[int] = mapped_column(Integer, default=0)
+    not_found_count: Mapped[int] = mapped_column(Integer, default=0)
+    api_error_count: Mapped[int] = mapped_column(Integer, default=0)
+    skipped_count: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class AppSetting(Base):
     __tablename__ = "settings"
 
@@ -79,3 +97,11 @@ def _migrate_scan_runs() -> None:
 def init_db() -> None:
     Base.metadata.create_all(engine)
     _migrate_scan_runs()
+
+    db = SessionLocal()
+    try:
+        if db.get(ScanProgress, 1) is None:
+            db.add(ScanProgress(id=1))
+            db.commit()
+    finally:
+        db.close()
