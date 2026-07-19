@@ -8,12 +8,16 @@ from datetime import datetime
 from sqlalchemy import select
 
 from .config import MOVIES_PATH, SYSTEM_FOLDERS
-from .settings_service import get_settings
 from .database import Release, ScanRun, SessionLocal
+from .settings_service import get_settings
 from .srrdb import check_exact_release
 
 logger = logging.getLogger(__name__)
 _scan_lock = threading.Lock()
+
+
+def normalize(name: str) -> str:
+    return name.strip().casefold()
 
 
 def should_scan_folder(
@@ -40,47 +44,75 @@ async def _scan_async() -> None:
     db.commit()
 
     try:
-        if not MOVIES_PATH.is_dir():
-            raise RuntimeError(f"Movie path unavailable: {MOVIES_PATH}")
+        if not MOVIES_PATH.exists() or not MOVIES_PATH.is_dir():
+            raise RuntimeError(
+                f"Movie path is unavailable: {MOVIES_PATH}"
+            )
 
-        names = sorted(
+        settings = get_settings()
+
+        all_directories = sorted(
             entry.name
             for entry in MOVIES_PATH.iterdir()
-            if entry.is_dir() and should_scan_folder(entry.name)
+            if entry.is_dir()
+        )
+
+        folder_names = [
+            name
+            for name in all_directories
+            if should_scan_folder(
+                name,
+                settings.skip_hidden_system_folders,
+            )
+        ]
+
+        run.skipped_folders = (
+            len(all_directories) - len(folder_names)
         )
 
         now = datetime.utcnow()
-        current = set(names)
-        existing = db.scalars(select(Release)).all()
-        by_name = {release.folder_name: release for release in existing}
+        current = set(folder_names)
+
+        releases = db.scalars(select(Release)).all()
+        by_name = {
+            release.folder_name: release
+            for release in releases
+        }
+
         new_count = 0
         missing_count = 0
 
-        for name in names:
+        for name in folder_names:
             release = by_name.get(name)
+
             if release is None:
                 release = Release(
                     folder_name=name,
+                    normalized_name=normalize(name),
                     first_seen=now,
                     last_seen=now,
                     is_present=True,
                     status="pending",
                 )
                 db.add(release)
+                db.flush()
                 new_count += 1
             else:
                 release.last_seen = now
                 release.is_present = True
 
-        for release in existing:
-            if release.folder_name not in current and release.is_present:
+        for release in releases:
+            if (
+                release.folder_name not in current
+                and release.is_present
+            ):
                 release.is_present = False
                 release.status = "missing"
                 missing_count += 1
 
         db.commit()
 
-        pending = db.scalars(
+        to_check = db.scalars(
             select(Release)
             .where(
                 Release.is_present.is_(True),
@@ -90,16 +122,18 @@ async def _scan_async() -> None:
             .order_by(Release.folder_name)
         ).all()
 
-        for release in pending:
-            (
-                release.status,
-                release.matched_release,
-                release.error_message,
-            ) = await check_exact_release(release.folder_name)
+        for release in to_check:
+            status, matched, error = await check_exact_release(
+                release.folder_name,
+                settings.srrdb_delay_seconds,
+            )
+            release.status = status
+            release.matched_release = matched
+            release.error_message = error
             release.last_checked = datetime.utcnow()
             db.commit()
 
-        present = db.scalars(
+        present_releases = db.scalars(
             select(Release).where(
                 Release.is_present.is_(True),
                 Release.ignored.is_(False),
@@ -108,17 +142,20 @@ async def _scan_async() -> None:
 
         run.completed_at = datetime.utcnow()
         run.status = "completed"
-        run.folders_found = len(names)
+        run.folders_found = len(folder_names)
         run.new_folders = new_count
         run.missing_folders = missing_count
         run.exact_matches = sum(
-            release.status == "verified" for release in present
+            release.status == "verified"
+            for release in present_releases
         )
         run.not_found = sum(
-            release.status == "not_found" for release in present
+            release.status == "not_found"
+            for release in present_releases
         )
         run.api_errors = sum(
-            release.status == "api_error" for release in present
+            release.status == "api_error"
+            for release in present_releases
         )
         db.commit()
 

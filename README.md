@@ -1,7 +1,12 @@
-# iSiTSCENE v0.3
+# iSiTSCENE v0.3.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## v0.3.1 bug fix
+
+- Fixes the scanner crash caused by calling `should_scan_folder()` without the current hidden/system-folder setting.
+- Preserves all v0.3 web settings and Docker behavior.
 
 ## New in v0.3
 
