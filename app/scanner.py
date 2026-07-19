@@ -118,6 +118,7 @@ def _start_scan() -> int:
         progress.processed_count = 0
         progress.total_count = 0
         progress.verified_count = 0
+        progress.unverified_count = 0
         progress.not_found_count = 0
         progress.api_error_count = 0
         progress.skipped_count = 0
@@ -187,6 +188,7 @@ def _inventory_archive(run_id: int) -> None:
                     first_seen=now,
                     last_seen=now,
                     is_present=True,
+                    verification_status="pending",
                     status="pending",
                 )
                 db.add(release)
@@ -208,7 +210,6 @@ def _inventory_archive(run_id: int) -> None:
                 and release.is_present
             ):
                 release.is_present = False
-                release.status = "missing"
                 missing_count += 1
 
         run.folders_found = len(folder_names)
@@ -240,7 +241,7 @@ async def _verify_releases(run_id: int) -> None:
             .where(
                 Release.is_present.is_(True),
                 Release.ignored.is_(False),
-                Release.status.in_(["pending", "api_error"]),
+                Release.verification_status.in_(["pending", "unverified"]),
             )
             .order_by(Release.folder_name)
         ).all()
@@ -275,6 +276,7 @@ async def _verify_releases(run_id: int) -> None:
 
             _check_stop()
 
+            release.verification_status = status
             release.status = status
             release.matched_release = matched
             release.error_message = error
@@ -283,10 +285,8 @@ async def _verify_releases(run_id: int) -> None:
             progress.processed_count = index
             if status == "verified":
                 progress.verified_count += 1
-            elif status == "not_found":
-                progress.not_found_count += 1
-            elif status == "api_error":
-                progress.api_error_count += 1
+            elif status == "unverified":
+                progress.unverified_count += 1
 
             db.commit()
 
@@ -302,17 +302,15 @@ async def _verify_releases(run_id: int) -> None:
         run.completed_at = completed_at
         run.status = "completed"
         run.exact_matches = sum(
-            release.status == "verified"
+            release.verification_status == "verified"
             for release in present_releases
         )
-        run.not_found = sum(
-            release.status == "not_found"
+        run.unverified = sum(
+            release.verification_status == "unverified"
             for release in present_releases
         )
-        run.api_errors = sum(
-            release.status == "api_error"
-            for release in present_releases
-        )
+        run.not_found = 0
+        run.api_errors = 0
 
         progress.is_running = False
         progress.phase = "complete"

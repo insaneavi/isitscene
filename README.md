@@ -1,7 +1,17 @@
-# iSiTSCENE v0.4.3
+# iSiTSCENE v0.5
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.5
+
+- Separates inventory state from verification state.
+- Inventory is shown as Present or Removed.
+- Verification is shown as Pending, Verified, or Unverified.
+- Not Found, API Error, timeout, and malformed SRRDB responses display as Unverified.
+- The detailed technical reason remains visible beneath the release name.
+- Releases can be filtered independently by inventory and verification state.
+- Existing v0.4 databases are upgraded automatically.
 
 ## v0.4.3 Releases search and branding fix
 

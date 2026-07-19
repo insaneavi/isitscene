@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5
+
+- Split inventory and verification state.
+- Added Present and Removed inventory labels.
+- Added Pending, Verified, and Unverified verification labels.
+- Consolidated not-found and API failures under Unverified.
+- Preserved detailed SRRDB failure reasons.
+- Added independent inventory and verification filters.
+- Added automatic database migration from v0.4.x.
+
+
 ## v0.4.3
 
 - Fixed the Releases page context variable so results render correctly.

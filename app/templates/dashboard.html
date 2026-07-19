@@ -72,8 +72,7 @@
 
   <div class="progress-stats">
     <span>Verified <strong id="live-verified">{{ progress.verified_count if progress else 0 }}</strong></span>
-    <span>Not Found <strong id="live-not-found">{{ progress.not_found_count if progress else 0 }}</strong></span>
-    <span>API Errors <strong id="live-api-errors">{{ progress.api_error_count if progress else 0 }}</strong></span>
+    <span>Unverified <strong id="live-unverified">{{ progress.unverified_count if progress else 0 }}</strong></span>
     <span>Skipped <strong id="live-skipped">{{ progress.skipped_count if progress else 0 }}</strong></span>
   </div>
 </section>
@@ -88,17 +87,14 @@
     <span>Verified</span>
   </div>
   <div class="card warn">
-    <strong>{{ counts.not_found }}</strong>
-    <span>Not Found</span>
+    <strong>{{ counts.unverified }}</strong>
+    <span>Unverified</span>
   </div>
   <div class="card">
     <strong>{{ counts.pending }}</strong>
     <span>Pending</span>
   </div>
-  <div class="card bad">
-    <strong>{{ counts.api_error }}</strong>
-    <span>API Errors</span>
-  </div>
+
   <div class="card">
     <strong>{{ counts.missing }}</strong>
     <span>Missing</span>
@@ -146,8 +142,8 @@
         <tr>
           <td>{{ release.folder_name }}</td>
           <td>
-            <span class="badge {{ release.status }}">
-              {{ release.status.replace("_", " ") }}
+            <span class="badge {{ release.verification_status }}">
+              {{ release.verification_status|capitalize }}
             </span>
           </td>
           <td>{{ release.matched_release or "—" }}</td>
@@ -179,8 +175,8 @@
         <tr>
           <td>{{ release.folder_name }}</td>
           <td>
-            <span class="badge {{ release.status }}">
-              {{ release.status.replace("_", " ") }}
+            <span class="badge {{ release.verification_status }}">
+              {{ release.verification_status|capitalize }}
             </span>
           </td>
           <td>{{ release.first_seen.strftime("%Y-%m-%d") }}</td>
@@ -205,8 +201,7 @@
   const bar = document.getElementById("progress-bar");
   const current = document.getElementById("current-release");
   const verified = document.getElementById("live-verified");
-  const notFound = document.getElementById("live-not-found");
-  const apiErrors = document.getElementById("live-api-errors");
+  const unverified = document.getElementById("live-unverified");
   const skipped = document.getElementById("live-skipped");
   const startButton = document.getElementById("start-button");
   const stopButton = document.getElementById("stop-button");
@@ -236,8 +231,7 @@
       bar.style.width = `${Math.min(percent, 100)}%`;
       current.textContent = data.current_release || "—";
       verified.textContent = data.verified_count || 0;
-      notFound.textContent = data.not_found_count || 0;
-      apiErrors.textContent = data.api_error_count || 0;
+      unverified.textContent = data.unverified_count || 0;
       skipped.textContent = data.skipped_count || 0;
       const stopping = data.phase === "stopping";
       startButton.disabled = data.is_running;

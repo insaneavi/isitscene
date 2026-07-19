@@ -1,1 +1,68 @@
-{% extends 'base.html' %}{% block content %}<section class="heading"><div><h1>Releases</h1><p>{{ items|length }} records</p></div></section><form class="filters" method="get"><input name="q" value="{{ q }}" placeholder="Search releases"><select name="status"><option value="">All statuses</option>{% for s in ['verified','not_found','pending','api_error','missing'] %}<option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s.replace('_',' ') }}</option>{% endfor %}</select><button>Filter</button></form><section class="panel"><table><thead><tr><th>Release</th><th>Status</th><th>Matched Release</th><th>Last Checked</th></tr></thead><tbody>{% for x in items %}<tr><td>{{ x.folder_name }}{% if x.error_message %}<small class="error">{{ x.error_message }}</small>{% endif %}</td><td><span class="badge {{ x.status }}">{{ x.status.replace('_',' ') }}</span></td><td>{{ x.matched_release or '—' }}</td><td>{{ x.last_checked.strftime('%Y-%m-%d %H:%M') if x.last_checked else '—' }}</td></tr>{% else %}<tr><td colspan="4">No releases found.</td></tr>{% endfor %}</tbody></table></section>{% endblock %}
+{% extends "base.html" %}
+{% block content %}
+<section class="heading">
+  <div>
+    <h1>Releases</h1>
+    <p>{{ items|length }} records</p>
+  </div>
+</section>
+
+<form class="filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Search releases">
+
+  <select name="inventory">
+    <option value="">All inventory</option>
+    <option value="present" {% if inventory == "present" %}selected{% endif %}>Present</option>
+    <option value="removed" {% if inventory == "removed" %}selected{% endif %}>Removed</option>
+  </select>
+
+  <select name="verification">
+    <option value="">All verification</option>
+    <option value="verified" {% if verification == "verified" %}selected{% endif %}>Verified</option>
+    <option value="pending" {% if verification == "pending" %}selected{% endif %}>Pending</option>
+    <option value="unverified" {% if verification == "unverified" %}selected{% endif %}>Unverified</option>
+  </select>
+
+  <button>Filter</button>
+</form>
+
+<section class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>Release</th>
+        <th>Inventory</th>
+        <th>Verification</th>
+        <th>Matched Release</th>
+        <th>Last Checked</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for release in items %}
+        <tr>
+          <td>
+            {{ release.folder_name }}
+            {% if release.error_message %}
+              <small class="error">{{ release.error_message }}</small>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge {{ 'present' if release.is_present else 'removed' }}">
+              {{ "Present" if release.is_present else "Removed" }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {{ release.verification_status }}">
+              {{ release.verification_status|capitalize }}
+            </span>
+          </td>
+          <td>{{ release.matched_release or "—" }}</td>
+          <td>{{ release.last_checked.strftime("%Y-%m-%d %H:%M") if release.last_checked else "—" }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No releases found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

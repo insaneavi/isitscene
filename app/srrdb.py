@@ -77,7 +77,7 @@ async def check_exact_release(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.4.2 "
+                    "iSiTSCENE/0.5 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -91,7 +91,7 @@ async def check_exact_release(
         await _interruptible_sleep(delay_seconds, stop_requested)
 
         if response.status_code == 404:
-            return "not_found", None, None
+            return "unverified", None, "No matching release was found in SRRDB."
 
         response.raise_for_status()
         payload = response.json()
@@ -124,7 +124,7 @@ async def check_exact_release(
             return "verified", exact, None
 
         return (
-            "api_error",
+            "unverified",
             None,
             "SRRDB response did not contain a recognizable exact release name.",
         )
@@ -133,7 +133,7 @@ async def check_exact_release(
         raise
     except httpx.HTTPStatusError as exc:
         if exc.response.status_code == 404:
-            return "not_found", None, None
-        return "api_error", None, f"HTTP {exc.response.status_code}"
+            return "unverified", None, "No matching release was found in SRRDB."
+        return "unverified", None, f"HTTP {exc.response.status_code}"
     except (httpx.HTTPError, ValueError) as exc:
-        return "api_error", None, str(exc)
+        return "unverified", None, str(exc)

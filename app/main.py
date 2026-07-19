@@ -82,22 +82,17 @@ def dashboard(request: Request):
             ) or 0,
             "verified": db.scalar(
                 select(func.count()).select_from(Release).where(
-                    present, Release.status == "verified"
+                    present, Release.verification_status == "verified"
                 )
             ) or 0,
-            "not_found": db.scalar(
+            "unverified": db.scalar(
                 select(func.count()).select_from(Release).where(
-                    present, Release.status == "not_found"
+                    present, Release.verification_status == "unverified"
                 )
             ) or 0,
             "pending": db.scalar(
                 select(func.count()).select_from(Release).where(
-                    present, Release.status == "pending"
-                )
-            ) or 0,
-            "api_error": db.scalar(
-                select(func.count()).select_from(Release).where(
-                    present, Release.status == "api_error"
+                    present, Release.verification_status == "pending"
                 )
             ) or 0,
             "missing": db.scalar(
@@ -154,8 +149,7 @@ def scan_status():
                     "processed_count": 0,
                     "total_count": 0,
                     "verified_count": 0,
-                    "not_found_count": 0,
-                    "api_error_count": 0,
+                    "unverified_count": 0,
                     "skipped_count": 0,
                     "message": "No scan has run yet.",
                     "started_at": None,
@@ -171,8 +165,7 @@ def scan_status():
                 "processed_count": progress.processed_count,
                 "total_count": progress.total_count,
                 "verified_count": progress.verified_count,
-                "not_found_count": progress.not_found_count,
-                "api_error_count": progress.api_error_count,
+                "unverified_count": progress.unverified_count,
                 "skipped_count": progress.skipped_count,
                 "message": progress.message,
                 "started_at": (
@@ -192,7 +185,12 @@ def scan_status():
 
 
 @app.get("/releases", response_class=HTMLResponse)
-def releases(request: Request, q: str = "", status: str = ""):
+def releases(
+    request: Request,
+    q: str = "",
+    verification: str = "",
+    inventory: str = "",
+):
     db = SessionLocal()
     try:
         statement = select(Release).order_by(Release.folder_name)
@@ -202,15 +200,27 @@ def releases(request: Request, q: str = "", status: str = ""):
                 Release.folder_name.ilike(f"%{q}%")
             )
 
-        if status:
-            statement = statement.where(Release.status == status)
+        if verification:
+            statement = statement.where(
+                Release.verification_status == verification
+            )
+
+        if inventory == "present":
+            statement = statement.where(Release.is_present.is_(True))
+        elif inventory == "removed":
+            statement = statement.where(Release.is_present.is_(False))
 
         items = db.scalars(statement).all()
 
         return templates.TemplateResponse(
             request=request,
             name="releases.html",
-            context={"items": items, "q": q, "status": status},
+            context={
+                "items": items,
+                "q": q,
+                "verification": verification,
+                "inventory": inventory,
+            },
         )
     finally:
         db.close()
