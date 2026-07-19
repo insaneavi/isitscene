@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Settings · iSiTSCENE{% endblock %}
+
+{% block content %}
+<section class="heading">
+  <div>
+    <h1>Settings</h1>
+    <p>Changes are stored in SQLite and apply without recreating the container.</p>
+  </div>
+</section>
+
+{% if request.query_params.get("saved") %}
+<section class="notice success">Settings saved.</section>
+{% endif %}
+
+<section class="panel settings-panel">
+  <form method="post" action="/settings">
+    <label class="toggle-row">
+      <input
+        type="checkbox"
+        name="skip_hidden_system_folders"
+        {% if settings.skip_hidden_system_folders %}checked{% endif %}
+      >
+      <span>
+        <strong>Skip hidden/system folders</strong>
+        <small>
+          Excludes dot-prefixed folders and common system folders such as
+          .Recycle.Bin and System Volume Information.
+        </small>
+      </span>
+    </label>
+
+    <label class="toggle-row">
+      <input
+        type="checkbox"
+        name="auto_scan_enabled"
+        {% if settings.auto_scan_enabled %}checked{% endif %}
+      >
+      <span>
+        <strong>Enable automatic scans</strong>
+        <small>Runs the scanner on the interval below.</small>
+      </span>
+    </label>
+
+    <label class="field-row">
+      <span>Scan interval (hours)</span>
+      <input
+        type="number"
+        name="scan_interval_hours"
+        min="1"
+        value="{{ settings.scan_interval_hours }}"
+      >
+    </label>
+
+    <label class="field-row">
+      <span>SRRDB delay (seconds)</span>
+      <input
+        type="number"
+        name="srrdb_delay_seconds"
+        min="0"
+        step="0.1"
+        value="{{ settings.srrdb_delay_seconds }}"
+      >
+    </label>
+
+    <button type="submit">Save Settings</button>
+  </form>
+</section>
+{% endblock %}

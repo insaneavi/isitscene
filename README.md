@@ -1,36 +1,55 @@
-# iSiTSCENE v0.2
+# iSiTSCENE v0.3
 
-This version separates configuration, database, scanning, SRRDB access, and web routes into individual modules.
+iSiTSCENE inventories immediate movie-release folders and checks whether each
+folder name exactly matches a release registered in SRRDB.
 
-## Hidden/system folder toggle
+## New in v0.3
 
-Set the Unraid environment variable:
+Application settings are now stored in SQLite and editable from the Web UI:
+
+- Skip hidden/system folders
+- Enable or disable automatic scans
+- Scan interval
+- SRRDB request delay
+
+Open:
 
 ```text
-SKIP_HIDDEN_SYSTEM_FOLDERS=true
+http://YOUR-UNRAID-IP:8080/settings
 ```
 
-With `true`, the scanner skips all dot-prefixed folders and common system folders such as `.Recycle.Bin`, `$RECYCLE.BIN`, `System Volume Information`, `@eaDir`, and `lost+found`.
+Changes apply immediately and do not require recreating the Docker container.
 
-Set it to `false` to include every immediate subfolder in the scan.
+## Docker configuration
 
-## Upgrade from the first build
+Only these Docker settings are required:
 
-Extract the ZIP and copy all contents into your existing local repository folder. Allow Windows to replace existing files. The ZIP contains no `.git` directory, so your Git history remains intact.
+| Type | Host / Value | Container / Key |
+|---|---|---|
+| Port | `8080` | `8080` |
+| Path | `/mnt/user/movies` | `/movies` (read-only) |
+| Path | `/mnt/user/appdata/isitscene` | `/config` (read/write) |
+| Variable | `America/New_York` | `TZ` |
 
-Then run:
+The following old Docker variables are no longer used and can be removed:
+
+```text
+SCAN_INTERVAL_HOURS
+SRRDB_DELAY_SECONDS
+SKIP_HIDDEN_SYSTEM_FOLDERS
+```
+
+Existing values in those variables will be ignored by v0.3.
+
+## Updating the repository
+
+Copy this ZIP's contents over your existing local repository, keeping the
+existing `.git` folder. Then run:
 
 ```powershell
-git status
 git add .
-git commit -m "Refactor app and add hidden folder toggle"
+git commit -m "Add web based application settings"
 git push
 ```
 
-After GitHub Actions finishes, update the container in Unraid and add:
-
-```text
-Name: Skip Hidden/System Folders
-Key: SKIP_HIDDEN_SYSTEM_FOLDERS
-Value: true
-```
+After GitHub Actions succeeds, update the container in Unraid.

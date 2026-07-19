@@ -7,11 +7,8 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from .config import (
-    MOVIES_PATH,
-    SKIP_HIDDEN_SYSTEM_FOLDERS,
-    SYSTEM_FOLDERS,
-)
+from .config import MOVIES_PATH, SYSTEM_FOLDERS
+from .settings_service import get_settings
 from .database import Release, ScanRun, SessionLocal
 from .srrdb import check_exact_release
 
@@ -19,8 +16,11 @@ logger = logging.getLogger(__name__)
 _scan_lock = threading.Lock()
 
 
-def should_scan_folder(folder_name: str) -> bool:
-    if not SKIP_HIDDEN_SYSTEM_FOLDERS:
+def should_scan_folder(
+    folder_name: str,
+    skip_hidden_system_folders: bool,
+) -> bool:
+    if not skip_hidden_system_folders:
         return True
 
     return (

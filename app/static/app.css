@@ -1,1 +1,49 @@
 :root{color-scheme:dark;--bg:#0b0f14;--panel:#131a22;--line:#263241;--text:#eef3f8;--muted:#94a3b8;--accent:#56d364;--bad:#f85149}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui}header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 4%;border-bottom:1px solid var(--line)}a{color:var(--muted);text-decoration:none}.brand{font-size:22px;font-weight:800;color:var(--text)}.brand span{color:var(--accent)}nav a{margin-left:22px}main{max-width:1400px;margin:auto;padding:32px 4%}.heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.heading p{color:var(--muted);margin:0}h1,h2{margin:0 0 8px}button{background:var(--accent);border:0;border-radius:7px;padding:10px 16px;font-weight:700;cursor:pointer}.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}.card{padding:20px}.card strong{display:block;font-size:28px}.card span{color:var(--muted);text-transform:capitalize}.verified strong{color:var(--accent)}.not_found strong,.api_error strong{color:var(--bad)}.panel{padding:20px;overflow:auto}.filters{display:flex;gap:10px;margin-bottom:18px}.filters input,.filters select{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:7px}.filters input{min-width:320px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:12px;text-transform:uppercase}.badge{padding:4px 8px;border-radius:999px;background:#263241;text-transform:capitalize}.badge.verified{background:#173c24;color:#75e28c}.badge.not_found,.badge.api_error{background:#462020;color:#ff8b86}.error{display:block;color:#ff8b86}@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+
+
+.success {
+  color: var(--accent);
+}
+
+.settings-panel {
+  max-width: 720px;
+}
+
+.toggle-row,
+.field-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.toggle-row input {
+  margin-top: 5px;
+  transform: scale(1.2);
+}
+
+.toggle-row span,
+.field-row span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-row {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field-row input {
+  width: 140px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.settings-panel button {
+  margin-top: 20px;
+}
