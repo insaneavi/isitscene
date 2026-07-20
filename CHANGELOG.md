@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.1
+
+- Made the Releases page nearly full-width.
+- Reduced row height and whitespace for a clean inventory-list view.
+- Added an internally scrollable table with visible scrollbars.
+- Added a sticky header and more practical fixed column widths.
+- Added compact badges, truncation, hover states, and mobile adjustments.
+- No database changes.
+
+
 ## v0.8
 
 - Added advisory Stage 2 SRRDB candidate search.

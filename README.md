@@ -1,7 +1,17 @@
-# iSiTSCENE v0.8
+# iSiTSCENE v0.8.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.8.1
+
+- Redesigned the Releases page as a compact inventory list.
+- Expanded the page to use nearly the full browser width.
+- Reduced ordinary release rows to approximately 36 pixels high.
+- Added a fixed-height table with internal vertical and horizontal scrolling.
+- Added a sticky table header so column names remain visible.
+- Added column sizing, ellipsis handling, hover feedback, and compact badges.
+- No database or verification behavior changes.
 
 ## New in v0.8
 
