@@ -1,7 +1,13 @@
-# iSiTSCENE v0.8.3
+# iSiTSCENE v0.8.3.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.8.3.1
+
+- Fixes the Collection Review refresh route collision with the numeric release ID route.
+- Moves the action to `/collection-review/refresh-library-changes`.
+- Adds live refresh-status polling and automatically reloads Collection Review when finished.
 
 ## New in v0.8.3
 

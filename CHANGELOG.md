@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.3.1
+
+- Fixed FastAPI interpreting `refresh` as a numeric Collection Review release ID.
+- Changed the refresh endpoint to `/collection-review/refresh-library-changes`.
+- Added live status text and automatic Collection Review reload after refresh completion.
+- No database changes.
+
 ## v0.8.3
 
 - Added Refresh Library Changes to Collection Review.

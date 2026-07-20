@@ -10,7 +10,7 @@
     </p>
   </div>
 
-  <form method="post" action="/collection-review/refresh">
+  <form method="post" action="/collection-review/refresh-library-changes">
     <button class="refresh-library-button" type="submit">
       Refresh Library Changes
     </button>
@@ -18,10 +18,11 @@
 </section>
 
 {% if request.query_params.get("refresh_started") %}
-  <section class="refresh-notice">
-    Library refresh started. Newly discovered folders will be verified;
-    unchanged releases will not be rescanned. Refresh this page shortly to
-    see the updated results.
+  <section class="refresh-notice" id="refresh-notice">
+    <strong id="refresh-title">Library refresh started.</strong>
+    <span id="refresh-message">
+      Detecting folder changes and verifying newly discovered releases.
+    </span>
   </section>
 {% endif %}
 
@@ -264,6 +265,47 @@
 </section>
 
 <script>
+{% if request.query_params.get("refresh_started") %}
+const refreshTitle = document.getElementById("refresh-title");
+const refreshMessage = document.getElementById("refresh-message");
+let refreshObservedRunning = false;
+
+async function pollLibraryRefresh() {
+  try {
+    const response = await fetch("/api/scan-status", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Unable to read refresh status.");
+    }
+
+    const status = await response.json();
+    if (status.is_running) {
+      refreshObservedRunning = true;
+      refreshTitle.textContent = "Refreshing library changes…";
+      refreshMessage.textContent = status.message || "Refresh in progress.";
+      window.setTimeout(pollLibraryRefresh, 1000);
+      return;
+    }
+
+    if (refreshObservedRunning || status.phase === "refresh_complete") {
+      refreshTitle.textContent = "Library refresh complete.";
+      refreshMessage.textContent = status.message || "Reloading Collection Review…";
+      window.setTimeout(function () {
+        window.location.href = "/collection-review";
+      }, 900);
+      return;
+    }
+
+    window.setTimeout(pollLibraryRefresh, 500);
+  } catch (error) {
+    refreshTitle.textContent = "Library refresh status unavailable.";
+    refreshMessage.textContent = error.message;
+    window.setTimeout(pollLibraryRefresh, 2500);
+  }
+}
+
+pollLibraryRefresh();
+{% endif %}
+
 document.addEventListener("click", function (event) {
   const button = event.target.closest(".comment-preset");
   if (!button) {

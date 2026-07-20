@@ -451,7 +451,7 @@ def update_settings(
     return RedirectResponse("/settings?saved=1", status_code=303)
 
 
-@app.post("/collection-review/refresh")
+@app.post("/collection-review/refresh-library-changes")
 def refresh_collection_library(background_tasks: BackgroundTasks):
     background_tasks.add_task(refresh_library_changes)
     return RedirectResponse(
