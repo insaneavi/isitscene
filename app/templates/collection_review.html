@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="heading">
+  <div>
+    <h1>Collection Review</h1>
+    <p>
+      Present releases that could not be verified against SRRDB.
+      Record why you are keeping them for now.
+    </p>
+  </div>
+</section>
+
+<form class="filters" method="get">
+  <input
+    name="q"
+    value="{{ q }}"
+    placeholder="Search unverified releases"
+  >
+
+  <select name="review_status">
+    <option value="">All review statuses</option>
+    <option value="pending" {% if review_status == "pending" %}selected{% endif %}>
+      Pending
+    </option>
+    <option value="keep" {% if review_status == "keep" %}selected{% endif %}>
+      Keep
+    </option>
+    <option value="replace" {% if review_status == "replace" %}selected{% endif %}>
+      Replace
+    </option>
+    <option value="ignored" {% if review_status == "ignored" %}selected{% endif %}>
+      Ignored
+    </option>
+  </select>
+
+  <button>Filter</button>
+  <a class="secondary-link" href="/collection-review">Clear</a>
+</form>
+
+<section class="review-summary">
+  <strong>{{ items|length }}</strong>
+  <span>
+    release{{ "" if items|length == 1 else "s" }} in this view
+  </span>
+</section>
+
+<section class="review-list">
+  {% for release in items %}
+    <article class="panel review-card">
+      <div class="review-card-heading">
+        <div>
+          <h2>{{ release.folder_name }}</h2>
+          <div class="review-meta">
+            <span class="badge unverified">Unverified</span>
+            <span>
+              Last checked:
+              {{
+                release.last_checked.strftime("%Y-%m-%d %H:%M")
+                if release.last_checked else "—"
+              }}
+            </span>
+            {% if release.last_reviewed %}
+              <span>
+                Last reviewed:
+                {{ release.last_reviewed.strftime("%Y-%m-%d %H:%M") }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <span class="badge review-{{ release.review_status }}">
+          {{ release.review_status|capitalize }}
+        </span>
+      </div>
+
+      {% if release.error_message %}
+        <p class="verification-reason">
+          <strong>Verification reason:</strong>
+          {{ release.error_message }}
+        </p>
+      {% endif %}
+
+      <form
+        class="review-form"
+        method="post"
+        action="/collection-review/{{ release.id }}"
+      >
+        <input type="hidden" name="q" value="{{ q }}">
+        <input
+          type="hidden"
+          name="active_filter"
+          value="{{ review_status }}"
+        >
+
+        <label>
+          Review decision
+          <select name="review_status">
+            <option value="pending" {% if release.review_status == "pending" %}selected{% endif %}>
+              Pending
+            </option>
+            <option value="keep" {% if release.review_status == "keep" %}selected{% endif %}>
+              Keep this version
+            </option>
+            <option value="replace" {% if release.review_status == "replace" %}selected{% endif %}>
+              Replace later
+            </option>
+            <option value="ignored" {% if release.review_status == "ignored" %}selected{% endif %}>
+              Ignore
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Comment
+          <textarea
+            name="review_comment"
+            rows="4"
+            placeholder="Example: Good quality encode; keep until a better scene release becomes available."
+          >{{ release.review_comment or "" }}</textarea>
+        </label>
+
+        <div class="review-actions">
+          <button type="submit">Save Review</button>
+        </div>
+      </form>
+    </article>
+  {% else %}
+    <section class="panel empty-state">
+      <h2>No releases found</h2>
+      <p>
+        There are no present, unverified releases matching the current
+        search and filter.
+      </p>
+    </section>
+  {% endfor %}
+</section>
+{% endblock %}

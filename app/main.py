@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -98,6 +99,27 @@ def dashboard(request: Request):
             "missing": db.scalar(
                 select(func.count()).select_from(Release).where(
                     Release.is_present.is_(False)
+                )
+            ) or 0,
+            "review_pending": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    present,
+                    Release.verification_status == "unverified",
+                    Release.review_status == "pending",
+                )
+            ) or 0,
+            "review_keep": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    present,
+                    Release.verification_status == "unverified",
+                    Release.review_status == "keep",
+                )
+            ) or 0,
+            "review_replace": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    present,
+                    Release.verification_status == "unverified",
+                    Release.review_status == "replace",
                 )
             ) or 0,
         }
@@ -224,6 +246,98 @@ def releases(
         )
     finally:
         db.close()
+
+
+
+@app.get("/collection-review", response_class=HTMLResponse)
+def collection_review(
+    request: Request,
+    q: str = "",
+    review_status: str = "",
+):
+    db = SessionLocal()
+    try:
+        statement = (
+            select(Release)
+            .where(
+                Release.is_present.is_(True),
+                Release.verification_status == "unverified",
+            )
+            .order_by(Release.folder_name)
+        )
+
+        if q:
+            statement = statement.where(
+                Release.folder_name.ilike(f"%{q}%")
+            )
+
+        if review_status:
+            statement = statement.where(
+                Release.review_status == review_status
+            )
+
+        items = db.scalars(statement).all()
+
+        return templates.TemplateResponse(
+            request=request,
+            name="collection_review.html",
+            context={
+                "items": items,
+                "q": q,
+                "review_status": review_status,
+            },
+        )
+    finally:
+        db.close()
+
+
+@app.post("/collection-review/{release_id}")
+def update_collection_review(
+    release_id: int,
+    review_status: str = Form("pending"),
+    review_comment: str = Form(""),
+    q: str = Form(""),
+    active_filter: str = Form(""),
+):
+    allowed_statuses = {"pending", "keep", "replace", "ignored"}
+    selected_status = (
+        review_status
+        if review_status in allowed_statuses
+        else "pending"
+    )
+
+    db = SessionLocal()
+    try:
+        release = db.get(Release, release_id)
+        if (
+            release is not None
+            and release.is_present
+            and release.verification_status == "unverified"
+        ):
+            release.review_status = selected_status
+            release.review_comment = review_comment.strip()
+            release.last_reviewed = datetime.utcnow()
+            db.commit()
+    finally:
+        db.close()
+
+    query_parts = []
+    if q:
+        query_parts.append(f"q={q}")
+    if active_filter:
+        query_parts.append(f"review_status={active_filter}")
+
+    destination = "/collection-review"
+    if query_parts:
+        from urllib.parse import urlencode
+        values = {}
+        if q:
+            values["q"] = q
+        if active_filter:
+            values["review_status"] = active_filter
+        destination += "?" + urlencode(values)
+
+    return RedirectResponse(destination, status_code=303)
 
 
 @app.get("/settings", response_class=HTMLResponse)

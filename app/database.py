@@ -50,6 +50,18 @@ class Release(Base):
     notes: Mapped[str] = mapped_column(Text, default="")
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # Personal collection-review workflow for present, unverified releases.
+    review_status: Mapped[str] = mapped_column(
+        String,
+        default="pending",
+        index=True,
+    )
+    review_comment: Mapped[str] = mapped_column(Text, default="")
+    last_reviewed: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
 
 class ScanRun(Base):
     __tablename__ = "scan_runs"
@@ -139,6 +151,21 @@ def _migrate_schema() -> None:
         "releases",
         "verification_status",
         "VARCHAR NOT NULL DEFAULT 'pending'",
+    )
+    _add_column_if_missing(
+        "releases",
+        "review_status",
+        "VARCHAR NOT NULL DEFAULT 'pending'",
+    )
+    _add_column_if_missing(
+        "releases",
+        "review_comment",
+        "TEXT NOT NULL DEFAULT ''",
+    )
+    _add_column_if_missing(
+        "releases",
+        "last_reviewed",
+        "DATETIME",
     )
 
     with engine.begin() as connection:

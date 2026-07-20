@@ -1,7 +1,17 @@
-# iSiTSCENE v0.5
+# iSiTSCENE v0.6
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.6
+
+- Adds a dedicated Collection Review page.
+- Shows only present, unverified releases.
+- Adds personal review decisions: Pending, Keep, Replace, and Ignored.
+- Adds a persistent comment field for each reviewed release.
+- Tracks the date and time each review was last saved.
+- Adds dashboard review counts and direct links into the queue.
+- Automatically upgrades existing databases without deleting scan history.
 
 ## New in v0.5
 

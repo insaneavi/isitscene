@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.6
+
+- Added the Collection Review workflow.
+- Added review status, comments, and last-reviewed timestamps.
+- Limited the review queue to present, unverified releases.
+- Added review-status filtering and release-name search.
+- Added dashboard counts for Pending, Keep, and Replace Later.
+- Added automatic SQLite schema migration for review fields.
+
+
 ## v0.5
 
 - Split inventory and verification state.

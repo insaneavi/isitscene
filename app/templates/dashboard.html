@@ -101,6 +101,31 @@
   </div>
 </section>
 
+<section class="panel collection-review-overview">
+  <div class="panel-heading-row">
+    <div>
+      <h2>Collection Review</h2>
+      <p>Manage the non-scene releases you still want to keep.</p>
+    </div>
+    <a class="button-link" href="/collection-review">Open Review Queue</a>
+  </div>
+
+  <div class="review-stat-grid">
+    <a href="/collection-review?review_status=pending">
+      <strong>{{ counts.review_pending }}</strong>
+      <span>Pending Review</span>
+    </a>
+    <a href="/collection-review?review_status=keep">
+      <strong>{{ counts.review_keep }}</strong>
+      <span>Keep</span>
+    </a>
+    <a href="/collection-review?review_status=replace">
+      <strong>{{ counts.review_replace }}</strong>
+      <span>Replace Later</span>
+    </a>
+  </div>
+</section>
+
 <section class="panel">
   <h2>Latest Scan</h2>
 
