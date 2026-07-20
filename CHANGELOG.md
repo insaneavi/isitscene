@@ -1,13 +1,15 @@
 # Changelog
 
-## v0.9.2
+## v0.10.0
 
-- Added Collection Upgrade scanner and page.
-- Added strict IMDb-based UHD detection requiring 2160p + UHD + x265.
-- Excluded WEB releases and already-UHD releases.
-- Added upgrade scan progress, stop control, persistent results, candidates, and history.
-- Added automatic creation of new SQLite tables.
-
+- Added Duplicate Finder with confirmed IMDb groups and cautious title/year fallback groups.
+- Added persistent IMDb metadata caching on every release to avoid repeated SRRDB lookups.
+- Updated Collection Upgrade to reuse the shared IMDb cache.
+- Added duplicate review states: Keep Both, Cleanup Needed, and Unreviewed.
+- Added Start, Stop, force-reset, progress, and restart recovery for Duplicate Finder.
+- Added a global version/build display and `GET /api/version`.
+- Added schema version 10 and automatic migration of IMDb IDs previously found by Collection Upgrade.
+- Duplicate Finder remains advisory and never modifies or deletes movie folders.
 
 ## v0.8.3.2
 

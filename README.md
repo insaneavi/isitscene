@@ -1,19 +1,21 @@
-# iSiTSCENE v0.9.2
+# iSiTSCENE v0.10.0
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.9.2
+## New in v0.10.0
 
-- Adds **Collection Upgrade**, a separate scanner and results page.
-- Scans only present, verified Blu-ray releases.
-- Excludes WEB-DL, WEBRip, other WEB releases, and releases already marked 2160p/UHD.
-- Retrieves the IMDb ID from the exact SRRDB release details.
-- Searches SRRDB using `imdb:<number>`.
-- Accepts an upgrade only when the release name contains all three strict Scene tags: `2160p`, `UHD`, and `x265`.
-- Displays every qualifying UHD candidate with direct SRRDB links.
-- Adds independent live progress, stopping, result caching, and scan history.
-- Adds new SQLite tables automatically; no manual migration is required.
+- Adds **Duplicate Finder** for different releases of the same movie.
+- Stores IMDb IDs directly on release records and reuses them in later scans.
+- Queries SRRDB only for new, changed, previously failed, or uncached releases.
+- Groups confirmed duplicates by IMDb ID and possible duplicates by normalized title and year.
+- Displays resolution, source, codec, release group, and edition-related tags.
+- Adds **Keep Both** and **Cleanup Needed** review states.
+- Includes independent Start, Stop, force-reset, live progress, and interrupted-scan recovery.
+- Updates Collection Upgrade to use the same shared IMDb cache.
+- Displays application version, build date, and Git commit in the web interface.
+- Exposes build information through `GET /api/version`.
+- Performs automatic SQLite schema migration; no manual database work is required.
 
 ## New in v0.8.3.2
 

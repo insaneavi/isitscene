@@ -84,6 +84,17 @@ class Release(Base):
         nullable=True,
     )
 
+    # Shared cached movie metadata used by upgrades and duplicate detection.
+    imdb_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    imdb_lookup_status: Mapped[str] = mapped_column(
+        String, default="not_checked", index=True
+    )
+    imdb_checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    imdb_error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    imdb_source_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    movie_title: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    movie_year: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+
 
 class ScanRun(Base):
     __tablename__ = "scan_runs"
@@ -176,6 +187,49 @@ class UpgradeProgress(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class DuplicateScan(Base):
+    __tablename__ = "duplicate_scans"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    status: Mapped[str] = mapped_column(String, default="running")
+    eligible_count: Mapped[int] = mapped_column(Integer, default=0)
+    checked_count: Mapped[int] = mapped_column(Integer, default=0)
+    cached_count: Mapped[int] = mapped_column(Integer, default=0)
+    looked_up_count: Mapped[int] = mapped_column(Integer, default=0)
+    group_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class DuplicateProgress(Base):
+    __tablename__ = "duplicate_progress"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    is_running: Mapped[bool] = mapped_column(Boolean, default=False)
+    phase: Mapped[str] = mapped_column(String, default="idle")
+    current_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    processed_count: Mapped[int] = mapped_column(Integer, default=0)
+    total_count: Mapped[int] = mapped_column(Integer, default=0)
+    cached_count: Mapped[int] = mapped_column(Integer, default=0)
+    looked_up_count: Mapped[int] = mapped_column(Integer, default=0)
+    group_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_count: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class DuplicateReview(Base):
+    __tablename__ = "duplicate_reviews"
+
+    group_key: Mapped[str] = mapped_column(String, primary_key=True)
+    review_status: Mapped[str] = mapped_column(String, default="unreviewed", index=True)
+    comment: Mapped[str] = mapped_column(Text, default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class AppSetting(Base):
@@ -271,6 +325,16 @@ def _migrate_schema() -> None:
         "DATETIME",
     )
 
+    _add_column_if_missing("releases", "imdb_id", "VARCHAR")
+    _add_column_if_missing(
+        "releases", "imdb_lookup_status", "VARCHAR NOT NULL DEFAULT 'not_checked'"
+    )
+    _add_column_if_missing("releases", "imdb_checked_at", "DATETIME")
+    _add_column_if_missing("releases", "imdb_error_message", "TEXT")
+    _add_column_if_missing("releases", "imdb_source_release", "VARCHAR")
+    _add_column_if_missing("releases", "movie_title", "VARCHAR")
+    _add_column_if_missing("releases", "movie_year", "VARCHAR")
+
     with engine.begin() as connection:
         connection.execute(
             text(
@@ -309,6 +373,20 @@ def init_db() -> None:
         if db.get(UpgradeProgress, 1) is None:
             db.add(UpgradeProgress(id=1))
             changed = True
+        if db.get(DuplicateProgress, 1) is None:
+            db.add(DuplicateProgress(id=1))
+            changed = True
+
+        # Reuse IMDb IDs already discovered by Collection Upgrade.
+        upgrade_rows = db.query(UpgradeResult).filter(UpgradeResult.imdb_id.isnot(None)).all()
+        for result in upgrade_rows:
+            release = db.get(Release, result.release_id)
+            if release and not release.imdb_id:
+                release.imdb_id = result.imdb_id
+                release.imdb_lookup_status = "found"
+                release.imdb_checked_at = result.checked_at
+                release.imdb_source_release = result.current_release
+                changed = True
         if changed:
             db.commit()
     finally:

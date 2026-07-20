@@ -488,7 +488,7 @@ async def check_release(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9.2 "
+                    "iSiTSCENE/0.10.0 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -644,7 +644,7 @@ async def find_uhd_upgrades(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9.2 "
+                    "iSiTSCENE/0.10.0 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -700,3 +700,77 @@ async def find_uhd_upgrades(
         return None, [], f"SRRDB returned HTTP {exc.response.status_code}."
     except (httpx.HTTPError, ValueError) as exc:
         return None, [], str(exc)
+
+
+async def lookup_imdb_id(
+    release_name: str,
+    delay_seconds: float,
+    stop_requested: Callable[[], bool] | None = None,
+) -> tuple[str | None, str | None]:
+    """Resolve and return an IMDb ID for one exact SRRDB release."""
+    timeout = httpx.Timeout(connect=10.0, read=20.0, write=10.0, pool=10.0)
+    encoded = quote(release_name, safe="")
+    try:
+        async with httpx.AsyncClient(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={"User-Agent": "iSiTSCENE/0.10.0 (+https://github.com/insaneavi/isitscene)"},
+        ) as client:
+            response = await _interruptible_get(
+                client, f"{BASE_URL}/imdb/{encoded}", stop_requested
+            )
+            await _interruptible_sleep(delay_seconds, stop_requested)
+            if response.status_code == 404:
+                return None, None
+            response.raise_for_status()
+            imdb_id = _extract_imdb_id(response.json())
+            if not imdb_id:
+                return None, "SRRDB IMDb response did not contain a recognizable IMDb ID."
+            return imdb_id, None
+    except ScanCancelled:
+        raise
+    except httpx.HTTPStatusError as exc:
+        return None, f"SRRDB returned HTTP {exc.response.status_code}."
+    except (httpx.HTTPError, ValueError) as exc:
+        return None, str(exc)
+
+
+async def find_uhd_upgrades_by_imdb(
+    imdb_id: str,
+    delay_seconds: float,
+    stop_requested: Callable[[], bool] | None = None,
+) -> tuple[list[CandidateResult], str | None]:
+    """Search strict UHD candidates using an already cached IMDb ID."""
+    timeout = httpx.Timeout(connect=10.0, read=20.0, write=10.0, pool=10.0)
+    digits = imdb_id.removeprefix("tt")
+    try:
+        async with httpx.AsyncClient(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={"User-Agent": "iSiTSCENE/0.10.0 (+https://github.com/insaneavi/isitscene)"},
+        ) as client:
+            response = await _interruptible_get(
+                client, f"{BASE_URL}/search/imdb:{quote(digits, safe='')}", stop_requested
+            )
+            await _interruptible_sleep(delay_seconds, stop_requested)
+            if response.status_code == 404:
+                return [], None
+            response.raise_for_status()
+            candidates = [
+                CandidateResult(
+                    release_name=name,
+                    url=f"{DETAILS_URL}/{quote(name, safe='.-_')}",
+                    score=100,
+                    reason="Contains all required Scene UHD tags: 2160p, UHD, and x265.",
+                )
+                for name in _extract_release_names(response.json())
+                if is_strict_uhd_upgrade(name)
+            ]
+            candidates.sort(key=lambda item: item.release_name.casefold())
+            return candidates, None
+    except ScanCancelled:
+        raise
+    except httpx.HTTPStatusError as exc:
+        return [], f"SRRDB returned HTTP {exc.response.status_code}."
+    except (httpx.HTTPError, ValueError) as exc:
+        return [], str(exc)

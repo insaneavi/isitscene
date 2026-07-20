@@ -13,10 +13,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 
-from .config import APP_NAME
+from .config import APP_NAME, APP_VERSION, BUILD_DATE, GIT_COMMIT, DATABASE_VERSION
 from .database import (
-    Release, ScanProgress, ScanRun, SessionLocal, UpgradeCandidate,
-    UpgradeProgress, UpgradeResult, UpgradeScan, init_db,
+    DuplicateProgress, DuplicateReview, DuplicateScan, Release, ScanProgress,
+    ScanRun, SessionLocal, UpgradeCandidate, UpgradeProgress, UpgradeResult,
+    UpgradeScan, init_db,
 )
 from .scanner import (
     recover_interrupted_scan,
@@ -31,6 +32,14 @@ from .upgrade_scanner import (
     reset_upgrade_scan_state,
     run_upgrade_scan,
 )
+from .duplicate_scanner import (
+    duplicate_group_count,
+    recover_interrupted_duplicate_scan,
+    request_duplicate_stop,
+    reset_duplicate_scan_state,
+    run_duplicate_scan,
+)
+from .srrdb import parse_release_name
 
 logging.basicConfig(level=logging.INFO)
 
@@ -60,6 +69,7 @@ async def lifespan(app: FastAPI):
     init_db()
     recover_interrupted_scan()
     recover_interrupted_upgrade_scan()
+    recover_interrupted_duplicate_scan()
     scheduler.start()
     refresh_scheduler()
     yield
@@ -69,6 +79,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title=APP_NAME, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
+templates.env.globals["app_version"] = APP_VERSION
+templates.env.globals["build_date"] = BUILD_DATE
+templates.env.globals["git_commit"] = GIT_COMMIT
 
 
 _RELEASE_YEAR_PATTERN = re.compile(
@@ -119,12 +132,26 @@ templates.env.globals["movie_title_from_release_name"] = (
 templates.env.globals["bluray_search_url"] = bluray_search_url
 
 
+@app.get("/api/version")
+def api_version():
+    return {
+        "version": APP_VERSION,
+        "build_date": BUILD_DATE,
+        "git_commit": GIT_COMMIT,
+        "database_version": DATABASE_VERSION,
+    }
+
+
 @app.get("/health")
 def health():
     settings = get_settings()
     return {
         "status": "ok",
         "application": APP_NAME,
+        "version": APP_VERSION,
+        "build_date": BUILD_DATE,
+        "git_commit": GIT_COMMIT,
+        "database_version": DATABASE_VERSION,
         "settings": {
             "skip_hidden_system_folders": (
                 settings.skip_hidden_system_folders
@@ -502,6 +529,101 @@ def reset_upgrade_scan():
     reset = reset_upgrade_scan_state()
     suffix = "reset=1" if reset else "reset_failed=1"
     return RedirectResponse(f"/collection-upgrade?{suffix}", status_code=303)
+
+
+@app.get("/duplicate-finder", response_class=HTMLResponse)
+def duplicate_finder(request: Request, status: str = ""):
+    db = SessionLocal()
+    try:
+        releases = db.scalars(
+            select(Release).where(
+                Release.is_present.is_(True), Release.ignored.is_(False)
+            ).order_by(Release.folder_name)
+        ).all()
+        groups: dict[str, dict] = {}
+        for release in releases:
+            parsed = parse_release_name(release.matched_release or release.folder_name)
+            if release.imdb_id:
+                key = f"imdb:{release.imdb_id}"
+                confidence = "confirmed"
+                title = " ".join(parsed.title_tokens).title() or release.folder_name
+                year = parsed.year
+            elif release.movie_title and release.movie_year:
+                key = f"title:{release.movie_title.casefold()}|{release.movie_year}"
+                confidence = "possible"
+                title = release.movie_title.title()
+                year = release.movie_year
+            else:
+                continue
+            group = groups.setdefault(key, {"key": key, "title": title, "year": year, "imdb_id": release.imdb_id, "confidence": confidence, "releases": []})
+            group["releases"].append({"release": release, "parsed": parsed})
+        rows = []
+        for key, group in groups.items():
+            if len(group["releases"]) < 2:
+                continue
+            editions = {tuple(sorted(item["parsed"].flags)) for item in group["releases"]}
+            group["kind"] = "edition_variant" if len(editions) > 1 and any(editions) else group["confidence"]
+            review = db.get(DuplicateReview, key)
+            group["review"] = review
+            if status and (review.review_status if review else "unreviewed") != status:
+                continue
+            rows.append(group)
+        rows.sort(key=lambda g: ((g["title"] or "").casefold(), g["year"] or ""))
+        return templates.TemplateResponse(request=request, name="duplicate_finder.html", context={"groups": rows, "progress": db.get(DuplicateProgress, 1), "status": status})
+    finally:
+        db.close()
+
+
+@app.get("/api/duplicate-status")
+def duplicate_status():
+    db = SessionLocal()
+    try:
+        p = db.get(DuplicateProgress, 1)
+        return JSONResponse({
+            "is_running": bool(p and p.is_running), "phase": p.phase if p else "idle",
+            "current_release": p.current_release if p else None,
+            "processed_count": p.processed_count if p else 0, "total_count": p.total_count if p else 0,
+            "cached_count": p.cached_count if p else 0, "looked_up_count": p.looked_up_count if p else 0,
+            "group_count": p.group_count if p else 0, "error_count": p.error_count if p else 0,
+            "message": p.message if p else "No duplicate scan has run yet.",
+        })
+    finally:
+        db.close()
+
+
+@app.post("/duplicate/start")
+def start_duplicate_scan(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_duplicate_scan)
+    return RedirectResponse("/duplicate-finder?started=1", status_code=303)
+
+
+@app.post("/duplicate/stop")
+def stop_duplicate_scan():
+    request_duplicate_stop()
+    return RedirectResponse("/duplicate-finder?stopping=1", status_code=303)
+
+
+@app.post("/duplicate/reset")
+def reset_duplicate_scan():
+    ok = reset_duplicate_scan_state()
+    return RedirectResponse(f"/duplicate-finder?{'reset=1' if ok else 'reset_failed=1'}", status_code=303)
+
+
+@app.post("/duplicate/{group_key:path}/review")
+def review_duplicate(group_key: str, review_status: str = Form(...), comment: str = Form("")):
+    db = SessionLocal()
+    try:
+        row = db.get(DuplicateReview, group_key)
+        if row is None:
+            row = DuplicateReview(group_key=group_key)
+            db.add(row)
+        row.review_status = review_status
+        row.comment = comment.strip()
+        row.updated_at = datetime.utcnow()
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/duplicate-finder", status_code=303)
 
 
 @app.get("/settings", response_class=HTMLResponse)

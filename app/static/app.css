@@ -775,3 +775,15 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
+
+.build-info { margin-left:auto; color:#98a2b3; font-size:.78rem; text-align:right; line-height:1.2; white-space:nowrap; }
+.build-info span { display:block; }
+.duplicate-release { padding:10px 12px; border:1px solid rgba(255,255,255,.09); border-radius:7px; overflow-wrap:anywhere; }
+.tag-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.tag { padding:2px 7px; border-radius:999px; background:rgba(79,140,255,.13); color:#b8d0ff; font-size:.75rem; text-transform:uppercase; }
+.duplicate-review { display:grid; grid-template-columns:180px 1fr auto; gap:8px; margin-top:14px; }
+.badge.confirmed { background:rgba(45,180,95,.16); color:#77e39e; }
+.badge.possible { background:rgba(230,160,40,.15); color:#f2c46f; }
+.badge.edition_variant { background:rgba(145,100,235,.17); color:#c9aef8; }
+a.card { text-decoration:none; color:inherit; }
+@media(max-width:760px){.build-info{display:none}.duplicate-review{grid-template-columns:1fr}}
