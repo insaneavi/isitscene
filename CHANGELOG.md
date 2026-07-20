@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.8.3.2
+
+- Moved Refresh Library Changes to `POST /scan/refresh-library`.
+- Eliminated collision with `/collection-review/{release_id}` regardless of route declaration order.
+- Updated the Collection Review form action.
+- Retained live scan-status polling and automatic page reload.
+- No database changes.
+
 ## v0.8.3.1
 
 - Fixed FastAPI interpreting `refresh` as a numeric Collection Review release ID.

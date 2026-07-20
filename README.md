@@ -1,13 +1,20 @@
-# iSiTSCENE v0.8.3.1
+# iSiTSCENE v0.8.3.2
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
+## New in v0.8.3.2
+
+- Fixes the remaining FastAPI route collision for Refresh Library Changes.
+- Moves the refresh action out of the dynamic Collection Review namespace to `POST /scan/refresh-library`.
+- Keeps the button on Collection Review while treating the operation as a scan action.
+- Retains live refresh-status polling and automatic Collection Review reload.
+- No database changes.
+
 ## New in v0.8.3.1
 
-- Fixes the Collection Review refresh route collision with the numeric release ID route.
-- Moves the action to `/collection-review/refresh-library-changes`.
-- Adds live refresh-status polling and automatically reloads Collection Review when finished.
+- Attempted to fix the Collection Review refresh route collision by renaming the endpoint.
+- Added live refresh-status polling and automatic Collection Review reload.
 
 ## New in v0.8.3
 
