@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="heading upgrade-heading">
+  <div>
+    <h1>Collection Upgrade</h1>
+    <p>Find strict Scene UHD upgrades for present, verified Blu-ray releases. A candidate must contain all three tags: <strong>2160p</strong>, <strong>UHD</strong>, and <strong>x265</strong>.</p>
+  </div>
+  <div class="upgrade-actions">
+    {% if progress and progress.is_running %}
+    <form method="post" action="/upgrade/stop"><button class="danger" type="submit">Stop Upgrade Scan</button></form>
+    {% else %}
+    <form method="post" action="/upgrade/start"><button type="submit">Scan Collection for Upgrades</button></form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="upgrade-progress" id="upgrade-progress">
+  <div class="progress-title"><strong id="upgrade-message">{{ progress.message if progress and progress.message else 'No upgrade scan has run yet.' }}</strong><span id="upgrade-count">{{ progress.processed_count if progress else 0 }} / {{ progress.total_count if progress else 0 }}</span></div>
+  <progress id="upgrade-bar" max="{{ progress.total_count if progress and progress.total_count else 1 }}" value="{{ progress.processed_count if progress else 0 }}"></progress>
+  <div class="upgrade-stats"><span>Upgrades: <b id="upgrade-found">{{ progress.upgrades_found if progress else 0 }}</b></span><span>No UHD: <b id="upgrade-none">{{ progress.no_upgrade_count if progress else 0 }}</b></span><span>IMDb unavailable: <b id="upgrade-imdb">{{ progress.imdb_missing_count if progress else 0 }}</b></span><span>API errors: <b id="upgrade-errors">{{ progress.api_error_count if progress else 0 }}</b></span></div>
+  <div class="current-release" id="upgrade-current">{{ progress.current_release if progress and progress.current_release else '' }}</div>
+</section>
+
+<form class="filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Search current release">
+  <select name="status">
+    <option value="">All statuses</option>
+    <option value="upgrade_available" {% if status == 'upgrade_available' %}selected{% endif %}>Upgrade Available</option>
+    <option value="no_upgrade" {% if status == 'no_upgrade' %}selected{% endif %}>No UHD Found</option>
+    <option value="imdb_unavailable" {% if status == 'imdb_unavailable' %}selected{% endif %}>IMDb Unavailable</option>
+    <option value="api_error" {% if status == 'api_error' %}selected{% endif %}>API Error</option>
+  </select>
+  <button type="submit">Filter</button>
+</form>
+
+<section class="upgrade-list">
+{% for result, candidates in rows %}
+  <article class="upgrade-card">
+    <div class="upgrade-card-head">
+      <div><div class="release-name">{{ result.current_release }}</div><div class="muted">{{ result.imdb_id or 'IMDb unavailable' }}{% if result.checked_at %} · Checked {{ result.checked_at.strftime('%Y-%m-%d %H:%M') }} UTC{% endif %}</div></div>
+      <span class="badge {{ result.status }}">{{ result.status.replace('_', ' ').title() }}</span>
+    </div>
+    {% if result.error_message %}<p class="error">{{ result.error_message }}</p>{% endif %}
+    {% if candidates %}
+      <div class="candidate-list">
+      {% for candidate in candidates %}
+        <a href="{{ candidate.srrdb_url }}" target="_blank" rel="noopener">{{ candidate.release_name }}</a>
+      {% endfor %}
+      </div>
+    {% elif result.status == 'no_upgrade' %}<p class="muted">No SRRDB release associated with this IMDb ID contained all three required tags.</p>{% endif %}
+  </article>
+{% else %}
+  <section class="empty-state"><h2>No upgrade results yet</h2><p>Run the Collection Upgrade scanner to check eligible verified Blu-ray releases.</p></section>
+{% endfor %}
+</section>
+
+<script>
+let wasRunning = {{ 'true' if progress and progress.is_running else 'false' }};
+async function pollUpgrade() {
+  try {
+    const response = await fetch('/api/upgrade-status', {cache: 'no-store'});
+    const data = await response.json();
+    document.getElementById('upgrade-message').textContent = data.message || '';
+    document.getElementById('upgrade-count').textContent = `${data.processed_count} / ${data.total_count}`;
+    const bar = document.getElementById('upgrade-bar'); bar.max = data.total_count || 1; bar.value = data.processed_count || 0;
+    document.getElementById('upgrade-found').textContent = data.upgrades_found;
+    document.getElementById('upgrade-none').textContent = data.no_upgrade_count;
+    document.getElementById('upgrade-imdb').textContent = data.imdb_missing_count;
+    document.getElementById('upgrade-errors').textContent = data.api_error_count;
+    document.getElementById('upgrade-current').textContent = data.current_release || '';
+    if (wasRunning && !data.is_running) location.reload();
+    wasRunning = data.is_running;
+  } catch (_) {}
+}
+setInterval(pollUpgrade, 2000); pollUpgrade();
+</script>
+{% endblock %}

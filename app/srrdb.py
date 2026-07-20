@@ -488,7 +488,7 @@ async def check_release(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.8 "
+                    "iSiTSCENE/0.9 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -563,3 +563,109 @@ async def check_exact_release(
         stop_requested,
     )
     return status, matched, error
+
+
+_IMDB_RE = re.compile(r"(?:tt)?(\d{7,9})", re.IGNORECASE)
+
+
+def _extract_imdb_id(payload: object) -> str | None:
+    """Find an IMDb identifier in SRRDB detail payloads."""
+    preferred_keys = {"imdb", "imdbid", "imdb_id", "imdbnumber", "imdb_number"}
+
+    def walk(value: object) -> str | None:
+        if isinstance(value, dict):
+            for key, nested in value.items():
+                if str(key).casefold() in preferred_keys:
+                    match = _IMDB_RE.search(str(nested))
+                    if match:
+                        return f"tt{match.group(1)}"
+            for nested in value.values():
+                found = walk(nested)
+                if found:
+                    return found
+        elif isinstance(value, list):
+            for nested in value:
+                found = walk(nested)
+                if found:
+                    return found
+        return None
+
+    return walk(payload)
+
+
+def is_strict_uhd_upgrade(release_name: str) -> bool:
+    """Match the user's exact Scene UHD rule: 2160p + UHD + x265."""
+    folded = release_name.casefold()
+
+    def has_tag(tag: str) -> bool:
+        return re.search(
+            rf"(?:^|[._\s-]){re.escape(tag)}(?:$|[._\s-])",
+            folded,
+        ) is not None
+
+    return all(has_tag(tag) for tag in ("2160p", "uhd", "x265"))
+
+
+async def find_uhd_upgrades(
+    release_name: str,
+    delay_seconds: float,
+    stop_requested: Callable[[], bool] | None = None,
+) -> tuple[str | None, list[CandidateResult], str | None]:
+    """Resolve IMDb from the verified release, then search strict UHD candidates."""
+    timeout = httpx.Timeout(connect=10.0, read=20.0, write=10.0, pool=10.0)
+    encoded = quote(release_name, safe="")
+
+    try:
+        async with httpx.AsyncClient(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={
+                "User-Agent": (
+                    "iSiTSCENE/0.9 "
+                    "(+https://github.com/insaneavi/isitscene)"
+                )
+            },
+        ) as client:
+            details_response = await _interruptible_get(
+                client,
+                f"{BASE_URL}/details/{encoded}",
+                stop_requested,
+            )
+            await _interruptible_sleep(delay_seconds, stop_requested)
+            details_response.raise_for_status()
+            details_payload = details_response.json()
+            imdb_id = _extract_imdb_id(details_payload)
+            if not imdb_id:
+                return None, [], None
+
+            imdb_digits = imdb_id.removeprefix("tt")
+            search_response = await _interruptible_get(
+                client,
+                f"{BASE_URL}/search/imdb:{quote(imdb_digits, safe='')}",
+                stop_requested,
+            )
+            await _interruptible_sleep(delay_seconds, stop_requested)
+
+            if search_response.status_code == 404:
+                return imdb_id, [], None
+
+            search_response.raise_for_status()
+            names = _extract_release_names(search_response.json())
+            candidates = [
+                CandidateResult(
+                    release_name=name,
+                    url=f"{DETAILS_URL}/{quote(name, safe='.-_')}",
+                    score=100,
+                    reason="Contains all required Scene UHD tags: 2160p, UHD, and x265.",
+                )
+                for name in names
+                if is_strict_uhd_upgrade(name)
+            ]
+            candidates.sort(key=lambda item: item.release_name.casefold())
+            return imdb_id, candidates, None
+    except ScanCancelled:
+        raise
+    except httpx.HTTPStatusError as exc:
+        return None, [], f"SRRDB returned HTTP {exc.response.status_code}."
+    except (httpx.HTTPError, ValueError) as exc:
+        return None, [], str(exc)

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.0
+
+- Added Collection Upgrade scanner and page.
+- Added strict IMDb-based UHD detection requiring 2160p + UHD + x265.
+- Excluded WEB releases and already-UHD releases.
+- Added upgrade scan progress, stop control, persistent results, candidates, and history.
+- Added automatic creation of new SQLite tables.
+
+
 ## v0.8.3.2
 
 - Moved Refresh Library Changes to `POST /scan/refresh-library`.

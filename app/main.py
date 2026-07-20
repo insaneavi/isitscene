@@ -14,7 +14,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 
 from .config import APP_NAME
-from .database import Release, ScanProgress, ScanRun, SessionLocal, init_db
+from .database import (
+    Release, ScanProgress, ScanRun, SessionLocal, UpgradeCandidate,
+    UpgradeProgress, UpgradeResult, UpgradeScan, init_db,
+)
 from .scanner import (
     recover_interrupted_scan,
     refresh_library_changes,
@@ -22,6 +25,7 @@ from .scanner import (
     run_scan,
 )
 from .settings_service import get_settings, save_settings
+from .upgrade_scanner import request_upgrade_stop, run_upgrade_scan
 
 logging.basicConfig(level=logging.INFO)
 
@@ -421,6 +425,69 @@ def update_collection_review(
         destination += "?" + urlencode(values)
 
     return RedirectResponse(destination, status_code=303)
+
+
+
+@app.get("/collection-upgrade", response_class=HTMLResponse)
+def collection_upgrade(request: Request, q: str = "", status: str = ""):
+    db = SessionLocal()
+    try:
+        statement = select(UpgradeResult).order_by(UpgradeResult.current_release)
+        if q:
+            statement = statement.where(UpgradeResult.current_release.ilike(f"%{q}%"))
+        if status:
+            statement = statement.where(UpgradeResult.status == status)
+        results = db.scalars(statement).all()
+        rows = []
+        for result in results:
+            candidates = db.scalars(
+                select(UpgradeCandidate)
+                .where(UpgradeCandidate.upgrade_result_id == result.id)
+                .order_by(UpgradeCandidate.release_name)
+            ).all()
+            rows.append((result, candidates))
+        latest_scan = db.scalars(select(UpgradeScan).order_by(UpgradeScan.started_at.desc()).limit(1)).first()
+        progress = db.get(UpgradeProgress, 1)
+        return templates.TemplateResponse(
+            request=request,
+            name="collection_upgrade.html",
+            context={"rows": rows, "q": q, "status": status, "latest_scan": latest_scan, "progress": progress},
+        )
+    finally:
+        db.close()
+
+
+@app.get("/api/upgrade-status")
+def upgrade_status():
+    db = SessionLocal()
+    try:
+        p = db.get(UpgradeProgress, 1)
+        return JSONResponse({
+            "is_running": bool(p and p.is_running),
+            "phase": p.phase if p else "idle",
+            "current_release": p.current_release if p else None,
+            "processed_count": p.processed_count if p else 0,
+            "total_count": p.total_count if p else 0,
+            "upgrades_found": p.upgrades_found if p else 0,
+            "no_upgrade_count": p.no_upgrade_count if p else 0,
+            "imdb_missing_count": p.imdb_missing_count if p else 0,
+            "api_error_count": p.api_error_count if p else 0,
+            "message": p.message if p else "No upgrade scan has run yet.",
+        })
+    finally:
+        db.close()
+
+
+@app.post("/upgrade/start")
+def start_upgrade_scan(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_upgrade_scan)
+    return RedirectResponse("/collection-upgrade?started=1", status_code=303)
+
+
+@app.post("/upgrade/stop")
+def stop_upgrade_scan():
+    request_upgrade_stop()
+    return RedirectResponse("/collection-upgrade", status_code=303)
 
 
 @app.get("/settings", response_class=HTMLResponse)

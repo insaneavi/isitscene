@@ -738,3 +738,23 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+.upgrade-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+.upgrade-actions form { margin:0; }
+.upgrade-progress { margin:0 0 18px; padding:16px; border:1px solid var(--border, #303744); border-radius:10px; background:rgba(255,255,255,.02); }
+.progress-title, .upgrade-card-head { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
+.upgrade-progress progress { width:100%; height:14px; margin:12px 0; }
+.upgrade-stats { display:flex; flex-wrap:wrap; gap:18px; font-size:.9rem; }
+.current-release { margin-top:10px; font-family:monospace; overflow-wrap:anywhere; color:#aeb7c6; }
+.upgrade-list { display:grid; gap:12px; }
+.upgrade-card { padding:16px; border:1px solid var(--border, #303744); border-radius:10px; background:rgba(255,255,255,.02); }
+.release-name { font-family:monospace; overflow-wrap:anywhere; }
+.candidate-list { display:grid; gap:8px; margin-top:14px; }
+.candidate-list a { display:block; padding:10px 12px; border:1px solid rgba(79,140,255,.35); border-radius:7px; overflow-wrap:anywhere; }
+.badge.upgrade_available { background:rgba(45,180,95,.16); color:#77e39e; }
+.badge.no_upgrade { background:rgba(130,140,155,.15); color:#c3cad4; }
+.badge.imdb_unavailable, .badge.api_error { background:rgba(230,160,40,.15); color:#f2c46f; }
+.muted { color:#98a2b3; font-size:.9rem; margin-top:5px; }
+.error { color:#ff9a9a; }
+@media(max-width:760px){ .upgrade-heading,.progress-title,.upgrade-card-head{flex-direction:column}.upgrade-actions,.upgrade-actions form,.upgrade-actions button{width:100%} }

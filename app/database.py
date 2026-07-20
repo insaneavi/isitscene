@@ -122,6 +122,62 @@ class ScanProgress(Base):
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class UpgradeScan(Base):
+    __tablename__ = "upgrade_scans"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    status: Mapped[str] = mapped_column(String, default="running")
+    eligible_count: Mapped[int] = mapped_column(Integer, default=0)
+    checked_count: Mapped[int] = mapped_column(Integer, default=0)
+    upgrades_found: Mapped[int] = mapped_column(Integer, default=0)
+    no_upgrade_count: Mapped[int] = mapped_column(Integer, default=0)
+    imdb_missing_count: Mapped[int] = mapped_column(Integer, default=0)
+    api_error_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class UpgradeResult(Base):
+    __tablename__ = "upgrade_results"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    release_id: Mapped[int] = mapped_column(Integer, unique=True, index=True)
+    current_release: Mapped[str] = mapped_column(String, index=True)
+    imdb_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    status: Mapped[str] = mapped_column(String, default="not_checked", index=True)
+    candidate_count: Mapped[int] = mapped_column(Integer, default=0)
+    checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class UpgradeCandidate(Base):
+    __tablename__ = "upgrade_candidates"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    upgrade_result_id: Mapped[int] = mapped_column(Integer, index=True)
+    release_name: Mapped[str] = mapped_column(String, index=True)
+    srrdb_url: Mapped[str] = mapped_column(Text)
+
+
+class UpgradeProgress(Base):
+    __tablename__ = "upgrade_progress"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    is_running: Mapped[bool] = mapped_column(Boolean, default=False)
+    phase: Mapped[str] = mapped_column(String, default="idle")
+    current_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    processed_count: Mapped[int] = mapped_column(Integer, default=0)
+    total_count: Mapped[int] = mapped_column(Integer, default=0)
+    upgrades_found: Mapped[int] = mapped_column(Integer, default=0)
+    no_upgrade_count: Mapped[int] = mapped_column(Integer, default=0)
+    imdb_missing_count: Mapped[int] = mapped_column(Integer, default=0)
+    api_error_count: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class AppSetting(Base):
     __tablename__ = "settings"
 
@@ -246,8 +302,14 @@ def init_db() -> None:
 
     db = SessionLocal()
     try:
+        changed = False
         if db.get(ScanProgress, 1) is None:
             db.add(ScanProgress(id=1))
+            changed = True
+        if db.get(UpgradeProgress, 1) is None:
+            db.add(UpgradeProgress(id=1))
+            changed = True
+        if changed:
             db.commit()
     finally:
         db.close()
