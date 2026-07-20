@@ -5,14 +5,43 @@
     <h1>Collection Upgrade</h1>
     <p>Find strict Scene UHD upgrades for present, verified Blu-ray releases. A candidate must contain all three tags: <strong>2160p</strong>, <strong>UHD</strong>, and <strong>x265</strong>.</p>
   </div>
-  <div class="upgrade-actions">
+  <div class="upgrade-actions" id="upgrade-actions">
+    <form method="post" action="/upgrade/start">
+      <button id="upgrade-start-button" type="submit"
+        {% if progress and progress.is_running %}disabled{% endif %}>
+        Start Upgrade Scan
+      </button>
+    </form>
+    <form method="post" action="/upgrade/stop">
+      <button id="upgrade-stop-button" class="danger" type="submit"
+        {% if not progress or not progress.is_running %}disabled{% endif %}>
+        Stop Upgrade Scan
+      </button>
+    </form>
     {% if progress and progress.is_running %}
-    <form method="post" action="/upgrade/stop"><button class="danger" type="submit">Stop Upgrade Scan</button></form>
-    {% else %}
-    <form method="post" action="/upgrade/start"><button type="submit">Scan Collection for Upgrades</button></form>
+    <form method="post" action="/upgrade/reset"
+          onsubmit="return confirm('Force reset only if the scan remains stuck after Stop. Continue?');">
+      <button class="secondary" type="submit">Force Reset Stuck Scan</button>
+    </form>
     {% endif %}
   </div>
 </section>
+
+{% if request.query_params.get("stopping") %}
+<section class="refresh-notice">
+  Stop requested. The active SRRDB request will be cancelled or allowed to
+  finish, then the scanner will stop.
+</section>
+{% elif request.query_params.get("reset") %}
+<section class="refresh-notice">
+  The stale Collection Upgrade state was reset. You can start a new scan.
+</section>
+{% elif request.query_params.get("reset_failed") %}
+<section class="refresh-notice error">
+  A scan worker is still active. Use Stop first and wait for the current
+  SRRDB request to exit.
+</section>
+{% endif %}
 
 <section class="upgrade-progress" id="upgrade-progress">
   <div class="progress-title"><strong id="upgrade-message">{{ progress.message if progress and progress.message else 'No upgrade scan has run yet.' }}</strong><span id="upgrade-count">{{ progress.processed_count if progress else 0 }} / {{ progress.total_count if progress else 0 }}</span></div>
@@ -68,6 +97,10 @@ async function pollUpgrade() {
     document.getElementById('upgrade-imdb').textContent = data.imdb_missing_count;
     document.getElementById('upgrade-errors').textContent = data.api_error_count;
     document.getElementById('upgrade-current').textContent = data.current_release || '';
+    const startButton = document.getElementById('upgrade-start-button');
+    const stopButton = document.getElementById('upgrade-stop-button');
+    if (startButton) startButton.disabled = data.is_running;
+    if (stopButton) stopButton.disabled = !data.is_running;
     if (wasRunning && !data.is_running) location.reload();
     wasRunning = data.is_running;
   } catch (_) {}

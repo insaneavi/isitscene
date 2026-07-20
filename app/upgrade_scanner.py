@@ -33,7 +33,88 @@ def _eligible(name: str) -> bool:
 
 
 def request_upgrade_stop() -> None:
+    """Request cancellation and immediately expose the stopping state."""
     _stop_event.set()
+    db = SessionLocal()
+    try:
+        progress = _progress(db)
+        if progress.is_running:
+            progress.phase = "stopping"
+            progress.message = (
+                "Stopping Collection Upgrade after the current SRRDB request..."
+            )
+            db.commit()
+    finally:
+        db.close()
+
+
+def recover_interrupted_upgrade_scan() -> None:
+    """Clear a stale running state left behind by a restart or worker exit."""
+    db = SessionLocal()
+    try:
+        progress = _progress(db)
+        if not progress.is_running:
+            return
+
+        now = datetime.utcnow()
+        progress.is_running = False
+        progress.phase = "interrupted"
+        progress.current_release = None
+        progress.completed_at = now
+        progress.message = (
+            "Previous Collection Upgrade scan was interrupted. "
+            "You can safely start it again."
+        )
+
+        active_runs = db.scalars(
+            select(UpgradeScan).where(UpgradeScan.status == "running")
+        ).all()
+        for run in active_runs:
+            run.status = "interrupted"
+            run.completed_at = now
+            run.error_message = (
+                "Application restarted or the previous scan worker exited."
+            )
+
+        db.commit()
+    finally:
+        db.close()
+
+
+def reset_upgrade_scan_state() -> bool:
+    """Force-clear stale UI/database state when no worker owns the scan lock."""
+    if not _upgrade_lock.acquire(blocking=False):
+        return False
+
+    try:
+        _stop_event.clear()
+        db = SessionLocal()
+        try:
+            now = datetime.utcnow()
+            progress = _progress(db)
+            progress.is_running = False
+            progress.phase = "reset"
+            progress.current_release = None
+            progress.completed_at = now
+            progress.message = (
+                "Collection Upgrade scan state was reset. "
+                "You can start a new scan."
+            )
+
+            active_runs = db.scalars(
+                select(UpgradeScan).where(UpgradeScan.status == "running")
+            ).all()
+            for run in active_runs:
+                run.status = "interrupted"
+                run.completed_at = now
+                run.error_message = "Scan state was manually reset."
+
+            db.commit()
+            return True
+        finally:
+            db.close()
+    finally:
+        _upgrade_lock.release()
 
 
 def _progress(db):
@@ -47,7 +128,9 @@ def _progress(db):
 
 async def _run() -> None:
     if not _upgrade_lock.acquire(blocking=False):
+        logger.info("Collection Upgrade is already running; start request ignored.")
         return
+
     _stop_event.clear()
     db = SessionLocal()
     run = None

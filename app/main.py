@@ -25,7 +25,12 @@ from .scanner import (
     run_scan,
 )
 from .settings_service import get_settings, save_settings
-from .upgrade_scanner import request_upgrade_stop, run_upgrade_scan
+from .upgrade_scanner import (
+    recover_interrupted_upgrade_scan,
+    request_upgrade_stop,
+    reset_upgrade_scan_state,
+    run_upgrade_scan,
+)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -54,6 +59,7 @@ def refresh_scheduler() -> None:
 async def lifespan(app: FastAPI):
     init_db()
     recover_interrupted_scan()
+    recover_interrupted_upgrade_scan()
     scheduler.start()
     refresh_scheduler()
     yield
@@ -473,6 +479,7 @@ def upgrade_status():
             "imdb_missing_count": p.imdb_missing_count if p else 0,
             "api_error_count": p.api_error_count if p else 0,
             "message": p.message if p else "No upgrade scan has run yet.",
+            "can_force_reset": bool(p and p.is_running),
         })
     finally:
         db.close()
@@ -487,7 +494,14 @@ def start_upgrade_scan(background_tasks: BackgroundTasks):
 @app.post("/upgrade/stop")
 def stop_upgrade_scan():
     request_upgrade_stop()
-    return RedirectResponse("/collection-upgrade", status_code=303)
+    return RedirectResponse("/collection-upgrade?stopping=1", status_code=303)
+
+
+@app.post("/upgrade/reset")
+def reset_upgrade_scan():
+    reset = reset_upgrade_scan_state()
+    suffix = "reset=1" if reset else "reset_failed=1"
+    return RedirectResponse(f"/collection-upgrade?{suffix}", status_code=303)
 
 
 @app.get("/settings", response_class=HTMLResponse)

@@ -758,3 +758,20 @@ button:disabled {
 .muted { color:#98a2b3; font-size:.9rem; margin-top:5px; }
 .error { color:#ff9a9a; }
 @media(max-width:760px){ .upgrade-heading,.progress-title,.upgrade-card-head{flex-direction:column}.upgrade-actions,.upgrade-actions form,.upgrade-actions button{width:100%} }
+
+
+.upgrade-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.upgrade-actions form {
+  margin: 0;
+}
+
+.upgrade-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}

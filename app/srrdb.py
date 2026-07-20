@@ -488,7 +488,7 @@ async def check_release(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9.1 "
+                    "iSiTSCENE/0.9.2 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -644,7 +644,7 @@ async def find_uhd_upgrades(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9.1 "
+                    "iSiTSCENE/0.9.2 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },

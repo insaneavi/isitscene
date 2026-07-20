@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.9.1
+## v0.9.2
 
 - Added Collection Upgrade scanner and page.
 - Added strict IMDb-based UHD detection requiring 2160p + UHD + x265.
