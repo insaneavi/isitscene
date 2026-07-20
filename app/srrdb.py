@@ -488,7 +488,7 @@ async def check_release(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9 "
+                    "iSiTSCENE/0.9.1 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
@@ -569,25 +569,48 @@ _IMDB_RE = re.compile(r"(?:tt)?(\d{7,9})", re.IGNORECASE)
 
 
 def _extract_imdb_id(payload: object) -> str | None:
-    """Find an IMDb identifier in SRRDB detail payloads."""
-    preferred_keys = {"imdb", "imdbid", "imdb_id", "imdbnumber", "imdb_number"}
+    """Find an IMDb identifier in SRRDB IMDb endpoint responses."""
+    preferred_keys = {
+        "imdb",
+        "imdbid",
+        "imdb_id",
+        "imdbnumber",
+        "imdb_number",
+        "id",
+    }
+
+    def normalize(value: object) -> str | None:
+        if value is None:
+            return None
+        match = _IMDB_RE.search(str(value))
+        if not match:
+            return None
+        return f"tt{match.group(1)}"
 
     def walk(value: object) -> str | None:
         if isinstance(value, dict):
+            # Prefer known IMDb-related fields first.
             for key, nested in value.items():
                 if str(key).casefold() in preferred_keys:
-                    match = _IMDB_RE.search(str(nested))
-                    if match:
-                        return f"tt{match.group(1)}"
+                    found = normalize(nested)
+                    if found:
+                        return found
+
+            # Then inspect nested payload wrappers used by SRRDB.
             for nested in value.values():
                 found = walk(nested)
                 if found:
                     return found
+
         elif isinstance(value, list):
             for nested in value:
                 found = walk(nested)
                 if found:
                     return found
+
+        elif isinstance(value, (str, int)):
+            return normalize(value)
+
         return None
 
     return walk(payload)
@@ -621,22 +644,30 @@ async def find_uhd_upgrades(
             follow_redirects=True,
             headers={
                 "User-Agent": (
-                    "iSiTSCENE/0.9 "
+                    "iSiTSCENE/0.9.1 "
                     "(+https://github.com/insaneavi/isitscene)"
                 )
             },
         ) as client:
-            details_response = await _interruptible_get(
+            imdb_response = await _interruptible_get(
                 client,
-                f"{BASE_URL}/details/{encoded}",
+                f"{BASE_URL}/imdb/{encoded}",
                 stop_requested,
             )
             await _interruptible_sleep(delay_seconds, stop_requested)
-            details_response.raise_for_status()
-            details_payload = details_response.json()
-            imdb_id = _extract_imdb_id(details_payload)
-            if not imdb_id:
+
+            if imdb_response.status_code == 404:
                 return None, [], None
+
+            imdb_response.raise_for_status()
+            imdb_payload = imdb_response.json()
+            imdb_id = _extract_imdb_id(imdb_payload)
+            if not imdb_id:
+                return (
+                    None,
+                    [],
+                    "SRRDB IMDb response did not contain a recognizable IMDb ID.",
+                )
 
             imdb_digits = imdb_id.removeprefix("tt")
             search_response = await _interruptible_get(

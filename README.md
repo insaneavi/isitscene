@@ -1,9 +1,9 @@
-# iSiTSCENE v0.9.0
+# iSiTSCENE v0.9.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.9.0
+## New in v0.9.1
 
 - Adds **Collection Upgrade**, a separate scanner and results page.
 - Scans only present, verified Blu-ray releases.
