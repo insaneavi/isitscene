@@ -34,6 +34,16 @@
     </option>
   </select>
 
+  <select name="candidate_status">
+    <option value="">All candidate results</option>
+    <option value="found" {% if candidate_status == "found" %}selected{% endif %}>
+      Candidate Found
+    </option>
+    <option value="none" {% if candidate_status == "none" %}selected{% endif %}>
+      No Candidate
+    </option>
+  </select>
+
   <button>Filter</button>
   <a class="secondary-link" href="/collection-review">Clear</a>
 </form>
@@ -95,6 +105,59 @@
         </p>
       {% endif %}
 
+      {% if release.candidate_release %}
+        <section class="candidate-panel">
+          <div class="candidate-heading">
+            <div>
+              <span class="candidate-kicker">
+                Possible SRRDB match — manual review only
+              </span>
+              <h3>{{ release.candidate_release }}</h3>
+            </div>
+            <span class="candidate-score">
+              {{ release.candidate_score or 0 }}/100
+            </span>
+          </div>
+
+          <p class="candidate-warning">
+            This folder remains <strong>Unverified</strong>. Correct the
+            folder name outside iSiTSCENE and rescan to obtain an exact
+            verification.
+          </p>
+
+          {% if release.candidate_reason %}
+            <p class="candidate-reason">
+              <strong>Likely difference:</strong>
+              {{ release.candidate_reason }}
+            </p>
+          {% endif %}
+
+          <div class="candidate-actions">
+            <a
+              class="srrdb-candidate-button"
+              href="{{ release.candidate_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open SRRDB Candidate
+            </a>
+            {% if release.candidate_checked_at %}
+              <span>
+                Candidate checked:
+                {{
+                  release.candidate_checked_at.strftime("%Y-%m-%d %H:%M")
+                }}
+              </span>
+            {% endif %}
+          </div>
+        </section>
+      {% else %}
+        <section class="candidate-panel candidate-empty">
+          <span class="candidate-kicker">Stage 2 candidate search</span>
+          <p>No sufficiently strong SRRDB candidate was found.</p>
+        </section>
+      {% endif %}
+
       <form
         class="review-form"
         method="post"
@@ -105,6 +168,11 @@
           type="hidden"
           name="active_filter"
           value="{{ review_status }}"
+        >
+        <input
+          type="hidden"
+          name="candidate_filter"
+          value="{{ candidate_status }}"
         >
 
         <label>

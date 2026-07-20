@@ -62,6 +62,28 @@ class Release(Base):
         nullable=True,
     )
 
+    # Advisory Stage 2 SRRDB candidate. This never changes verification.
+    candidate_release: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )
+    candidate_url: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+    candidate_score: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+    candidate_reason: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+    candidate_checked_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
 
 class ScanRun(Base):
     __tablename__ = "scan_runs"
@@ -165,6 +187,31 @@ def _migrate_schema() -> None:
     _add_column_if_missing(
         "releases",
         "last_reviewed",
+        "DATETIME",
+    )
+    _add_column_if_missing(
+        "releases",
+        "candidate_release",
+        "VARCHAR",
+    )
+    _add_column_if_missing(
+        "releases",
+        "candidate_url",
+        "TEXT",
+    )
+    _add_column_if_missing(
+        "releases",
+        "candidate_score",
+        "INTEGER",
+    )
+    _add_column_if_missing(
+        "releases",
+        "candidate_reason",
+        "TEXT",
+    )
+    _add_column_if_missing(
+        "releases",
+        "candidate_checked_at",
         "DATETIME",
     )
 

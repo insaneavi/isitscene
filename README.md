@@ -1,7 +1,20 @@
-# iSiTSCENE v0.7
+# iSiTSCENE v0.8
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.8
+
+- Adds Stage 2 advisory SRRDB candidate matching.
+- Exact folder-name equality remains the only path to Verified status.
+- Unverified releases can display a likely SRRDB candidate, score, likely
+  difference, direct link, and candidate-check timestamp.
+- Candidate matching compares title, group, resolution, source, codec,
+  release flags, and year.
+- Candidates below the confidence threshold are not displayed.
+- Adds Collection Review filters for Candidate Found and No Candidate.
+- Adds dashboard counts for candidate results.
+- Existing SQLite databases are upgraded automatically.
 
 ## New in v0.7
 

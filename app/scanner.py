@@ -10,7 +10,7 @@ from sqlalchemy import select
 from .config import MOVIES_PATH, SYSTEM_FOLDERS
 from .database import Release, ScanProgress, ScanRun, SessionLocal
 from .settings_service import get_settings
-from .srrdb import ScanCancelled, check_exact_release
+from .srrdb import ScanCancelled, check_release
 
 logger = logging.getLogger(__name__)
 
@@ -268,7 +268,7 @@ async def _verify_releases(run_id: int) -> None:
             progress.message = "Checking SRRDB..."
             db.commit()
 
-            status, matched, error = await check_exact_release(
+            status, matched, error, candidate = await check_release(
                 release.folder_name,
                 settings.srrdb_delay_seconds,
                 stop_requested=_stop_event.is_set,
@@ -281,6 +281,27 @@ async def _verify_releases(run_id: int) -> None:
             release.matched_release = matched
             release.error_message = error
             release.last_checked = datetime.utcnow()
+
+            if status == "verified":
+                release.candidate_release = None
+                release.candidate_url = None
+                release.candidate_score = None
+                release.candidate_reason = None
+                release.candidate_checked_at = None
+            else:
+                release.candidate_release = (
+                    candidate.release_name if candidate else None
+                )
+                release.candidate_url = (
+                    candidate.url if candidate else None
+                )
+                release.candidate_score = (
+                    candidate.score if candidate else None
+                )
+                release.candidate_reason = (
+                    candidate.reason if candidate else None
+                )
+                release.candidate_checked_at = datetime.utcnow()
 
             progress.processed_count = index
             if status == "verified":

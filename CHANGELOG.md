@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8
+
+- Added advisory Stage 2 SRRDB candidate search.
+- Kept exact verification rules unchanged.
+- Added candidate scoring and likely-difference explanations.
+- Added candidate fields and automatic SQLite migration.
+- Added candidate display, SRRDB links, filters, and dashboard counts.
+- Candidate API failures remain non-fatal and never verify a release.
+
+
 ## v0.7
 
 - Added automatic title extraction from release folder names.

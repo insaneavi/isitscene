@@ -156,6 +156,20 @@ def dashboard(request: Request):
                     Release.review_status == "replace",
                 )
             ) or 0,
+            "candidate_found": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    present,
+                    Release.verification_status == "unverified",
+                    Release.candidate_release.is_not(None),
+                )
+            ) or 0,
+            "candidate_missing": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    present,
+                    Release.verification_status == "unverified",
+                    Release.candidate_release.is_(None),
+                )
+            ) or 0,
         }
 
         latest_scan = db.scalars(
@@ -288,6 +302,7 @@ def collection_review(
     request: Request,
     q: str = "",
     review_status: str = "",
+    candidate_status: str = "",
 ):
     db = SessionLocal()
     try:
@@ -310,6 +325,15 @@ def collection_review(
                 Release.review_status == review_status
             )
 
+        if candidate_status == "found":
+            statement = statement.where(
+                Release.candidate_release.is_not(None)
+            )
+        elif candidate_status == "none":
+            statement = statement.where(
+                Release.candidate_release.is_(None)
+            )
+
         items = db.scalars(statement).all()
 
         return templates.TemplateResponse(
@@ -319,6 +343,7 @@ def collection_review(
                 "items": items,
                 "q": q,
                 "review_status": review_status,
+                "candidate_status": candidate_status,
             },
         )
     finally:
@@ -332,6 +357,7 @@ def update_collection_review(
     review_comment: str = Form(""),
     q: str = Form(""),
     active_filter: str = Form(""),
+    candidate_filter: str = Form(""),
 ):
     allowed_statuses = {"pending", "keep", "replace", "ignored"}
     selected_status = (
@@ -369,6 +395,8 @@ def update_collection_review(
             values["q"] = q
         if active_filter:
             values["review_status"] = active_filter
+        if candidate_filter:
+            values["candidate_status"] = candidate_filter
         destination += "?" + urlencode(values)
 
     return RedirectResponse(destination, status_code=303)
