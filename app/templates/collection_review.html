@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="heading">
+<section class="heading collection-review-heading">
   <div>
     <h1>Collection Review</h1>
     <p>
@@ -9,7 +9,21 @@
       Record why you are keeping them for now.
     </p>
   </div>
+
+  <form method="post" action="/collection-review/refresh">
+    <button class="refresh-library-button" type="submit">
+      Refresh Library Changes
+    </button>
+  </form>
 </section>
+
+{% if request.query_params.get("refresh_started") %}
+  <section class="refresh-notice">
+    Library refresh started. Newly discovered folders will be verified;
+    unchanged releases will not be rescanned. Refresh this page shortly to
+    see the updated results.
+  </section>
+{% endif %}
 
 <form class="filters" method="get">
   <input

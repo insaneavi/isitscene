@@ -1,7 +1,19 @@
-# iSiTSCENE v0.8.2
+# iSiTSCENE v0.8.3
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.8.3
+
+- Adds a Refresh Library Changes button to Collection Review.
+- Re-inventories only top-level movie-folder names.
+- Marks disappeared folders as Removed.
+- Adds newly discovered or renamed folders as new release records.
+- Verifies only newly discovered folders against SRRDB.
+- Leaves all unchanged releases untouched.
+- Uses the existing scan lock and progress tracking to prevent overlapping
+  full scans and library refreshes.
+- No database changes.
 
 ## New in v0.8.2
 

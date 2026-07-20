@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.3
+
+- Added Refresh Library Changes to Collection Review.
+- Added lightweight top-level inventory refresh.
+- Added targeted verification for newly discovered folders only.
+- Renamed folders are represented as an old Removed record and a new release.
+- Reused scan locking, stopping, progress, and scan-history behavior.
+- No database changes.
+
+
 ## v0.8.2
 
 - Fixed Stage 2 candidate searches by removing the rejected `group:` keyword.

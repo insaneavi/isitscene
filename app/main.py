@@ -15,7 +15,12 @@ from sqlalchemy import func, select
 
 from .config import APP_NAME
 from .database import Release, ScanProgress, ScanRun, SessionLocal, init_db
-from .scanner import recover_interrupted_scan, request_stop, run_scan
+from .scanner import (
+    recover_interrupted_scan,
+    refresh_library_changes,
+    request_stop,
+    run_scan,
+)
 from .settings_service import get_settings, save_settings
 
 logging.basicConfig(level=logging.INFO)
@@ -444,6 +449,15 @@ def update_settings(
     )
     refresh_scheduler()
     return RedirectResponse("/settings?saved=1", status_code=303)
+
+
+@app.post("/collection-review/refresh")
+def refresh_collection_library(background_tasks: BackgroundTasks):
+    background_tasks.add_task(refresh_library_changes)
+    return RedirectResponse(
+        "/collection-review?refresh_started=1",
+        status_code=303,
+    )
 
 
 @app.post("/scan/start")

@@ -699,3 +699,42 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+.collection-review-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.refresh-library-button {
+  min-width: 190px;
+  border-color: #4f8cff;
+  color: #d5e4ff;
+  background: rgba(79, 140, 255, 0.12);
+}
+
+.refresh-library-button:hover {
+  background: rgba(79, 140, 255, 0.2);
+}
+
+.refresh-notice {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(79, 140, 255, 0.5);
+  border-radius: 8px;
+  color: #d5e4ff;
+  background: rgba(79, 140, 255, 0.08);
+}
+
+@media (max-width: 760px) {
+  .collection-review-heading {
+    flex-direction: column;
+  }
+
+  .collection-review-heading form,
+  .refresh-library-button {
+    width: 100%;
+  }
+}

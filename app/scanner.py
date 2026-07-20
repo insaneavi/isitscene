@@ -418,3 +418,258 @@ async def _scan_async() -> None:
 
 def run_scan() -> None:
     asyncio.run(_scan_async())
+
+
+def _start_library_refresh() -> int:
+    """Create scan history/progress state for a lightweight library refresh."""
+    db = SessionLocal()
+    try:
+        run = ScanRun(status="running")
+        db.add(run)
+        db.flush()
+
+        progress = _get_progress(db)
+        progress.is_running = True
+        progress.phase = "refresh_inventory"
+        progress.current_release = None
+        progress.processed_count = 0
+        progress.total_count = 0
+        progress.verified_count = 0
+        progress.unverified_count = 0
+        progress.not_found_count = 0
+        progress.api_error_count = 0
+        progress.skipped_count = 0
+        progress.started_at = datetime.utcnow()
+        progress.completed_at = None
+        progress.message = "Refreshing top-level movie folders..."
+
+        db.commit()
+        return run.id
+    finally:
+        db.close()
+
+
+def _refresh_inventory(run_id: int) -> list[int]:
+    """Re-inventory folders and return only newly discovered release IDs."""
+    settings = get_settings()
+    _check_stop()
+
+    if not MOVIES_PATH.exists() or not MOVIES_PATH.is_dir():
+        raise RuntimeError(f"Movie path is unavailable: {MOVIES_PATH}")
+
+    all_directories = sorted(
+        entry.name
+        for entry in MOVIES_PATH.iterdir()
+        if entry.is_dir()
+    )
+    folder_names = [
+        name
+        for name in all_directories
+        if should_scan_folder(
+            name,
+            settings.skip_hidden_system_folders,
+        )
+    ]
+
+    skipped_count = len(all_directories) - len(folder_names)
+    current = set(folder_names)
+    now = datetime.utcnow()
+
+    db = SessionLocal()
+    try:
+        run = db.get(ScanRun, run_id)
+        progress = _get_progress(db)
+
+        progress.phase = "refresh_inventory"
+        progress.total_count = len(folder_names)
+        progress.processed_count = 0
+        progress.skipped_count = skipped_count
+        progress.message = "Detecting renamed and newly added folders..."
+        run.skipped_folders = skipped_count
+        db.commit()
+
+        releases = db.scalars(select(Release)).all()
+        by_name = {release.folder_name: release for release in releases}
+        new_ids: list[int] = []
+        missing_count = 0
+
+        for index, name in enumerate(folder_names, start=1):
+            _check_stop()
+            release = by_name.get(name)
+
+            if release is None:
+                release = Release(
+                    folder_name=name,
+                    normalized_name=normalize(name),
+                    first_seen=now,
+                    last_seen=now,
+                    is_present=True,
+                    verification_status="pending",
+                    status="pending",
+                )
+                db.add(release)
+                db.flush()
+                new_ids.append(release.id)
+            else:
+                release.last_seen = now
+                release.is_present = True
+
+            progress.processed_count = index
+
+            if index % 250 == 0:
+                db.commit()
+
+        for release in releases:
+            _check_stop()
+            if release.is_present and release.folder_name not in current:
+                release.is_present = False
+                missing_count += 1
+
+        run.folders_found = len(folder_names)
+        run.new_folders = len(new_ids)
+        run.missing_folders = missing_count
+
+        progress.phase = "refresh_inventory_complete"
+        progress.current_release = None
+        progress.processed_count = len(folder_names)
+        progress.total_count = len(folder_names)
+        progress.message = (
+            f"Inventory refreshed. Found {len(new_ids)} new folder(s) "
+            f"and {missing_count} removed folder(s)."
+        )
+        db.commit()
+        return new_ids
+    finally:
+        db.close()
+
+
+async def _verify_new_releases(run_id: int, release_ids: list[int]) -> None:
+    """Verify only folders discovered by Refresh Library Changes."""
+    settings = get_settings()
+    db = SessionLocal()
+
+    try:
+        progress = _get_progress(db)
+        progress.phase = "refresh_verifying"
+        progress.processed_count = 0
+        progress.total_count = len(release_ids)
+        progress.current_release = None
+        progress.message = (
+            "No new folders require verification."
+            if not release_ids
+            else "Verifying newly discovered folders against SRRDB..."
+        )
+        db.commit()
+
+        for index, release_id in enumerate(release_ids, start=1):
+            _check_stop()
+
+            release = db.get(Release, release_id)
+            if release is None or not release.is_present or release.ignored:
+                continue
+
+            progress.current_release = release.folder_name
+            progress.message = "Checking newly discovered release..."
+            db.commit()
+
+            status, matched, error, candidate = await check_release(
+                release.folder_name,
+                settings.srrdb_delay_seconds,
+                stop_requested=_stop_event.is_set,
+            )
+            _check_stop()
+
+            release.verification_status = status
+            release.status = status
+            release.matched_release = matched
+            release.error_message = error
+            release.last_checked = datetime.utcnow()
+
+            if status == "verified":
+                release.candidate_release = None
+                release.candidate_url = None
+                release.candidate_score = None
+                release.candidate_reason = None
+                release.candidate_checked_at = None
+            else:
+                release.candidate_release = (
+                    candidate.release_name if candidate else None
+                )
+                release.candidate_url = candidate.url if candidate else None
+                release.candidate_score = candidate.score if candidate else None
+                release.candidate_reason = (
+                    candidate.reason if candidate else None
+                )
+                release.candidate_checked_at = datetime.utcnow()
+
+            progress.processed_count = index
+            if status == "verified":
+                progress.verified_count += 1
+            elif status == "unverified":
+                progress.unverified_count += 1
+
+            db.commit()
+
+        completed_at = datetime.utcnow()
+        run = db.get(ScanRun, run_id)
+        present_releases = db.scalars(
+            select(Release).where(
+                Release.is_present.is_(True),
+                Release.ignored.is_(False),
+            )
+        ).all()
+
+        run.completed_at = completed_at
+        run.status = "completed"
+        run.exact_matches = sum(
+            release.verification_status == "verified"
+            for release in present_releases
+        )
+        run.unverified = sum(
+            release.verification_status == "unverified"
+            for release in present_releases
+        )
+        run.not_found = 0
+        run.api_errors = 0
+
+        progress.is_running = False
+        progress.phase = "refresh_complete"
+        progress.current_release = None
+        progress.completed_at = completed_at
+        progress.message = (
+            f"Library refresh completed. "
+            f"Verified {len(release_ids)} newly discovered folder(s)."
+        )
+        db.commit()
+    finally:
+        db.close()
+
+
+async def _refresh_library_changes_async() -> None:
+    if not _scan_lock.acquire(blocking=False):
+        logger.info("A scan or refresh is already running; request ignored.")
+        return
+
+    run_id: int | None = None
+    _stop_event.clear()
+
+    try:
+        run_id = _start_library_refresh()
+        new_release_ids = _refresh_inventory(run_id)
+        await _verify_new_releases(run_id, new_release_ids)
+    except ScanCancelled:
+        logger.info("Library refresh stopped by user.")
+        if run_id is not None:
+            _record_stopped(run_id)
+    except Exception as exc:
+        logger.exception("Library refresh failed")
+        if run_id is not None:
+            _record_failure(run_id, exc)
+    finally:
+        _stop_event.clear()
+        _scan_lock.release()
+
+
+def refresh_library_changes() -> None:
+    """Refresh inventory and verify only newly discovered folders."""
+    asyncio.run(_refresh_library_changes_async())
