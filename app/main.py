@@ -57,20 +57,36 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 _RELEASE_YEAR_PATTERN = re.compile(
-    r"(?<!\\d)(?:19\\d{2}|20\\d{2}|21\\d{2})(?!\\d)"
+    r"(?<!\d)(?:19\d{2}|20\d{2}|21\d{2})(?!\d)"
+)
+_RELEASE_TECH_PATTERN = re.compile(
+    r"(?i)(?:^|[._\s-])"
+    r"(?:480[pi]|576[pi]|720p|1080[pi]|2160p|4k|"
+    r"bluray|blu-ray|uhd|web-dl|webrip|hdtv|dvdrip|"
+    r"bdrip|brrip|remux|repack|proper|x264|x265|"
+    r"h264|h265|hevc|xvid|av1)"
+    r"(?=$|[._\s-])"
 )
 
 
 def movie_title_from_release_name(folder_name: str) -> str:
-    """Extract everything before the first plausible four-digit release year."""
+    """Extract the readable movie title before year or technical tags."""
     name = folder_name.strip()
+    boundaries = []
+
     year_match = _RELEASE_YEAR_PATTERN.search(name)
+    tech_match = _RELEASE_TECH_PATTERN.search(name)
 
     if year_match:
-        name = name[:year_match.start()]
+        boundaries.append(year_match.start())
+    if tech_match:
+        boundaries.append(tech_match.start())
+
+    if boundaries:
+        name = name[:min(boundaries)]
 
     name = re.sub(r"[._]+", " ", name)
-    name = re.sub(r"\\s+", " ", name)
+    name = re.sub(r"\s+", " ", name)
     return name.strip(" -")
 
 

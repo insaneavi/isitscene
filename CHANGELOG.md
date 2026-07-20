@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.8.2
+
+- Fixed Stage 2 candidate searches by removing the rejected `group:` keyword.
+- Retained group, resolution, source, codec, flags, and year as local scoring signals.
+- Fixed Blu-ray.com search-title regex escaping.
+- Added technical-tag fallback parsing for releases without a year.
+- No database changes.
+
+
 ## v0.8.1
 
 - Made the Releases page nearly full-width.

@@ -378,8 +378,9 @@ async def _interruptible_get(
 
 
 def _search_url(parsed: ParsedRelease) -> str | None:
-    # SRRDB search supports path-separated words and keyword filters.
-    # Use title words plus the strongest known identifier: release group.
+    # The live SRRDB API currently rejects the documented group: keyword.
+    # Search by title words only and use release metadata locally to score
+    # the returned candidates.
     meaningful_words = [
         word
         for word in parsed.title_tokens
@@ -390,12 +391,6 @@ def _search_url(parsed: ParsedRelease) -> str | None:
         return None
 
     segments = [quote(word, safe="") for word in meaningful_words]
-
-    if parsed.group:
-        segments.append(
-            "group:" + quote(parsed.group, safe="")
-        )
-
     return f"{BASE_URL}/search/" + "/".join(segments)
 
 

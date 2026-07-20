@@ -1,7 +1,17 @@
-# iSiTSCENE v0.8.1
+# iSiTSCENE v0.8.2
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.8.2
+
+- Fixed Stage 2 candidate searches returning no results.
+- Removed the SRRDB `group:` search keyword currently rejected by the API.
+- Candidate searches now use title terms and score release metadata locally.
+- Fixed Blu-ray.com title-extraction regex escaping.
+- Releases without a year now stop before technical tags such as 1080p,
+  REPACK, BluRay, x264, and similar metadata.
+- No database changes.
 
 ## New in v0.8.1
 
