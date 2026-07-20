@@ -337,3 +337,78 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+
+.review-title-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.review-title-tools strong {
+  color: var(--text);
+}
+
+.bluray-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #4f8cff;
+  border-radius: 7px;
+  color: #a9c8ff;
+  text-decoration: none;
+  background: rgba(79, 140, 255, 0.08);
+}
+
+.bluray-search-button:hover {
+  background: rgba(79, 140, 255, 0.16);
+}
+
+.comment-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  font-weight: 600;
+}
+
+.comment-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.comment-preset {
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+
+.comment-preset:hover,
+.comment-preset:focus-visible {
+  border-color: #39d98a;
+  background: rgba(57, 217, 138, 0.08);
+}
+
+.comment-other {
+  border-style: dashed;
+}
+
+@media (max-width: 760px) {
+  .bluray-search-button,
+  .comment-preset {
+    width: 100%;
+  }
+}

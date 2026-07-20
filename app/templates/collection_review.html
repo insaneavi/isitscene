@@ -51,6 +51,20 @@
       <div class="review-card-heading">
         <div>
           <h2>{{ release.folder_name }}</h2>
+          <div class="review-title-tools">
+            <span>
+              Search title:
+              <strong>{{ movie_title_from_release_name(release.folder_name) }}</strong>
+            </span>
+            <a
+              class="bluray-search-button"
+              href="{{ bluray_search_url(release.folder_name) }}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Search Blu-ray.com
+            </a>
+          </div>
           <div class="review-meta">
             <span class="badge unverified">Unverified</span>
             <span>
@@ -111,14 +125,45 @@
           </select>
         </label>
 
-        <label>
-          Comment
-          <textarea
-            name="review_comment"
-            rows="4"
-            placeholder="Example: Good quality encode; keep until a better scene release becomes available."
-          >{{ release.review_comment or "" }}</textarea>
-        </label>
+        <div class="comment-editor">
+          <span class="field-label">Quick comments</span>
+          <div
+            class="comment-presets"
+            role="group"
+            aria-label="Comment presets"
+          >
+            <button type="button" class="comment-preset"
+              data-comment="No Physical Blu-ray Release">
+              No Physical Blu-ray Release
+            </button>
+            <button type="button" class="comment-preset"
+              data-comment="Requested Movie">
+              Requested Movie
+            </button>
+            <button type="button" class="comment-preset"
+              data-comment="Personal Favorite">
+              Personal Favorite
+            </button>
+            <button type="button" class="comment-preset"
+              data-comment="Unable to Locate Scene Release">
+              Unable to Locate Scene Release
+            </button>
+            <button type="button"
+              class="comment-preset comment-other"
+              data-other="true">
+              Other
+            </button>
+          </div>
+
+          <label>
+            Comment
+            <textarea
+              name="review_comment"
+              rows="4"
+              placeholder="Choose a quick comment or enter a custom note."
+            >{{ release.review_comment or "" }}</textarea>
+          </label>
+        </div>
 
         <div class="review-actions">
           <button type="submit">Save Review</button>
@@ -135,4 +180,32 @@
     </section>
   {% endfor %}
 </section>
+
+<script>
+document.addEventListener("click", function (event) {
+  const button = event.target.closest(".comment-preset");
+  if (!button) {
+    return;
+  }
+
+  const form = button.closest(".review-form");
+  const textarea = form.querySelector(
+    'textarea[name="review_comment"]'
+  );
+
+  if (button.dataset.other === "true") {
+    textarea.value = "";
+    textarea.focus();
+    return;
+  }
+
+  textarea.value = button.dataset.comment || "";
+  textarea.focus();
+  textarea.setSelectionRange(
+    textarea.value.length,
+    textarea.value.length
+  );
+});
+</script>
+
 {% endblock %}

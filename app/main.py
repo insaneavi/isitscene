@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+import re
 from datetime import datetime
+from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -52,6 +54,38 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title=APP_NAME, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
+
+
+_RELEASE_YEAR_PATTERN = re.compile(
+    r"(?<!\\d)(?:19\\d{2}|20\\d{2}|21\\d{2})(?!\\d)"
+)
+
+
+def movie_title_from_release_name(folder_name: str) -> str:
+    """Extract everything before the first plausible four-digit release year."""
+    name = folder_name.strip()
+    year_match = _RELEASE_YEAR_PATTERN.search(name)
+
+    if year_match:
+        name = name[:year_match.start()]
+
+    name = re.sub(r"[._]+", " ", name)
+    name = re.sub(r"\\s+", " ", name)
+    return name.strip(" -")
+
+
+def bluray_search_url(folder_name: str) -> str:
+    title = movie_title_from_release_name(folder_name)
+    return (
+        "https://www.blu-ray.com/movies/search.php"
+        f"?keyword={quote_plus(title)}&action=search"
+    )
+
+
+templates.env.globals["movie_title_from_release_name"] = (
+    movie_title_from_release_name
+)
+templates.env.globals["bluray_search_url"] = bluray_search_url
 
 
 @app.get("/health")

@@ -1,7 +1,21 @@
-# iSiTSCENE v0.6
+# iSiTSCENE v0.7
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
+
+## New in v0.7
+
+- Adds a Blu-ray.com search button to each Collection Review item.
+- Extracts the movie title using everything before the first four-digit year.
+- Converts scene-style dots and underscores into readable search text.
+- Opens the Blu-ray.com search in a new browser tab.
+- Adds quick-comment buttons:
+  - No Physical Blu-ray Release
+  - Requested Movie
+  - Personal Favorite
+  - Unable to Locate Scene Release
+  - Other
+- Other clears and focuses the comment field for custom text.
 
 ## New in v0.6
 

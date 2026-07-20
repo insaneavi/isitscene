@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7
+
+- Added automatic title extraction from release folder names.
+- Added per-release Blu-ray.com search links.
+- Added one-click comment presets and custom Other notes.
+- Added responsive styling for the new controls.
+
+
 ## v0.6
 
 - Added the Collection Review workflow.
