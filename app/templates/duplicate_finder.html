@@ -1,6 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="heading upgrade-heading"><div><h1>Duplicate Finder</h1><p>Find different releases of the same movie. IMDb IDs are cached on each release, so later scans only query SRRDB for new or changed folders.</p></div><div class="upgrade-actions"><form method="post" action="/duplicate/start"><button id="duplicate-start" {% if progress and progress.is_running %}disabled{% endif %}>Start Duplicate Scan</button></form><form method="post" action="/duplicate/stop"><button id="duplicate-stop" class="danger" {% if not progress or not progress.is_running %}disabled{% endif %}>Stop Duplicate Scan</button></form>{% if progress and progress.is_running %}<form method="post" action="/duplicate/reset" onsubmit="return confirm('Force reset only if Stop remains stuck. Continue?');"><button class="secondary">Force Reset</button></form>{% endif %}</div></section>
+<section class="heading upgrade-heading">
+  <div>
+    <h1>Duplicate Finder</h1>
+    <p>Find different releases of the same movie. IMDb IDs are cached on each release, so later scans only query SRRDB for new or changed folders.</p>
+  </div>
+  <div class="scan-control-block">
+    <div class="upgrade-actions">
+      <form method="post" action="/duplicate/start">
+        <button id="duplicate-start" {% if progress and progress.is_running %}disabled{% endif %}>Start Duplicate Scan</button>
+      </form>
+      <form method="post" action="/duplicate/stop">
+        <button id="duplicate-stop" class="danger" {% if not progress or not progress.is_running %}disabled{% endif %}>Stop Duplicate Scan</button>
+      </form>
+      {% if progress and progress.is_running %}
+      <form method="post" action="/duplicate/reset" onsubmit="return confirm('Force reset only if Stop remains stuck. Continue?');">
+        <button class="secondary">Force Reset</button>
+      </form>
+      {% endif %}
+    </div>
+    <p class="last-successful-scan" id="last-successful-duplicate">
+      Last successful scan:
+      <strong>
+        {% if last_successful_scan %}
+          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+        {% else %}
+          Never
+        {% endif %}
+      </strong>
+    </p>
+  </div>
+</section>
 <section class="upgrade-progress"><div class="progress-title"><strong id="duplicate-message">{{ progress.message if progress and progress.message else 'No duplicate scan has run yet.' }}</strong><span id="duplicate-count">{{ progress.processed_count if progress else 0 }} / {{ progress.total_count if progress else 0 }}</span></div><progress id="duplicate-bar" max="{{ progress.total_count if progress and progress.total_count else 1 }}" value="{{ progress.processed_count if progress else 0 }}"></progress><div class="upgrade-stats"><span>Cached: <b id="duplicate-cached">{{ progress.cached_count if progress else 0 }}</b></span><span>Looked up: <b id="duplicate-looked">{{ progress.looked_up_count if progress else 0 }}</b></span><span>Groups: <b id="duplicate-groups">{{ progress.group_count if progress else 0 }}</b></span><span>Errors: <b id="duplicate-errors">{{ progress.error_count if progress else 0 }}</b></span></div><div class="current-release" id="duplicate-current">{{ progress.current_release if progress and progress.current_release else '' }}</div></section>
 <form class="filters" method="get"><select name="status"><option value="">All reviews</option><option value="unreviewed" {% if status=='unreviewed' %}selected{% endif %}>Unreviewed</option><option value="keep_both" {% if status=='keep_both' %}selected{% endif %}>Keep Both</option><option value="cleanup_needed" {% if status=='cleanup_needed' %}selected{% endif %}>Cleanup Needed</option></select><button>Filter</button></form>
 <section class="upgrade-list">{% for group in groups %}<article class="upgrade-card duplicate-card"><div class="upgrade-card-head"><div><div class="release-name">{{ group.title }}{% if group.year %} ({{ group.year }}){% endif %}</div><div class="muted">{{ group.imdb_id or 'Title/year match' }} · {{ group.releases|length }} releases</div></div><span class="badge {{ group.kind }}">{{ group.kind.replace('_',' ').title() }}</span></div><div class="candidate-list">{% for item in group.releases %}<div class="duplicate-release"><strong>{{ item.release.folder_name }}</strong><div class="tag-row">{% if item.parsed.resolution %}<span class="tag">{{ item.parsed.resolution }}</span>{% endif %}{% if item.parsed.source %}<span class="tag">{{ item.parsed.source }}</span>{% endif %}{% if item.parsed.codec %}<span class="tag">{{ item.parsed.codec }}</span>{% endif %}{% for flag in item.parsed.flags %}<span class="tag">{{ flag }}</span>{% endfor %}{% if item.parsed.group %}<span class="tag">{{ item.parsed.group }}</span>{% endif %}</div></div>{% endfor %}</div><form class="duplicate-review" method="post" action="/duplicate/{{ group.key }}/review"><select name="review_status"><option value="unreviewed" {% if not group.review or group.review.review_status=='unreviewed' %}selected{% endif %}>Unreviewed</option><option value="keep_both" {% if group.review and group.review.review_status=='keep_both' %}selected{% endif %}>Keep Both</option><option value="cleanup_needed" {% if group.review and group.review.review_status=='cleanup_needed' %}selected{% endif %}>Cleanup Needed</option></select><input name="comment" value="{{ group.review.comment if group.review else '' }}" placeholder="Optional note"><button>Save</button></form></article>{% else %}<section class="empty-state"><h2>No duplicate groups found</h2><p>Run Duplicate Finder to resolve missing IMDb metadata and group releases.</p></section>{% endfor %}</section>

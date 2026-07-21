@@ -5,25 +5,37 @@
     <h1>Collection Upgrade</h1>
     <p>Find strict Scene UHD upgrades for present, verified Blu-ray releases. A candidate must contain all three tags: <strong>2160p</strong>, <strong>UHD</strong>, and <strong>x265</strong>.</p>
   </div>
-  <div class="upgrade-actions" id="upgrade-actions">
-    <form method="post" action="/upgrade/start">
-      <button id="upgrade-start-button" type="submit"
-        {% if progress and progress.is_running %}disabled{% endif %}>
-        Start Upgrade Scan
-      </button>
-    </form>
-    <form method="post" action="/upgrade/stop">
-      <button id="upgrade-stop-button" class="danger" type="submit"
-        {% if not progress or not progress.is_running %}disabled{% endif %}>
-        Stop Upgrade Scan
-      </button>
-    </form>
-    {% if progress and progress.is_running %}
-    <form method="post" action="/upgrade/reset"
-          onsubmit="return confirm('Force reset only if the scan remains stuck after Stop. Continue?');">
-      <button class="secondary" type="submit">Force Reset Stuck Scan</button>
-    </form>
-    {% endif %}
+  <div class="scan-control-block">
+    <div class="upgrade-actions" id="upgrade-actions">
+      <form method="post" action="/upgrade/start">
+        <button id="upgrade-start-button" type="submit"
+          {% if progress and progress.is_running %}disabled{% endif %}>
+          Start Upgrade Scan
+        </button>
+      </form>
+      <form method="post" action="/upgrade/stop">
+        <button id="upgrade-stop-button" class="danger" type="submit"
+          {% if not progress or not progress.is_running %}disabled{% endif %}>
+          Stop Upgrade Scan
+        </button>
+      </form>
+      {% if progress and progress.is_running %}
+      <form method="post" action="/upgrade/reset"
+            onsubmit="return confirm('Force reset only if the scan remains stuck after Stop. Continue?');">
+        <button class="secondary" type="submit">Force Reset Stuck Scan</button>
+      </form>
+      {% endif %}
+    </div>
+    <p class="last-successful-scan" id="last-successful-upgrade">
+      Last successful scan:
+      <strong>
+        {% if last_successful_scan %}
+          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+        {% else %}
+          Never
+        {% endif %}
+      </strong>
+    </p>
   </div>
 </section>
 

@@ -6,13 +6,25 @@
     <h1>Archive Health</h1>
     <p>Exact folder-name validation against SRRDB.</p>
   </div>
-  <div class="scan-actions">
-    <form method="post" action="/scan/start">
-      <button id="start-button">Start Scan</button>
-    </form>
-    <form method="post" action="/scan/stop">
-      <button id="stop-button" class="secondary-button">Stop Scan</button>
-    </form>
+  <div class="scan-control-block">
+    <div class="scan-actions">
+      <form method="post" action="/scan/start">
+        <button id="start-button">Start Scan</button>
+      </form>
+      <form method="post" action="/scan/stop">
+        <button id="stop-button" class="secondary-button">Stop Scan</button>
+      </form>
+    </div>
+    <p class="last-successful-scan" id="last-successful-main">
+      Last successful scan:
+      <strong>
+        {% if last_successful_scan %}
+          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+        {% else %}
+          Never
+        {% endif %}
+      </strong>
+    </p>
   </div>
 </section>
 

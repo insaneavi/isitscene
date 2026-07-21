@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.10.0
+## v0.10.1
 
 - Added Duplicate Finder with confirmed IMDb groups and cautious title/year fallback groups.
 - Added persistent IMDb metadata caching on every release to avoid repeated SRRDB lookups.

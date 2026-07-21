@@ -787,3 +787,36 @@ button:disabled {
 .badge.edition_variant { background:rgba(145,100,235,.17); color:#c9aef8; }
 a.card { text-decoration:none; color:inherit; }
 @media(max-width:760px){.build-info{display:none}.duplicate-review{grid-template-columns:1fr}}
+
+
+.scan-control-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.last-successful-scan {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted, #8a93a3);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.last-successful-scan strong {
+  color: inherit;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .scan-control-block {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .last-successful-scan {
+    text-align: left;
+    white-space: normal;
+  }
+}

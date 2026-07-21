@@ -233,6 +233,15 @@ def dashboard(request: Request):
         latest_scan = db.scalars(
             select(ScanRun).order_by(ScanRun.started_at.desc()).limit(1)
         ).first()
+        last_successful_scan = db.scalars(
+            select(ScanRun)
+            .where(
+                ScanRun.status == "completed",
+                ScanRun.completed_at.is_not(None),
+            )
+            .order_by(ScanRun.completed_at.desc())
+            .limit(1)
+        ).first()
 
         recent = db.scalars(
             select(Release).order_by(Release.first_seen.desc()).limit(10)
@@ -253,6 +262,7 @@ def dashboard(request: Request):
             context={
                 "counts": counts,
                 "latest_scan": latest_scan,
+                "last_successful_scan": last_successful_scan,
                 "recent": recent,
                 "recent_results": recent_results,
                 "progress": progress,
@@ -268,6 +278,15 @@ def scan_status():
     db = SessionLocal()
     try:
         progress = db.get(ScanProgress, 1)
+        last_successful_scan = db.scalars(
+            select(ScanRun)
+            .where(
+                ScanRun.status == "completed",
+                ScanRun.completed_at.is_not(None),
+            )
+            .order_by(ScanRun.completed_at.desc())
+            .limit(1)
+        ).first()
         if progress is None:
             return JSONResponse(
                 {
@@ -282,6 +301,10 @@ def scan_status():
                     "message": "No scan has run yet.",
                     "started_at": None,
                     "completed_at": None,
+                    "last_successful_at": (
+                        last_successful_scan.completed_at.isoformat()
+                        if last_successful_scan else None
+                    ),
                 }
             )
 
@@ -305,6 +328,10 @@ def scan_status():
                     progress.completed_at.isoformat()
                     if progress.completed_at
                     else None
+                ),
+                "last_successful_at": (
+                    last_successful_scan.completed_at.isoformat()
+                    if last_successful_scan else None
                 ),
             }
         )
@@ -479,12 +506,30 @@ def collection_upgrade(request: Request, q: str = "", status: str = ""):
                 .order_by(UpgradeCandidate.release_name)
             ).all()
             rows.append((result, candidates))
-        latest_scan = db.scalars(select(UpgradeScan).order_by(UpgradeScan.started_at.desc()).limit(1)).first()
+        latest_scan = db.scalars(
+            select(UpgradeScan).order_by(UpgradeScan.started_at.desc()).limit(1)
+        ).first()
+        last_successful_scan = db.scalars(
+            select(UpgradeScan)
+            .where(
+                UpgradeScan.status == "completed",
+                UpgradeScan.completed_at.is_not(None),
+            )
+            .order_by(UpgradeScan.completed_at.desc())
+            .limit(1)
+        ).first()
         progress = db.get(UpgradeProgress, 1)
         return templates.TemplateResponse(
             request=request,
             name="collection_upgrade.html",
-            context={"rows": rows, "q": q, "status": status, "latest_scan": latest_scan, "progress": progress},
+            context={
+                "rows": rows,
+                "q": q,
+                "status": status,
+                "latest_scan": latest_scan,
+                "last_successful_scan": last_successful_scan,
+                "progress": progress,
+            },
         )
     finally:
         db.close()
@@ -495,6 +540,15 @@ def upgrade_status():
     db = SessionLocal()
     try:
         p = db.get(UpgradeProgress, 1)
+        last_successful_scan = db.scalars(
+            select(UpgradeScan)
+            .where(
+                UpgradeScan.status == "completed",
+                UpgradeScan.completed_at.is_not(None),
+            )
+            .order_by(UpgradeScan.completed_at.desc())
+            .limit(1)
+        ).first()
         return JSONResponse({
             "is_running": bool(p and p.is_running),
             "phase": p.phase if p else "idle",
@@ -507,6 +561,10 @@ def upgrade_status():
             "api_error_count": p.api_error_count if p else 0,
             "message": p.message if p else "No upgrade scan has run yet.",
             "can_force_reset": bool(p and p.is_running),
+            "last_successful_at": (
+                last_successful_scan.completed_at.isoformat()
+                if last_successful_scan else None
+            ),
         })
     finally:
         db.close()
@@ -569,7 +627,25 @@ def duplicate_finder(request: Request, status: str = ""):
                 continue
             rows.append(group)
         rows.sort(key=lambda g: ((g["title"] or "").casefold(), g["year"] or ""))
-        return templates.TemplateResponse(request=request, name="duplicate_finder.html", context={"groups": rows, "progress": db.get(DuplicateProgress, 1), "status": status})
+        last_successful_scan = db.scalars(
+            select(DuplicateScan)
+            .where(
+                DuplicateScan.status == "completed",
+                DuplicateScan.completed_at.is_not(None),
+            )
+            .order_by(DuplicateScan.completed_at.desc())
+            .limit(1)
+        ).first()
+        return templates.TemplateResponse(
+            request=request,
+            name="duplicate_finder.html",
+            context={
+                "groups": rows,
+                "progress": db.get(DuplicateProgress, 1),
+                "status": status,
+                "last_successful_scan": last_successful_scan,
+            },
+        )
     finally:
         db.close()
 
@@ -579,6 +655,15 @@ def duplicate_status():
     db = SessionLocal()
     try:
         p = db.get(DuplicateProgress, 1)
+        last_successful_scan = db.scalars(
+            select(DuplicateScan)
+            .where(
+                DuplicateScan.status == "completed",
+                DuplicateScan.completed_at.is_not(None),
+            )
+            .order_by(DuplicateScan.completed_at.desc())
+            .limit(1)
+        ).first()
         return JSONResponse({
             "is_running": bool(p and p.is_running), "phase": p.phase if p else "idle",
             "current_release": p.current_release if p else None,
@@ -586,6 +671,10 @@ def duplicate_status():
             "cached_count": p.cached_count if p else 0, "looked_up_count": p.looked_up_count if p else 0,
             "group_count": p.group_count if p else 0, "error_count": p.error_count if p else 0,
             "message": p.message if p else "No duplicate scan has run yet.",
+            "last_successful_at": (
+                last_successful_scan.completed_at.isoformat()
+                if last_successful_scan else None
+            ),
         })
     finally:
         db.close()
