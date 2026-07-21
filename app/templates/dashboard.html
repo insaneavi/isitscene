@@ -19,7 +19,7 @@
       Last successful scan:
       <strong>
         {% if last_successful_scan %}
-          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+          {{ format_datetime(last_successful_scan.completed_at, true) }}
         {% else %}
           Never
         {% endif %}
@@ -158,7 +158,7 @@
       <span class="badge {{ latest_scan.status }}">
         {{ latest_scan.status }}
       </span>
-      Started {{ latest_scan.started_at.strftime("%Y-%m-%d %H:%M") }}
+      Started {{ format_datetime(latest_scan.started_at) }}
     </p>
     <p>
       {{ latest_scan.folders_found }} scanned ·
@@ -197,7 +197,7 @@
           </td>
           <td>{{ release.matched_release or "—" }}</td>
           <td>
-            {{ release.last_checked.strftime("%Y-%m-%d %H:%M:%S") }}
+            {{ format_datetime(release.last_checked, true) }}
           </td>
         </tr>
       {% else %}
@@ -228,7 +228,7 @@
               {{ release.verification_status|capitalize }}
             </span>
           </td>
-          <td>{{ release.first_seen.strftime("%Y-%m-%d") }}</td>
+          <td>{{ format_date(release.first_seen) }}</td>
         </tr>
       {% else %}
         <tr>

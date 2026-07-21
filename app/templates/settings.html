@@ -64,6 +64,48 @@
       >
     </label>
 
+
+    <div class="settings-section-heading">
+      <h2>Date &amp; Time</h2>
+      <p>All timestamps are stored safely in UTC and converted to this time zone when displayed.</p>
+    </div>
+
+    <label class="field-row">
+      <span>Time zone</span>
+      <input
+        type="text"
+        name="timezone_name"
+        value="{{ settings.timezone }}"
+        list="timezone-options"
+        autocomplete="off"
+        required
+      >
+      <datalist id="timezone-options">
+        <option value="America/New_York">
+        <option value="America/Chicago">
+        <option value="America/Denver">
+        <option value="America/Los_Angeles">
+        <option value="America/Phoenix">
+        <option value="America/Anchorage">
+        <option value="Pacific/Honolulu">
+        <option value="Europe/London">
+        <option value="Europe/Berlin">
+        <option value="Asia/Kolkata">
+        <option value="Asia/Tokyo">
+        <option value="Australia/Sydney">
+        <option value="UTC">
+      </datalist>
+      <small>Use an IANA time zone such as America/New_York. This automatically switches between EST and EDT.</small>
+    </label>
+
+    <label class="field-row">
+      <span>Time format</span>
+      <select name="time_format">
+        <option value="12h" {% if settings.time_format == "12h" %}selected{% endif %}>12-hour (2:45 PM)</option>
+        <option value="24h" {% if settings.time_format == "24h" %}selected{% endif %}>24-hour (14:45)</option>
+      </select>
+    </label>
+
     <button type="submit">Save Settings</button>
   </form>
 </section>

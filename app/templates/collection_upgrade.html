@@ -30,7 +30,7 @@
       Last successful scan:
       <strong>
         {% if last_successful_scan %}
-          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+          {{ format_datetime(last_successful_scan.completed_at, true) }}
         {% else %}
           Never
         {% endif %}
@@ -78,7 +78,7 @@
 {% for result, candidates in rows %}
   <article class="upgrade-card">
     <div class="upgrade-card-head">
-      <div><div class="release-name">{{ result.current_release }}</div><div class="muted">{{ result.imdb_id or 'IMDb unavailable' }}{% if result.checked_at %} · Checked {{ result.checked_at.strftime('%Y-%m-%d %H:%M') }} UTC{% endif %}</div></div>
+      <div><div class="release-name">{{ result.current_release }}</div><div class="muted">{{ result.imdb_id or 'IMDb unavailable' }}{% if result.checked_at %} · Checked {{ format_datetime(result.checked_at) }}{% endif %}</div></div>
       <span class="badge {{ result.status }}">{{ result.status.replace('_', ' ').title() }}</span>
     </div>
     {% if result.error_message %}<p class="error">{{ result.error_message }}</p>{% endif %}

@@ -820,3 +820,25 @@ a.card { text-decoration:none; color:inherit; }
     white-space: normal;
   }
 }
+
+
+.settings-section-heading {
+  margin: 28px 0 12px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.settings-section-heading h2 {
+  margin: 0 0 5px;
+  font-size: 1.05rem;
+}
+
+.settings-section-heading p,
+.field-row small {
+  color: var(--muted, #8a93a3);
+  font-size: 0.82rem;
+}
+
+.field-row select {
+  min-width: 220px;
+}

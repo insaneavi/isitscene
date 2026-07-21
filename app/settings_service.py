@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .database import AppSetting, SessionLocal
 
@@ -9,6 +11,8 @@ DEFAULTS = {
     "auto_scan_enabled": "true",
     "scan_interval_hours": "24",
     "srrdb_delay_seconds": "1.5",
+    "timezone": os.getenv("TZ", "America/New_York"),
+    "time_format": "12h",
 }
 
 
@@ -18,6 +22,8 @@ class RuntimeSettings:
     auto_scan_enabled: bool
     scan_interval_hours: int
     srrdb_delay_seconds: float
+    timezone: str
+    time_format: str
 
 
 def _to_bool(value: str, default: bool) -> bool:
@@ -27,6 +33,19 @@ def _to_bool(value: str, default: bool) -> bool:
     if normalized in {"0", "false", "no", "off"}:
         return False
     return default
+
+
+def normalize_timezone(value: str | None) -> str:
+    candidate = (value or "").strip() or os.getenv("TZ", "America/New_York")
+    try:
+        ZoneInfo(candidate)
+        return candidate
+    except ZoneInfoNotFoundError:
+        return "America/New_York"
+
+
+def normalize_time_format(value: str | None) -> str:
+    return "24h" if value == "24h" else "12h"
 
 
 def ensure_defaults() -> None:
@@ -61,6 +80,10 @@ def get_settings() -> RuntimeSettings:
         srrdb_delay_seconds=max(
             0.0, float(values.get("srrdb_delay_seconds", "1.5"))
         ),
+        timezone=normalize_timezone(
+            values.get("timezone", os.getenv("TZ", "America/New_York"))
+        ),
+        time_format=normalize_time_format(values.get("time_format", "12h")),
     )
 
 
@@ -70,12 +93,16 @@ def save_settings(
     auto_scan_enabled: bool,
     scan_interval_hours: int,
     srrdb_delay_seconds: float,
+    timezone: str,
+    time_format: str,
 ) -> None:
     updates = {
         "skip_hidden_system_folders": str(skip_hidden_system_folders).lower(),
         "auto_scan_enabled": str(auto_scan_enabled).lower(),
         "scan_interval_hours": str(max(1, scan_interval_hours)),
         "srrdb_delay_seconds": str(max(0.0, srrdb_delay_seconds)),
+        "timezone": normalize_timezone(timezone),
+        "time_format": normalize_time_format(time_format),
     }
 
     db = SessionLocal()

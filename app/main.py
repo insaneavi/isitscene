@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
 
@@ -84,6 +85,41 @@ templates.env.globals["build_date"] = BUILD_DATE
 templates.env.globals["git_commit"] = GIT_COMMIT
 
 
+def local_datetime(value: datetime | None) -> datetime | None:
+    """Treat persisted naive datetimes as UTC and convert for display."""
+    if value is None:
+        return None
+    settings = get_settings()
+    source = value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    return source.astimezone(ZoneInfo(settings.timezone))
+
+
+def format_datetime(value: datetime | None, include_seconds: bool = False) -> str:
+    localized = local_datetime(value)
+    if localized is None:
+        return "—"
+    settings = get_settings()
+    if settings.time_format == "24h":
+        pattern = "%b %d, %Y %H:%M:%S %Z" if include_seconds else "%b %d, %Y %H:%M %Z"
+    else:
+        pattern = "%b %d, %Y %-I:%M:%S %p %Z" if include_seconds else "%b %d, %Y %-I:%M %p %Z"
+    return localized.strftime(pattern)
+
+
+def format_date(value: datetime | None) -> str:
+    localized = local_datetime(value)
+    return localized.strftime("%b %d, %Y") if localized else "—"
+
+
+def current_timezone_name() -> str:
+    return get_settings().timezone
+
+
+templates.env.globals["format_datetime"] = format_datetime
+templates.env.globals["format_date"] = format_date
+templates.env.globals["current_timezone_name"] = current_timezone_name
+
+
 _RELEASE_YEAR_PATTERN = re.compile(
     r"(?<!\d)(?:19\d{2}|20\d{2}|21\d{2})(?!\d)"
 )
@@ -139,6 +175,8 @@ def api_version():
         "build_date": BUILD_DATE,
         "git_commit": GIT_COMMIT,
         "database_version": DATABASE_VERSION,
+        "timezone": get_settings().timezone,
+        "time_format": get_settings().time_format,
     }
 
 
@@ -159,6 +197,8 @@ def health():
             "auto_scan_enabled": settings.auto_scan_enabled,
             "scan_interval_hours": settings.scan_interval_hours,
             "srrdb_delay_seconds": settings.srrdb_delay_seconds,
+            "timezone": settings.timezone,
+            "time_format": settings.time_format,
         },
     }
 
@@ -730,6 +770,8 @@ def update_settings(
     auto_scan_enabled: str | None = Form(None),
     scan_interval_hours: int = Form(24),
     srrdb_delay_seconds: float = Form(1.5),
+    timezone_name: str = Form("America/New_York"),
+    time_format: str = Form("12h"),
 ):
     save_settings(
         skip_hidden_system_folders=(
@@ -738,6 +780,8 @@ def update_settings(
         auto_scan_enabled=(auto_scan_enabled is not None),
         scan_interval_hours=scan_interval_hours,
         srrdb_delay_seconds=srrdb_delay_seconds,
+        timezone=timezone_name,
+        time_format=time_format,
     )
     refresh_scheduler()
     return RedirectResponse("/settings?saved=1", status_code=303)

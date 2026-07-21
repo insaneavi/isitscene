@@ -23,7 +23,7 @@
       Last successful scan:
       <strong>
         {% if last_successful_scan %}
-          {{ last_successful_scan.completed_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+          {{ format_datetime(last_successful_scan.completed_at, true) }}
         {% else %}
           Never
         {% endif %}

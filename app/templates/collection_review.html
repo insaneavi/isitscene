@@ -95,14 +95,14 @@
             <span>
               Last checked:
               {{
-                release.last_checked.strftime("%Y-%m-%d %H:%M")
+                format_datetime(release.last_checked)
                 if release.last_checked else "—"
               }}
             </span>
             {% if release.last_reviewed %}
               <span>
                 Last reviewed:
-                {{ release.last_reviewed.strftime("%Y-%m-%d %H:%M") }}
+                {{ format_datetime(release.last_reviewed) }}
               </span>
             {% endif %}
           </div>
@@ -160,7 +160,7 @@
               <span>
                 Candidate checked:
                 {{
-                  release.candidate_checked_at.strftime("%Y-%m-%d %H:%M")
+                  format_datetime(release.candidate_checked_at)
                 }}
               </span>
             {% endif %}

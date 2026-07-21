@@ -1,9 +1,9 @@
-# iSiTSCENE v0.10.1
+# iSiTSCENE v0.10.2
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.10.1
+## New in v0.10.2
 
 - Adds **Duplicate Finder** for different releases of the same movie.
 - Stores IMDb IDs directly on release records and reuses them in later scans.

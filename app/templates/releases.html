@@ -84,7 +84,7 @@
             </td>
             <td class="checked-cell">
               {{
-                release.last_checked.strftime("%Y-%m-%d %H:%M")
+                format_datetime(release.last_checked)
                 if release.last_checked else "—"
               }}
             </td>
