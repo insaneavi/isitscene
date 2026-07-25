@@ -232,6 +232,39 @@ class DuplicateReview(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class MovieList(Base):
+    __tablename__ = "movie_lists"
+
+    key: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(Text, default="")
+    source_url: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class MovieListItem(Base):
+    __tablename__ = "movie_list_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    list_key: Mapped[str] = mapped_column(String, index=True)
+    rank: Mapped[int] = mapped_column(Integer, nullable=False)
+    imdb_id: Mapped[str] = mapped_column(String, index=True)
+    title: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    rating: Mapped[float | None] = mapped_column(nullable=True)
+
+
+class MovieListSync(Base):
+    __tablename__ = "movie_list_sync"
+
+    list_key: Mapped[str] = mapped_column(String, primary_key=True)
+    status: Mapped[str] = mapped_column(String, default="never")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    item_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class AppSetting(Base):
     __tablename__ = "settings"
 

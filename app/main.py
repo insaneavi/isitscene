@@ -16,7 +16,7 @@ from sqlalchemy import func, select
 
 from .config import APP_NAME, APP_VERSION, BUILD_DATE, GIT_COMMIT, DATABASE_VERSION
 from .database import (
-    DuplicateProgress, DuplicateReview, DuplicateScan, Release, ScanProgress,
+    DuplicateProgress, DuplicateReview, DuplicateScan, MovieList, MovieListItem, MovieListSync, Release, ScanProgress,
     ScanRun, SessionLocal, UpgradeCandidate, UpgradeProgress, UpgradeResult,
     UpgradeScan, init_db,
 )
@@ -41,6 +41,7 @@ from .duplicate_scanner import (
     run_duplicate_scan,
 )
 from .srrdb import parse_release_name
+from .movie_lists import sync_imdb_top_100
 
 logging.basicConfig(level=logging.INFO)
 
@@ -753,6 +754,54 @@ def review_duplicate(group_key: str, review_status: str = Form(...), comment: st
     finally:
         db.close()
     return RedirectResponse("/duplicate-finder", status_code=303)
+
+
+@app.get("/movie-lists", response_class=HTMLResponse)
+def movie_lists_page(request: Request, view: str = "all", q: str = ""):
+    db = SessionLocal()
+    try:
+        movie_list = db.get(MovieList, "imdb-top-100")
+        sync = db.get(MovieListSync, "imdb-top-100")
+        items = db.scalars(
+            select(MovieListItem)
+            .where(MovieListItem.list_key == "imdb-top-100")
+            .order_by(MovieListItem.rank)
+        ).all()
+        releases = db.scalars(
+            select(Release).where(Release.is_present.is_(True), Release.imdb_id.is_not(None))
+        ).all()
+        owned_by_imdb = {}
+        for release in releases:
+            owned_by_imdb.setdefault(release.imdb_id, release)
+        all_rows = [{"item": item, "release": owned_by_imdb.get(item.imdb_id)} for item in items]
+        total = len(all_rows)
+        owned = sum(1 for row in all_rows if row["release"])
+        missing = total - owned
+        rows = all_rows
+        if view == "owned":
+            rows = [row for row in rows if row["release"]]
+        elif view == "missing":
+            rows = [row for row in rows if not row["release"]]
+        if q:
+            query = q.casefold().strip()
+            rows = [row for row in rows if query in row["item"].title.casefold() or query == str(row["item"].year)]
+        return templates.TemplateResponse(
+            request=request, name="movie_lists.html",
+            context={
+                "movie_list": movie_list, "sync": sync, "rows": rows,
+                "total": total, "owned": owned, "missing": missing,
+                "completion": round((owned / total * 100), 1) if total else 0,
+                "view": view, "q": q,
+            },
+        )
+    finally:
+        db.close()
+
+
+@app.post("/movie-lists/imdb-top-100/sync")
+def sync_movie_list(background_tasks: BackgroundTasks):
+    background_tasks.add_task(sync_imdb_top_100)
+    return RedirectResponse("/movie-lists?syncing=1", status_code=303)
 
 
 @app.get("/settings", response_class=HTMLResponse)

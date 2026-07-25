@@ -1,6 +1,17 @@
 # Changelog
 
-## v0.10.2
+## v0.10.3
+
+- Added a reusable Movie Lists section with an IMDb Top 100 list.
+- Added manual synchronization; the application never repeatedly refreshes the list automatically.
+- Stores the synchronized list locally in SQLite and displays the cache date.
+- Compares list entries to present releases using exact cached IMDb IDs.
+- Added All, Owned, and Missing filters with completion statistics.
+- Preserves the previous cache if IMDb synchronization fails.
+- Added schema version 11.
+
+
+## v0.10.3
 
 - Added Duplicate Finder with confirmed IMDb groups and cautious title/year fallback groups.
 - Added persistent IMDb metadata caching on every release to avoid repeated SRRDB lookups.
