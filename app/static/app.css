@@ -842,3 +842,90 @@ a.card { text-decoration:none; color:inherit; }
 .field-row select {
   min-width: 220px;
 }
+
+
+.release-imdb-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.release-imdb-summary a {
+  color: #a9c8ff;
+  font-family: monospace;
+}
+
+.badge.manual-override {
+  background: rgba(230, 160, 40, 0.16);
+  color: #f2c46f;
+  font-size: 0.68rem;
+}
+
+.imdb-override-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.imdb-override-form input,
+.compact-imdb-form input {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: monospace;
+  padding: 7px 9px;
+}
+
+.imdb-override-form input {
+  width: 155px;
+}
+
+.imdb-override-form button {
+  min-height: 34px;
+  padding: 7px 11px;
+}
+
+.releases-table .release-column { width: 35%; }
+.releases-table .matched-column { width: 21%; }
+.releases-table .imdb-column { width: 15%; }
+.releases-table .checked-column { width: 10%; }
+
+.compact-imdb-form {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.compact-imdb-form input {
+  width: 112px;
+  min-width: 0;
+  padding: 5px 6px;
+  font-size: 0.76rem;
+}
+
+.compact-imdb-form button {
+  min-height: 27px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+}
+
+.compact-imdb-form .compact-restore {
+  background: transparent;
+  border: 1px solid #f2c46f;
+  color: #f2c46f;
+}
+
+@media (max-width: 760px) {
+  .imdb-override-form,
+  .imdb-override-form input,
+  .imdb-override-form button {
+    width: 100%;
+  }
+}

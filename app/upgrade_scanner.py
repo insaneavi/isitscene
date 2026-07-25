@@ -55,9 +55,13 @@ async def _run():
             result=db.scalar(select(UpgradeResult).where(UpgradeResult.release_id==release.id))
             if result is None: result=UpgradeResult(release_id=release.id,current_release=current); db.add(result); db.flush()
             else: result.current_release=current; db.execute(delete(UpgradeCandidate).where(UpgradeCandidate.upgrade_result_id==result.id))
-            imdb_id=release.imdb_id if release.imdb_source_release==current else None; error=None
-            if not imdb_id and not (release.imdb_lookup_status=="unavailable" and release.imdb_source_release==current):
-                imdb_id,error=await lookup_imdb_id(current,delay,_stop_event.is_set); release.imdb_id=imdb_id; release.imdb_source_release=current; release.imdb_checked_at=datetime.utcnow(); release.imdb_error_message=error; release.imdb_lookup_status="api_error" if error else ("found" if imdb_id else "unavailable")
+            if release.imdb_manual_override and release.imdb_id:
+                imdb_id=release.imdb_id
+            else:
+                imdb_id=release.imdb_id if release.imdb_source_release==current else None
+            error=None
+            if not release.imdb_manual_override and not imdb_id and not (release.imdb_lookup_status=="unavailable" and release.imdb_source_release==current):
+                imdb_id,error=await lookup_imdb_id(current,delay,_stop_event.is_set); release.imdb_id=imdb_id; release.imdb_srrdb_id=imdb_id; release.imdb_source_release=current; release.imdb_checked_at=datetime.utcnow(); release.imdb_error_message=error; release.imdb_lookup_status="api_error" if error else ("found" if imdb_id else "unavailable")
             candidates=[]
             if imdb_id and not error: candidates,error=await find_uhd_upgrades_by_imdb(imdb_id,delay,_stop_event.is_set)
             result.imdb_id=imdb_id; result.checked_at=datetime.utcnow(); result.error_message=error; result.candidate_count=len(candidates)

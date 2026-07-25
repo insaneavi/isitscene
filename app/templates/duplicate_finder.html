@@ -31,8 +31,84 @@
     </p>
   </div>
 </section>
+{% if request.query_params.get("imdb_saved") %}
+<section class="notice success">Manual IMDb override saved. Duplicate groups now use the corrected ID.</section>
+{% elif request.query_params.get("imdb_error") == "invalid" %}
+<section class="notice error">IMDb IDs must use the format tt followed by 7–10 digits.</section>
+{% endif %}
 <section class="upgrade-progress"><div class="progress-title"><strong id="duplicate-message">{{ progress.message if progress and progress.message else 'No duplicate scan has run yet.' }}</strong><span id="duplicate-count">{{ progress.processed_count if progress else 0 }} / {{ progress.total_count if progress else 0 }}</span></div><progress id="duplicate-bar" max="{{ progress.total_count if progress and progress.total_count else 1 }}" value="{{ progress.processed_count if progress else 0 }}"></progress><div class="upgrade-stats"><span>Cached: <b id="duplicate-cached">{{ progress.cached_count if progress else 0 }}</b></span><span>Looked up: <b id="duplicate-looked">{{ progress.looked_up_count if progress else 0 }}</b></span><span>Groups: <b id="duplicate-groups">{{ progress.group_count if progress else 0 }}</b></span><span>Errors: <b id="duplicate-errors">{{ progress.error_count if progress else 0 }}</b></span></div><div class="current-release" id="duplicate-current">{{ progress.current_release if progress and progress.current_release else '' }}</div></section>
 <form class="filters" method="get"><select name="status"><option value="">All reviews</option><option value="unreviewed" {% if status=='unreviewed' %}selected{% endif %}>Unreviewed</option><option value="keep_both" {% if status=='keep_both' %}selected{% endif %}>Keep Both</option><option value="cleanup_needed" {% if status=='cleanup_needed' %}selected{% endif %}>Cleanup Needed</option></select><button>Filter</button></form>
-<section class="upgrade-list">{% for group in groups %}<article class="upgrade-card duplicate-card"><div class="upgrade-card-head"><div><div class="release-name">{{ group.title }}{% if group.year %} ({{ group.year }}){% endif %}</div><div class="muted">{{ group.imdb_id or 'Title/year match' }} · {{ group.releases|length }} releases</div></div><span class="badge {{ group.kind }}">{{ group.kind.replace('_',' ').title() }}</span></div><div class="candidate-list">{% for item in group.releases %}<div class="duplicate-release"><strong>{{ item.release.folder_name }}</strong><div class="tag-row">{% if item.parsed.resolution %}<span class="tag">{{ item.parsed.resolution }}</span>{% endif %}{% if item.parsed.source %}<span class="tag">{{ item.parsed.source }}</span>{% endif %}{% if item.parsed.codec %}<span class="tag">{{ item.parsed.codec }}</span>{% endif %}{% for flag in item.parsed.flags %}<span class="tag">{{ flag }}</span>{% endfor %}{% if item.parsed.group %}<span class="tag">{{ item.parsed.group }}</span>{% endif %}</div></div>{% endfor %}</div><form class="duplicate-review" method="post" action="/duplicate/{{ group.key }}/review"><select name="review_status"><option value="unreviewed" {% if not group.review or group.review.review_status=='unreviewed' %}selected{% endif %}>Unreviewed</option><option value="keep_both" {% if group.review and group.review.review_status=='keep_both' %}selected{% endif %}>Keep Both</option><option value="cleanup_needed" {% if group.review and group.review.review_status=='cleanup_needed' %}selected{% endif %}>Cleanup Needed</option></select><input name="comment" value="{{ group.review.comment if group.review else '' }}" placeholder="Optional note"><button>Save</button></form></article>{% else %}<section class="empty-state"><h2>No duplicate groups found</h2><p>Run Duplicate Finder to resolve missing IMDb metadata and group releases.</p></section>{% endfor %}</section>
+<section class="upgrade-list">
+  {% for group in groups %}
+  <article class="upgrade-card duplicate-card">
+    <div class="upgrade-card-head">
+      <div>
+        <div class="release-name">{{ group.title }}{% if group.year %} ({{ group.year }}){% endif %}</div>
+        <div class="muted">{{ group.imdb_id or 'Title/year match' }} · {{ group.releases|length }} releases</div>
+      </div>
+      <span class="badge {{ group.kind }}">{{ group.kind.replace('_',' ').title() }}</span>
+    </div>
+
+    <div class="candidate-list">
+      {% for item in group.releases %}
+      <div class="duplicate-release">
+        <strong>{{ item.release.folder_name }}</strong>
+        <div class="release-imdb-summary">
+          Effective IMDb:
+          <a href="https://www.imdb.com/title/{{ item.release.imdb_id }}/" target="_blank" rel="noopener">
+            {{ item.release.imdb_id or "Not cached" }}
+          </a>
+          {% if item.release.imdb_manual_override %}
+            <span class="badge manual-override">Manual override</span>
+            {% if item.release.imdb_srrdb_id %}
+              <span>SRRDB supplied {{ item.release.imdb_srrdb_id }}</span>
+            {% endif %}
+          {% endif %}
+        </div>
+        <div class="tag-row">
+          {% if item.parsed.resolution %}<span class="tag">{{ item.parsed.resolution }}</span>{% endif %}
+          {% if item.parsed.source %}<span class="tag">{{ item.parsed.source }}</span>{% endif %}
+          {% if item.parsed.codec %}<span class="tag">{{ item.parsed.codec }}</span>{% endif %}
+          {% for flag in item.parsed.flags %}<span class="tag">{{ flag }}</span>{% endfor %}
+          {% if item.parsed.group %}<span class="tag">{{ item.parsed.group }}</span>{% endif %}
+        </div>
+        <form class="imdb-override-form" method="post" action="/releases/{{ item.release.id }}/imdb">
+          <input type="hidden" name="return_to" value="/duplicate-finder">
+          <input
+            name="imdb_id"
+            value="{{ item.release.imdb_id or '' }}"
+            placeholder="tt1234567"
+            pattern="tt[0-9]{7,10}"
+            aria-label="IMDb ID for {{ item.release.folder_name }}"
+          >
+          <button type="submit" name="action" value="save">Save IMDb</button>
+          {% if item.release.imdb_manual_override %}
+          <button class="secondary-button" type="submit" name="action" value="clear"
+                  onclick="return confirm('Remove the manual override and restore the SRRDB value?');">
+            Restore SRRDB
+          </button>
+          {% endif %}
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+
+    <form class="duplicate-review" method="post" action="/duplicate/{{ group.key }}/review">
+      <select name="review_status">
+        <option value="unreviewed" {% if not group.review or group.review.review_status=='unreviewed' %}selected{% endif %}>Unreviewed</option>
+        <option value="keep_both" {% if group.review and group.review.review_status=='keep_both' %}selected{% endif %}>Keep Both</option>
+        <option value="cleanup_needed" {% if group.review and group.review.review_status=='cleanup_needed' %}selected{% endif %}>Cleanup Needed</option>
+      </select>
+      <input name="comment" value="{{ group.review.comment if group.review else '' }}" placeholder="Optional note">
+      <button>Save Review</button>
+    </form>
+  </article>
+  {% else %}
+  <section class="empty-state">
+    <h2>No duplicate groups found</h2>
+    <p>Run Duplicate Finder to resolve missing IMDb metadata and group releases.</p>
+  </section>
+  {% endfor %}
+</section>
 <script>let duplicateWasRunning={{ 'true' if progress and progress.is_running else 'false' }};async function pollDuplicate(){try{const r=await fetch('/api/duplicate-status',{cache:'no-store'}),d=await r.json();document.getElementById('duplicate-message').textContent=d.message||'';document.getElementById('duplicate-count').textContent=`${d.processed_count} / ${d.total_count}`;const b=document.getElementById('duplicate-bar');b.max=d.total_count||1;b.value=d.processed_count||0;document.getElementById('duplicate-cached').textContent=d.cached_count;document.getElementById('duplicate-looked').textContent=d.looked_up_count;document.getElementById('duplicate-groups').textContent=d.group_count;document.getElementById('duplicate-errors').textContent=d.error_count;document.getElementById('duplicate-current').textContent=d.current_release||'';document.getElementById('duplicate-start').disabled=d.is_running;document.getElementById('duplicate-stop').disabled=!d.is_running;if(duplicateWasRunning&&!d.is_running)location.reload();duplicateWasRunning=d.is_running}catch(e){}}setInterval(pollDuplicate,2000);pollDuplicate();</script>
 {% endblock %}

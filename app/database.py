@@ -92,6 +92,9 @@ class Release(Base):
     imdb_checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     imdb_error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     imdb_source_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    imdb_srrdb_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    imdb_manual_override: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    imdb_manual_updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     movie_title: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     movie_year: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
 
@@ -365,6 +368,11 @@ def _migrate_schema() -> None:
     _add_column_if_missing("releases", "imdb_checked_at", "DATETIME")
     _add_column_if_missing("releases", "imdb_error_message", "TEXT")
     _add_column_if_missing("releases", "imdb_source_release", "VARCHAR")
+    _add_column_if_missing("releases", "imdb_srrdb_id", "VARCHAR")
+    _add_column_if_missing(
+        "releases", "imdb_manual_override", "BOOLEAN NOT NULL DEFAULT 0"
+    )
+    _add_column_if_missing("releases", "imdb_manual_updated_at", "DATETIME")
     _add_column_if_missing("releases", "movie_title", "VARCHAR")
     _add_column_if_missing("releases", "movie_year", "VARCHAR")
 

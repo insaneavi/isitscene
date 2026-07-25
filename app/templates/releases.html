@@ -8,6 +8,12 @@
     </div>
   </section>
 
+  {% if request.query_params.get("imdb_saved") %}
+  <section class="notice success">Manual IMDb override saved.</section>
+  {% elif request.query_params.get("imdb_error") == "invalid" %}
+  <section class="notice error">IMDb IDs must use the format tt followed by 7–10 digits.</section>
+  {% endif %}
+
   <form class="filters releases-filters" method="get">
     <input
       name="q"
@@ -49,6 +55,7 @@
         <col class="inventory-column">
         <col class="verification-column">
         <col class="matched-column">
+        <col class="imdb-column">
         <col class="checked-column">
       </colgroup>
       <thead>
@@ -57,6 +64,7 @@
           <th>Inventory</th>
           <th>Verification</th>
           <th>Matched Release</th>
+          <th>IMDb</th>
           <th>Last Checked</th>
         </tr>
       </thead>
@@ -82,6 +90,22 @@
             <td class="matched-release-cell" title="{{ release.matched_release or '' }}">
               {{ release.matched_release or "—" }}
             </td>
+            <td class="imdb-cell">
+              <form class="compact-imdb-form" method="post" action="/releases/{{ release.id }}/imdb">
+                <input type="hidden" name="return_to" value="/releases">
+                <input
+                  name="imdb_id"
+                  value="{{ release.imdb_id or '' }}"
+                  placeholder="tt1234567"
+                  pattern="tt[0-9]{7,10}"
+                  title="{% if release.imdb_manual_override %}Manual override; SRRDB: {{ release.imdb_srrdb_id or 'none' }}{% else %}Cached from SRRDB{% endif %}"
+                >
+                <button type="submit" name="action" value="save">Save</button>
+                {% if release.imdb_manual_override %}
+                <button class="compact-restore" type="submit" name="action" value="clear" title="Restore SRRDB IMDb ID">↺</button>
+                {% endif %}
+              </form>
+            </td>
             <td class="checked-cell">
               {{
                 format_datetime(release.last_checked)
@@ -91,7 +115,7 @@
           </tr>
         {% else %}
           <tr>
-            <td class="releases-empty" colspan="5">No releases found.</td>
+            <td class="releases-empty" colspan="6">No releases found.</td>
           </tr>
         {% endfor %}
       </tbody>

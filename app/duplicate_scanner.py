@@ -126,7 +126,9 @@ async def _run() -> None:
             release.movie_title = " ".join(parsed.title_tokens).strip() or None
             release.movie_year = parsed.year
             p.current_release = source
-            if release.imdb_id and release.imdb_source_release == source:
+            if release.imdb_manual_override and release.imdb_id:
+                p.cached_count += 1
+            elif release.imdb_id and release.imdb_source_release == source:
                 p.cached_count += 1
             elif release.imdb_lookup_status == "unavailable" and release.imdb_source_release == source:
                 p.cached_count += 1
@@ -134,6 +136,7 @@ async def _run() -> None:
                 p.message = "Looking up missing IMDb metadata in SRRDB..."
                 imdb_id, error = await lookup_imdb_id(source, delay, _stop.is_set)
                 release.imdb_id = imdb_id
+                release.imdb_srrdb_id = imdb_id
                 release.imdb_source_release = source
                 release.imdb_checked_at = datetime.utcnow()
                 release.imdb_error_message = error

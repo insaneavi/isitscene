@@ -857,6 +857,60 @@ def stop_scan():
     return RedirectResponse("/", status_code=303)
 
 
+@app.post("/releases/{release_id}/imdb")
+def update_release_imdb(
+    release_id: int,
+    imdb_id: str = Form(""),
+    action: str = Form("save"),
+    return_to: str = Form("/releases"),
+):
+    """Set or clear a persistent manual IMDb override for one release."""
+    safe_destination = (
+        return_to
+        if return_to.startswith(("/releases", "/duplicate-finder", "/collection-upgrade"))
+        else "/releases"
+    )
+    db = SessionLocal()
+    error_code = ""
+    try:
+        release = db.get(Release, release_id)
+        if release is None:
+            error_code = "not_found"
+        elif action == "clear":
+            release.imdb_id = release.imdb_srrdb_id
+            release.imdb_manual_override = False
+            release.imdb_manual_updated_at = datetime.utcnow()
+            release.imdb_lookup_status = "found" if release.imdb_id else "not_checked"
+            release.imdb_error_message = None
+            db.commit()
+        else:
+            normalized = imdb_id.strip().lower()
+            if not re.fullmatch(r"tt\d{7,10}", normalized):
+                error_code = "invalid"
+            else:
+                if not release.imdb_manual_override:
+                    release.imdb_srrdb_id = release.imdb_id
+                release.imdb_id = normalized
+                release.imdb_manual_override = True
+                release.imdb_manual_updated_at = datetime.utcnow()
+                release.imdb_lookup_status = "manual"
+                release.imdb_error_message = None
+                db.commit()
+    finally:
+        db.close()
+
+    separator = "&" if "?" in safe_destination else "?"
+    if error_code:
+        return RedirectResponse(
+            f"{safe_destination}{separator}imdb_error={error_code}",
+            status_code=303,
+        )
+    return RedirectResponse(
+        f"{safe_destination}{separator}imdb_saved=1",
+        status_code=303,
+    )
+
+
 @app.post("/releases/{release_id}/ignore")
 def toggle_ignore(release_id: int):
     db = SessionLocal()
