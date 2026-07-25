@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "key": "imdb-top-100",
+  "name": "IMDb Top 100",
+  "description": "First 100 titles from the bundled IMDb reference snapshot.",
+  "source_name": "IMDb",
+  "source_url": "https://www.imdb.com/chart/top/",
+  "list_version": "2026-07-25",
+  "data_updated_at": "2026-07-25",
+  "item_count": 100,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0111161",
+      "title": "The Shawshank Redemption",
+      "year": 1994
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0068646",
+      "title": "The Godfather",
+      "year": 1972
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0468569",
+      "title": "The Dark Knight",
+      "year": 2008
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0071562",
+      "title": "The Godfather Part II",
+      "year": 1974
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0050083",
+      "title": "12 Angry Men",
+      "year": 1957
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt0108052",
+      "title": "Schindler's List",
+      "year": 1993
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt0167260",
+      "title": "The Lord of the Rings: The Return of the King",
+      "year": 2003
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt0110912",
+      "title": "Pulp Fiction",
+      "year": 1994
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt0120737",
+      "title": "The Lord of the Rings: The Fellowship of the Ring",
+      "year": 2001
+    },
+    {
+      "rank": 10,
+      "imdb_id": "tt0060196",
+      "title": "The Good, the Bad and the Ugly",
+      "year": 1966
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt0109830",
+      "title": "Forrest Gump",
+      "year": 1994
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt0137523",
+      "title": "Fight Club",
+      "year": 1999
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt1375666",
+      "title": "Inception",
+      "year": 2010
+    },
+    {
+      "rank": 14,
+      "imdb_id": "tt0167261",
+      "title": "The Lord of the Rings: The Two Towers",
+      "year": 2002
+    },
+    {
+      "rank": 15,
+      "imdb_id": "tt0080684",
+      "title": "The Empire Strikes Back",
+      "year": 1980
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt0133093",
+      "title": "The Matrix",
+      "year": 1999
+    },
+    {
+      "rank": 17,
+      "imdb_id": "tt0099685",
+      "title": "Goodfellas",
+      "year": 1990
+    },
+    {
+      "rank": 18,
+      "imdb_id": "tt0073486",
+      "title": "One Flew Over the Cuckoo's Nest",
+      "year": 1975
+    },
+    {
+      "rank": 19,
+      "imdb_id": "tt0114369",
+      "title": "Se7en",
+      "year": 1995
+    },
+    {
+      "rank": 20,
+      "imdb_id": "tt0047478",
+      "title": "Seven Samurai",
+      "year": 1954
+    },
+    {
+      "rank": 21,
+      "imdb_id": "tt0038650",
+      "title": "It's a Wonderful Life",
+      "year": 1946
+    },
+    {
+      "rank": 22,
+      "imdb_id": "tt0102926",
+      "title": "The Silence of the Lambs",
+      "year": 1991
+    },
+    {
+      "rank": 23,
+      "imdb_id": "tt0317248",
+      "title": "City of God",
+      "year": 2002
+    },
+    {
+      "rank": 24,
+      "imdb_id": "tt0120815",
+      "title": "Saving Private Ryan",
+      "year": 1998
+    },
+    {
+      "rank": 25,
+      "imdb_id": "tt0118799",
+      "title": "Life Is Beautiful",
+      "year": 1997
+    },
+    {
+      "rank": 26,
+      "imdb_id": "tt0120689",
+      "title": "The Green Mile",
+      "year": 1999
+    },
+    {
+      "rank": 27,
+      "imdb_id": "tt0816692",
+      "title": "Interstellar",
+      "year": 2014
+    },
+    {
+      "rank": 28,
+      "imdb_id": "tt0076759",
+      "title": "Star Wars",
+      "year": 1977
+    },
+    {
+      "rank": 29,
+      "imdb_id": "tt0245429",
+      "title": "Spirited Away",
+      "year": 2001
+    },
+    {
+      "rank": 30,
+      "imdb_id": "tt0120586",
+      "title": "American History X",
+      "year": 1998
+    },
+    {
+      "rank": 31,
+      "imdb_id": "tt0110413",
+      "title": "Léon: The Professional",
+      "year": 1994
+    },
+    {
+      "rank": 32,
+      "imdb_id": "tt0054215",
+      "title": "Psycho",
+      "year": 1960
+    },
+    {
+      "rank": 33,
+      "imdb_id": "tt0253474",
+      "title": "The Pianist",
+      "year": 2002
+    },
+    {
+      "rank": 34,
+      "imdb_id": "tt6751668",
+      "title": "Parasite",
+      "year": 2019
+    },
+    {
+      "rank": 35,
+      "imdb_id": "tt0021749",
+      "title": "City Lights",
+      "year": 1931
+    },
+    {
+      "rank": 36,
+      "imdb_id": "tt0172495",
+      "title": "Gladiator",
+      "year": 2000
+    },
+    {
+      "rank": 37,
+      "imdb_id": "tt0407887",
+      "title": "The Departed",
+      "year": 2006
+    },
+    {
+      "rank": 38,
+      "imdb_id": "tt2582802",
+      "title": "Whiplash",
+      "year": 2014
+    },
+    {
+      "rank": 39,
+      "imdb_id": "tt1675434",
+      "title": "The Intouchables",
+      "year": 2011
+    },
+    {
+      "rank": 40,
+      "imdb_id": "tt0482571",
+      "title": "The Prestige",
+      "year": 2006
+    },
+    {
+      "rank": 41,
+      "imdb_id": "tt0064116",
+      "title": "Once Upon a Time in the West",
+      "year": 1968
+    },
+    {
+      "rank": 42,
+      "imdb_id": "tt0034583",
+      "title": "Casablanca",
+      "year": 1942
+    },
+    {
+      "rank": 43,
+      "imdb_id": "tt0095765",
+      "title": "Cinema Paradiso",
+      "year": 1988
+    },
+    {
+      "rank": 44,
+      "imdb_id": "tt0114814",
+      "title": "The Usual Suspects",
+      "year": 1995
+    },
+    {
+      "rank": 45,
+      "imdb_id": "tt0056058",
+      "title": "Harakiri",
+      "year": 1962
+    },
+    {
+      "rank": 46,
+      "imdb_id": "tt0027977",
+      "title": "Modern Times",
+      "year": 1936
+    },
+    {
+      "rank": 47,
+      "imdb_id": "tt0047396",
+      "title": "Rear Window",
+      "year": 1954
+    },
+    {
+      "rank": 48,
+      "imdb_id": "tt0078748",
+      "title": "Alien",
+      "year": 1979
+    },
+    {
+      "rank": 49,
+      "imdb_id": "tt0043014",
+      "title": "Sunset Boulevard",
+      "year": 1950
+    },
+    {
+      "rank": 50,
+      "imdb_id": "tt0209144",
+      "title": "Memento",
+      "year": 2000
+    },
+    {
+      "rank": 51,
+      "imdb_id": "tt1853728",
+      "title": "Django Unchained",
+      "year": 2012
+    },
+    {
+      "rank": 52,
+      "imdb_id": "tt0088763",
+      "title": "Back to the Future",
+      "year": 1985
+    },
+    {
+      "rank": 53,
+      "imdb_id": "tt0910970",
+      "title": "WALL·E",
+      "year": 2008
+    },
+    {
+      "rank": 54,
+      "imdb_id": "tt0082971",
+      "title": "Raiders of the Lost Ark",
+      "year": 1981
+    },
+    {
+      "rank": 55,
+      "imdb_id": "tt0405094",
+      "title": "The Lives of Others",
+      "year": 2006
+    },
+    {
+      "rank": 56,
+      "imdb_id": "tt0050825",
+      "title": "Paths of Glory",
+      "year": 1957
+    },
+    {
+      "rank": 57,
+      "imdb_id": "tt4154796",
+      "title": "Avengers: Endgame",
+      "year": 2019
+    },
+    {
+      "rank": 58,
+      "imdb_id": "tt4633694",
+      "title": "Spider-Man: Into the Spider-Verse",
+      "year": 2018
+    },
+    {
+      "rank": 59,
+      "imdb_id": "tt0051201",
+      "title": "Witness for the Prosecution",
+      "year": 1957
+    },
+    {
+      "rank": 60,
+      "imdb_id": "tt0081505",
+      "title": "The Shining",
+      "year": 1980
+    },
+    {
+      "rank": 61,
+      "imdb_id": "tt0110357",
+      "title": "The Lion King",
+      "year": 1994
+    },
+    {
+      "rank": 62,
+      "imdb_id": "tt0364569",
+      "title": "Oldboy",
+      "year": 2003
+    },
+    {
+      "rank": 63,
+      "imdb_id": "tt1345836",
+      "title": "The Dark Knight Rises",
+      "year": 2012
+    },
+    {
+      "rank": 64,
+      "imdb_id": "tt0057012",
+      "title": "Dr. Strangelove",
+      "year": 1964
+    },
+    {
+      "rank": 65,
+      "imdb_id": "tt2380307",
+      "title": "Coco",
+      "year": 2017
+    },
+    {
+      "rank": 66,
+      "imdb_id": "tt0169547",
+      "title": "American Beauty",
+      "year": 1999
+    },
+    {
+      "rank": 67,
+      "imdb_id": "tt0082096",
+      "title": "Das Boot",
+      "year": 1981
+    },
+    {
+      "rank": 68,
+      "imdb_id": "tt5311514",
+      "title": "Your Name.",
+      "year": 2016
+    },
+    {
+      "rank": 69,
+      "imdb_id": "tt1187043",
+      "title": "3 Idiots",
+      "year": 2009
+    },
+    {
+      "rank": 70,
+      "imdb_id": "tt0119698",
+      "title": "Princess Mononoke",
+      "year": 1997
+    },
+    {
+      "rank": 71,
+      "imdb_id": "tt0087843",
+      "title": "Once Upon a Time in America",
+      "year": 1984
+    },
+    {
+      "rank": 72,
+      "imdb_id": "tt0045152",
+      "title": "Singin' in the Rain",
+      "year": 1952
+    },
+    {
+      "rank": 73,
+      "imdb_id": "tt0090605",
+      "title": "Aliens",
+      "year": 1986
+    },
+    {
+      "rank": 74,
+      "imdb_id": "tt0057565",
+      "title": "High and Low",
+      "year": 1963
+    },
+    {
+      "rank": 75,
+      "imdb_id": "tt8267604",
+      "title": "Capernaum",
+      "year": 2018
+    },
+    {
+      "rank": 76,
+      "imdb_id": "tt0086879",
+      "title": "Amadeus",
+      "year": 1984
+    },
+    {
+      "rank": 77,
+      "imdb_id": "tt0105236",
+      "title": "Reservoir Dogs",
+      "year": 1992
+    },
+    {
+      "rank": 78,
+      "imdb_id": "tt0180093",
+      "title": "Requiem for a Dream",
+      "year": 2000
+    },
+    {
+      "rank": 79,
+      "imdb_id": "tt0022100",
+      "title": "M",
+      "year": 1931
+    },
+    {
+      "rank": 80,
+      "imdb_id": "tt0033467",
+      "title": "Citizen Kane",
+      "year": 1941
+    },
+    {
+      "rank": 81,
+      "imdb_id": "tt8579674",
+      "title": "1917",
+      "year": 2019
+    },
+    {
+      "rank": 82,
+      "imdb_id": "tt0052357",
+      "title": "Vertigo",
+      "year": 1958
+    },
+    {
+      "rank": 83,
+      "imdb_id": "tt0053125",
+      "title": "North by Northwest",
+      "year": 1959
+    },
+    {
+      "rank": 84,
+      "imdb_id": "tt2106476",
+      "title": "The Hunt",
+      "year": 2012
+    },
+    {
+      "rank": 85,
+      "imdb_id": "tt0338013",
+      "title": "Eternal Sunshine of the Spotless Mind",
+      "year": 2004
+    },
+    {
+      "rank": 86,
+      "imdb_id": "tt0044741",
+      "title": "Ikiru",
+      "year": 1952
+    },
+    {
+      "rank": 87,
+      "imdb_id": "tt0435761",
+      "title": "Toy Story 3",
+      "year": 2010
+    },
+    {
+      "rank": 88,
+      "imdb_id": "tt0040522",
+      "title": "Bicycle Thieves",
+      "year": 1948
+    },
+    {
+      "rank": 89,
+      "imdb_id": "tt0042876",
+      "title": "Rashomon",
+      "year": 1950
+    },
+    {
+      "rank": 90,
+      "imdb_id": "tt0053604",
+      "title": "The Apartment",
+      "year": 1960
+    },
+    {
+      "rank": 91,
+      "imdb_id": "tt0071853",
+      "title": "Monty Python and the Holy Grail",
+      "year": 1975
+    },
+    {
+      "rank": 92,
+      "imdb_id": "tt0056172",
+      "title": "Lawrence of Arabia",
+      "year": 1962
+    },
+    {
+      "rank": 93,
+      "imdb_id": "tt0066921",
+      "title": "A Clockwork Orange",
+      "year": 1971
+    },
+    {
+      "rank": 94,
+      "imdb_id": "tt0093058",
+      "title": "Full Metal Jacket",
+      "year": 1987
+    },
+    {
+      "rank": 95,
+      "imdb_id": "tt0070735",
+      "title": "The Sting",
+      "year": 1973
+    },
+    {
+      "rank": 96,
+      "imdb_id": "tt0095327",
+      "title": "Grave of the Fireflies",
+      "year": 1988
+    },
+    {
+      "rank": 97,
+      "imdb_id": "tt1255953",
+      "title": "Incendies",
+      "year": 2010
+    },
+    {
+      "rank": 98,
+      "imdb_id": "tt0211915",
+      "title": "Amélie",
+      "year": 2001
+    },
+    {
+      "rank": 99,
+      "imdb_id": "tt1832382",
+      "title": "A Separation",
+      "year": 2011
+    },
+    {
+      "rank": 100,
+      "imdb_id": "tt0012349",
+      "title": "The Kid",
+      "year": 1921
+    }
+  ]
+}

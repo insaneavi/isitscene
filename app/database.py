@@ -242,6 +242,9 @@ class MovieList(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str] = mapped_column(Text, default="")
     source_url: Mapped[str] = mapped_column(Text, nullable=False)
+    source_name: Mapped[str] = mapped_column(String, default="")
+    list_version: Mapped[str] = mapped_column(String, default="")
+    data_updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
@@ -251,7 +254,7 @@ class MovieListItem(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     list_key: Mapped[str] = mapped_column(String, index=True)
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
-    imdb_id: Mapped[str] = mapped_column(String, index=True)
+    imdb_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     title: Mapped[str] = mapped_column(String, nullable=False, index=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     rating: Mapped[float | None] = mapped_column(nullable=True)
@@ -375,6 +378,9 @@ def _migrate_schema() -> None:
     _add_column_if_missing("releases", "imdb_manual_updated_at", "DATETIME")
     _add_column_if_missing("releases", "movie_title", "VARCHAR")
     _add_column_if_missing("releases", "movie_year", "VARCHAR")
+    _add_column_if_missing("movie_lists", "source_name", "VARCHAR NOT NULL DEFAULT ''")
+    _add_column_if_missing("movie_lists", "list_version", "VARCHAR NOT NULL DEFAULT ''")
+    _add_column_if_missing("movie_lists", "data_updated_at", "DATETIME")
 
     with engine.begin() as connection:
         connection.execute(

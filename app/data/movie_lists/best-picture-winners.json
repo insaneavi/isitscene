@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "key": "best-picture-winners",
+  "name": "Academy Award Best Picture Winners",
+  "description": "Chronological Best Picture winners.",
+  "source_name": "Academy Awards",
+  "source_url": "https://www.oscars.org/oscars/ceremonies",
+  "list_version": "2026-07-25",
+  "data_updated_at": "2026-07-25",
+  "item_count": 97,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": null,
+      "title": "Wings",
+      "year": 1927
+    },
+    {
+      "rank": 2,
+      "imdb_id": null,
+      "title": "The Broadway Melody",
+      "year": 1929
+    },
+    {
+      "rank": 3,
+      "imdb_id": null,
+      "title": "All Quiet on the Western Front",
+      "year": 1930
+    },
+    {
+      "rank": 4,
+      "imdb_id": null,
+      "title": "Cimarron",
+      "year": 1931
+    },
+    {
+      "rank": 5,
+      "imdb_id": null,
+      "title": "Grand Hotel",
+      "year": 1932
+    },
+    {
+      "rank": 6,
+      "imdb_id": null,
+      "title": "Cavalcade",
+      "year": 1933
+    },
+    {
+      "rank": 7,
+      "imdb_id": null,
+      "title": "It Happened One Night",
+      "year": 1934
+    },
+    {
+      "rank": 8,
+      "imdb_id": null,
+      "title": "Mutiny on the Bounty",
+      "year": 1935
+    },
+    {
+      "rank": 9,
+      "imdb_id": null,
+      "title": "The Great Ziegfeld",
+      "year": 1936
+    },
+    {
+      "rank": 10,
+      "imdb_id": null,
+      "title": "The Life of Emile Zola",
+      "year": 1937
+    },
+    {
+      "rank": 11,
+      "imdb_id": null,
+      "title": "You Can't Take It with You",
+      "year": 1938
+    },
+    {
+      "rank": 12,
+      "imdb_id": null,
+      "title": "Gone with the Wind",
+      "year": 1939
+    },
+    {
+      "rank": 13,
+      "imdb_id": null,
+      "title": "Rebecca",
+      "year": 1940
+    },
+    {
+      "rank": 14,
+      "imdb_id": null,
+      "title": "How Green Was My Valley",
+      "year": 1941
+    },
+    {
+      "rank": 15,
+      "imdb_id": null,
+      "title": "Mrs. Miniver",
+      "year": 1942
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt0034583",
+      "title": "Casablanca",
+      "year": 1942
+    },
+    {
+      "rank": 17,
+      "imdb_id": null,
+      "title": "Going My Way",
+      "year": 1944
+    },
+    {
+      "rank": 18,
+      "imdb_id": null,
+      "title": "The Lost Weekend",
+      "year": 1945
+    },
+    {
+      "rank": 19,
+      "imdb_id": null,
+      "title": "The Best Years of Our Lives",
+      "year": 1946
+    },
+    {
+      "rank": 20,
+      "imdb_id": null,
+      "title": "Gentleman's Agreement",
+      "year": 1947
+    },
+    {
+      "rank": 21,
+      "imdb_id": null,
+      "title": "Hamlet",
+      "year": 1948
+    },
+    {
+      "rank": 22,
+      "imdb_id": null,
+      "title": "All the King's Men",
+      "year": 1949
+    },
+    {
+      "rank": 23,
+      "imdb_id": null,
+      "title": "All About Eve",
+      "year": 1950
+    },
+    {
+      "rank": 24,
+      "imdb_id": null,
+      "title": "An American in Paris",
+      "year": 1951
+    },
+    {
+      "rank": 25,
+      "imdb_id": null,
+      "title": "The Greatest Show on Earth",
+      "year": 1952
+    },
+    {
+      "rank": 26,
+      "imdb_id": null,
+      "title": "From Here to Eternity",
+      "year": 1953
+    },
+    {
+      "rank": 27,
+      "imdb_id": null,
+      "title": "On the Waterfront",
+      "year": 1954
+    },
+    {
+      "rank": 28,
+      "imdb_id": null,
+      "title": "Marty",
+      "year": 1955
+    },
+    {
+      "rank": 29,
+      "imdb_id": null,
+      "title": "Around the World in 80 Days",
+      "year": 1956
+    },
+    {
+      "rank": 30,
+      "imdb_id": null,
+      "title": "The Bridge on the River Kwai",
+      "year": 1957
+    },
+    {
+      "rank": 31,
+      "imdb_id": null,
+      "title": "Gigi",
+      "year": 1958
+    },
+    {
+      "rank": 32,
+      "imdb_id": null,
+      "title": "Ben-Hur",
+      "year": 1959
+    },
+    {
+      "rank": 33,
+      "imdb_id": "tt0053604",
+      "title": "The Apartment",
+      "year": 1960
+    },
+    {
+      "rank": 34,
+      "imdb_id": null,
+      "title": "West Side Story",
+      "year": 1961
+    },
+    {
+      "rank": 35,
+      "imdb_id": "tt0056172",
+      "title": "Lawrence of Arabia",
+      "year": 1962
+    },
+    {
+      "rank": 36,
+      "imdb_id": null,
+      "title": "Tom Jones",
+      "year": 1963
+    },
+    {
+      "rank": 37,
+      "imdb_id": null,
+      "title": "My Fair Lady",
+      "year": 1964
+    },
+    {
+      "rank": 38,
+      "imdb_id": null,
+      "title": "The Sound of Music",
+      "year": 1965
+    },
+    {
+      "rank": 39,
+      "imdb_id": null,
+      "title": "A Man for All Seasons",
+      "year": 1966
+    },
+    {
+      "rank": 40,
+      "imdb_id": null,
+      "title": "In the Heat of the Night",
+      "year": 1967
+    },
+    {
+      "rank": 41,
+      "imdb_id": null,
+      "title": "Oliver!",
+      "year": 1968
+    },
+    {
+      "rank": 42,
+      "imdb_id": null,
+      "title": "Midnight Cowboy",
+      "year": 1969
+    },
+    {
+      "rank": 43,
+      "imdb_id": null,
+      "title": "Patton",
+      "year": 1970
+    },
+    {
+      "rank": 44,
+      "imdb_id": null,
+      "title": "The French Connection",
+      "year": 1971
+    },
+    {
+      "rank": 45,
+      "imdb_id": "tt0068646",
+      "title": "The Godfather",
+      "year": 1972
+    },
+    {
+      "rank": 46,
+      "imdb_id": "tt0070735",
+      "title": "The Sting",
+      "year": 1973
+    },
+    {
+      "rank": 47,
+      "imdb_id": "tt0071562",
+      "title": "The Godfather Part II",
+      "year": 1974
+    },
+    {
+      "rank": 48,
+      "imdb_id": "tt0073486",
+      "title": "One Flew Over the Cuckoo's Nest",
+      "year": 1975
+    },
+    {
+      "rank": 49,
+      "imdb_id": null,
+      "title": "Rocky",
+      "year": 1976
+    },
+    {
+      "rank": 50,
+      "imdb_id": null,
+      "title": "Annie Hall",
+      "year": 1977
+    },
+    {
+      "rank": 51,
+      "imdb_id": null,
+      "title": "The Deer Hunter",
+      "year": 1978
+    },
+    {
+      "rank": 52,
+      "imdb_id": null,
+      "title": "Kramer vs. Kramer",
+      "year": 1979
+    },
+    {
+      "rank": 53,
+      "imdb_id": null,
+      "title": "Ordinary People",
+      "year": 1980
+    },
+    {
+      "rank": 54,
+      "imdb_id": null,
+      "title": "Chariots of Fire",
+      "year": 1981
+    },
+    {
+      "rank": 55,
+      "imdb_id": null,
+      "title": "Gandhi",
+      "year": 1982
+    },
+    {
+      "rank": 56,
+      "imdb_id": null,
+      "title": "Terms of Endearment",
+      "year": 1983
+    },
+    {
+      "rank": 57,
+      "imdb_id": "tt0086879",
+      "title": "Amadeus",
+      "year": 1984
+    },
+    {
+      "rank": 58,
+      "imdb_id": null,
+      "title": "Out of Africa",
+      "year": 1985
+    },
+    {
+      "rank": 59,
+      "imdb_id": null,
+      "title": "Platoon",
+      "year": 1986
+    },
+    {
+      "rank": 60,
+      "imdb_id": null,
+      "title": "The Last Emperor",
+      "year": 1987
+    },
+    {
+      "rank": 61,
+      "imdb_id": null,
+      "title": "Rain Man",
+      "year": 1988
+    },
+    {
+      "rank": 62,
+      "imdb_id": null,
+      "title": "Driving Miss Daisy",
+      "year": 1989
+    },
+    {
+      "rank": 63,
+      "imdb_id": null,
+      "title": "Dances with Wolves",
+      "year": 1990
+    },
+    {
+      "rank": 64,
+      "imdb_id": "tt0102926",
+      "title": "The Silence of the Lambs",
+      "year": 1991
+    },
+    {
+      "rank": 65,
+      "imdb_id": null,
+      "title": "Unforgiven",
+      "year": 1992
+    },
+    {
+      "rank": 66,
+      "imdb_id": "tt0108052",
+      "title": "Schindler's List",
+      "year": 1993
+    },
+    {
+      "rank": 67,
+      "imdb_id": "tt0109830",
+      "title": "Forrest Gump",
+      "year": 1994
+    },
+    {
+      "rank": 68,
+      "imdb_id": null,
+      "title": "Braveheart",
+      "year": 1995
+    },
+    {
+      "rank": 69,
+      "imdb_id": null,
+      "title": "The English Patient",
+      "year": 1996
+    },
+    {
+      "rank": 70,
+      "imdb_id": null,
+      "title": "Titanic",
+      "year": 1997
+    },
+    {
+      "rank": 71,
+      "imdb_id": null,
+      "title": "Shakespeare in Love",
+      "year": 1998
+    },
+    {
+      "rank": 72,
+      "imdb_id": "tt0169547",
+      "title": "American Beauty",
+      "year": 1999
+    },
+    {
+      "rank": 73,
+      "imdb_id": "tt0172495",
+      "title": "Gladiator",
+      "year": 2000
+    },
+    {
+      "rank": 74,
+      "imdb_id": null,
+      "title": "A Beautiful Mind",
+      "year": 2001
+    },
+    {
+      "rank": 75,
+      "imdb_id": null,
+      "title": "Chicago",
+      "year": 2002
+    },
+    {
+      "rank": 76,
+      "imdb_id": "tt0167260",
+      "title": "The Lord of the Rings: The Return of the King",
+      "year": 2003
+    },
+    {
+      "rank": 77,
+      "imdb_id": null,
+      "title": "Million Dollar Baby",
+      "year": 2004
+    },
+    {
+      "rank": 78,
+      "imdb_id": null,
+      "title": "Crash",
+      "year": 2005
+    },
+    {
+      "rank": 79,
+      "imdb_id": "tt0407887",
+      "title": "The Departed",
+      "year": 2006
+    },
+    {
+      "rank": 80,
+      "imdb_id": null,
+      "title": "No Country for Old Men",
+      "year": 2007
+    },
+    {
+      "rank": 81,
+      "imdb_id": null,
+      "title": "Slumdog Millionaire",
+      "year": 2008
+    },
+    {
+      "rank": 82,
+      "imdb_id": null,
+      "title": "The Hurt Locker",
+      "year": 2009
+    },
+    {
+      "rank": 83,
+      "imdb_id": null,
+      "title": "The King's Speech",
+      "year": 2010
+    },
+    {
+      "rank": 84,
+      "imdb_id": null,
+      "title": "The Artist",
+      "year": 2011
+    },
+    {
+      "rank": 85,
+      "imdb_id": null,
+      "title": "Argo",
+      "year": 2012
+    },
+    {
+      "rank": 86,
+      "imdb_id": null,
+      "title": "12 Years a Slave",
+      "year": 2013
+    },
+    {
+      "rank": 87,
+      "imdb_id": null,
+      "title": "Birdman",
+      "year": 2014
+    },
+    {
+      "rank": 88,
+      "imdb_id": null,
+      "title": "Spotlight",
+      "year": 2015
+    },
+    {
+      "rank": 89,
+      "imdb_id": null,
+      "title": "Moonlight",
+      "year": 2016
+    },
+    {
+      "rank": 90,
+      "imdb_id": null,
+      "title": "The Shape of Water",
+      "year": 2017
+    },
+    {
+      "rank": 91,
+      "imdb_id": null,
+      "title": "Green Book",
+      "year": 2018
+    },
+    {
+      "rank": 92,
+      "imdb_id": "tt6751668",
+      "title": "Parasite",
+      "year": 2019
+    },
+    {
+      "rank": 93,
+      "imdb_id": null,
+      "title": "Nomadland",
+      "year": 2020
+    },
+    {
+      "rank": 94,
+      "imdb_id": null,
+      "title": "CODA",
+      "year": 2021
+    },
+    {
+      "rank": 95,
+      "imdb_id": null,
+      "title": "Everything Everywhere All at Once",
+      "year": 2022
+    },
+    {
+      "rank": 96,
+      "imdb_id": null,
+      "title": "Oppenheimer",
+      "year": 2023
+    },
+    {
+      "rank": 97,
+      "imdb_id": null,
+      "title": "Anora",
+      "year": 2024
+    }
+  ]
+}

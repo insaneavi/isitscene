@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "key": "afi-100",
+  "name": "AFI 100 Years…100 Movies",
+  "description": "American Film Institute classics reference list.",
+  "source_name": "American Film Institute",
+  "source_url": "https://www.afi.com/afi-lists/",
+  "list_version": "2026-07-25",
+  "data_updated_at": "2026-07-25",
+  "item_count": 100,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0033467",
+      "title": "Citizen Kane",
+      "year": 1941
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0068646",
+      "title": "The Godfather",
+      "year": 1972
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0034583",
+      "title": "Casablanca",
+      "year": 1942
+    },
+    {
+      "rank": 4,
+      "imdb_id": null,
+      "title": "Raging Bull",
+      "year": 1980
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0045152",
+      "title": "Singin' in the Rain",
+      "year": 1952
+    },
+    {
+      "rank": 6,
+      "imdb_id": null,
+      "title": "Gone with the Wind",
+      "year": 1939
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt0056172",
+      "title": "Lawrence of Arabia",
+      "year": 1962
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt0108052",
+      "title": "Schindler's List",
+      "year": 1993
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt0052357",
+      "title": "Vertigo",
+      "year": 1958
+    },
+    {
+      "rank": 10,
+      "imdb_id": null,
+      "title": "The Wizard of Oz",
+      "year": 1939
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt0021749",
+      "title": "City Lights",
+      "year": 1931
+    },
+    {
+      "rank": 12,
+      "imdb_id": null,
+      "title": "The Searchers",
+      "year": 1956
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt0076759",
+      "title": "Star Wars",
+      "year": 1977
+    },
+    {
+      "rank": 14,
+      "imdb_id": "tt0054215",
+      "title": "Psycho",
+      "year": 1960
+    },
+    {
+      "rank": 15,
+      "imdb_id": "tt0062622",
+      "title": "2001: A Space Odyssey",
+      "year": 1968
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt0043014",
+      "title": "Sunset Boulevard",
+      "year": 1950
+    },
+    {
+      "rank": 17,
+      "imdb_id": null,
+      "title": "The Graduate",
+      "year": 1967
+    },
+    {
+      "rank": 18,
+      "imdb_id": null,
+      "title": "The General",
+      "year": 1926
+    },
+    {
+      "rank": 19,
+      "imdb_id": null,
+      "title": "On the Waterfront",
+      "year": 1954
+    },
+    {
+      "rank": 20,
+      "imdb_id": "tt0038650",
+      "title": "It's a Wonderful Life",
+      "year": 1946
+    },
+    {
+      "rank": 21,
+      "imdb_id": null,
+      "title": "Chinatown",
+      "year": 1974
+    },
+    {
+      "rank": 22,
+      "imdb_id": null,
+      "title": "Some Like It Hot",
+      "year": 1959
+    },
+    {
+      "rank": 23,
+      "imdb_id": null,
+      "title": "The Grapes of Wrath",
+      "year": 1940
+    },
+    {
+      "rank": 24,
+      "imdb_id": null,
+      "title": "E.T. the Extra-Terrestrial",
+      "year": 1982
+    },
+    {
+      "rank": 25,
+      "imdb_id": null,
+      "title": "To Kill a Mockingbird",
+      "year": 1962
+    },
+    {
+      "rank": 26,
+      "imdb_id": null,
+      "title": "Mr. Smith Goes to Washington",
+      "year": 1939
+    },
+    {
+      "rank": 27,
+      "imdb_id": null,
+      "title": "High Noon",
+      "year": 1952
+    },
+    {
+      "rank": 28,
+      "imdb_id": null,
+      "title": "All About Eve",
+      "year": 1950
+    },
+    {
+      "rank": 29,
+      "imdb_id": null,
+      "title": "Double Indemnity",
+      "year": 1944
+    },
+    {
+      "rank": 30,
+      "imdb_id": null,
+      "title": "Apocalypse Now",
+      "year": 1979
+    },
+    {
+      "rank": 31,
+      "imdb_id": null,
+      "title": "The Maltese Falcon",
+      "year": 1941
+    },
+    {
+      "rank": 32,
+      "imdb_id": "tt0071562",
+      "title": "The Godfather Part II",
+      "year": 1974
+    },
+    {
+      "rank": 33,
+      "imdb_id": "tt0073486",
+      "title": "One Flew Over the Cuckoo's Nest",
+      "year": 1975
+    },
+    {
+      "rank": 34,
+      "imdb_id": null,
+      "title": "Snow White and the Seven Dwarfs",
+      "year": 1937
+    },
+    {
+      "rank": 35,
+      "imdb_id": null,
+      "title": "Annie Hall",
+      "year": 1977
+    },
+    {
+      "rank": 36,
+      "imdb_id": null,
+      "title": "The Bridge on the River Kwai",
+      "year": 1957
+    },
+    {
+      "rank": 37,
+      "imdb_id": null,
+      "title": "The Best Years of Our Lives",
+      "year": 1946
+    },
+    {
+      "rank": 38,
+      "imdb_id": null,
+      "title": "The Treasure of the Sierra Madre",
+      "year": 1948
+    },
+    {
+      "rank": 39,
+      "imdb_id": "tt0057012",
+      "title": "Dr. Strangelove",
+      "year": 1964
+    },
+    {
+      "rank": 40,
+      "imdb_id": null,
+      "title": "The Sound of Music",
+      "year": 1965
+    },
+    {
+      "rank": 41,
+      "imdb_id": null,
+      "title": "King Kong",
+      "year": 1933
+    },
+    {
+      "rank": 42,
+      "imdb_id": null,
+      "title": "Bonnie and Clyde",
+      "year": 1967
+    },
+    {
+      "rank": 43,
+      "imdb_id": null,
+      "title": "Midnight Cowboy",
+      "year": 1969
+    },
+    {
+      "rank": 44,
+      "imdb_id": null,
+      "title": "The Philadelphia Story",
+      "year": 1940
+    },
+    {
+      "rank": 45,
+      "imdb_id": null,
+      "title": "Shane",
+      "year": 1953
+    },
+    {
+      "rank": 46,
+      "imdb_id": null,
+      "title": "It Happened One Night",
+      "year": 1934
+    },
+    {
+      "rank": 47,
+      "imdb_id": null,
+      "title": "A Streetcar Named Desire",
+      "year": 1951
+    },
+    {
+      "rank": 48,
+      "imdb_id": null,
+      "title": "Taxi Driver",
+      "year": 1976
+    },
+    {
+      "rank": 49,
+      "imdb_id": null,
+      "title": "Jaws",
+      "year": 1975
+    },
+    {
+      "rank": 50,
+      "imdb_id": null,
+      "title": "Rocky",
+      "year": 1976
+    },
+    {
+      "rank": 51,
+      "imdb_id": null,
+      "title": "The Deer Hunter",
+      "year": 1978
+    },
+    {
+      "rank": 52,
+      "imdb_id": null,
+      "title": "The Wild Bunch",
+      "year": 1969
+    },
+    {
+      "rank": 53,
+      "imdb_id": "tt0027977",
+      "title": "Modern Times",
+      "year": 1936
+    },
+    {
+      "rank": 54,
+      "imdb_id": null,
+      "title": "The French Connection",
+      "year": 1971
+    },
+    {
+      "rank": 55,
+      "imdb_id": null,
+      "title": "Nashville",
+      "year": 1975
+    },
+    {
+      "rank": 56,
+      "imdb_id": null,
+      "title": "Network",
+      "year": 1976
+    },
+    {
+      "rank": 57,
+      "imdb_id": "tt0102926",
+      "title": "The Silence of the Lambs",
+      "year": 1991
+    },
+    {
+      "rank": 58,
+      "imdb_id": "tt0082971",
+      "title": "Raiders of the Lost Ark",
+      "year": 1981
+    },
+    {
+      "rank": 59,
+      "imdb_id": null,
+      "title": "Who's Afraid of Virginia Woolf?",
+      "year": 1966
+    },
+    {
+      "rank": 60,
+      "imdb_id": null,
+      "title": "Unforgiven",
+      "year": 1992
+    },
+    {
+      "rank": 61,
+      "imdb_id": null,
+      "title": "Tootsie",
+      "year": 1982
+    },
+    {
+      "rank": 62,
+      "imdb_id": "tt0066921",
+      "title": "A Clockwork Orange",
+      "year": 1971
+    },
+    {
+      "rank": 63,
+      "imdb_id": "tt0120815",
+      "title": "Saving Private Ryan",
+      "year": 1998
+    },
+    {
+      "rank": 64,
+      "imdb_id": "tt0111161",
+      "title": "The Shawshank Redemption",
+      "year": 1994
+    },
+    {
+      "rank": 65,
+      "imdb_id": null,
+      "title": "Butch Cassidy and the Sundance Kid",
+      "year": 1969
+    },
+    {
+      "rank": 66,
+      "imdb_id": null,
+      "title": "The African Queen",
+      "year": 1951
+    },
+    {
+      "rank": 67,
+      "imdb_id": null,
+      "title": "Platoon",
+      "year": 1986
+    },
+    {
+      "rank": 68,
+      "imdb_id": null,
+      "title": "The Sixth Sense",
+      "year": 1999
+    },
+    {
+      "rank": 69,
+      "imdb_id": null,
+      "title": "Cabaret",
+      "year": 1972
+    },
+    {
+      "rank": 70,
+      "imdb_id": null,
+      "title": "All the President's Men",
+      "year": 1976
+    },
+    {
+      "rank": 71,
+      "imdb_id": null,
+      "title": "The Third Man",
+      "year": 1949
+    },
+    {
+      "rank": 72,
+      "imdb_id": "tt0114814",
+      "title": "The Usual Suspects",
+      "year": 1995
+    },
+    {
+      "rank": 73,
+      "imdb_id": "tt0080684",
+      "title": "The Empire Strikes Back",
+      "year": 1980
+    },
+    {
+      "rank": 74,
+      "imdb_id": "tt0120737",
+      "title": "The Lord of the Rings: The Fellowship of the Ring",
+      "year": 2001
+    },
+    {
+      "rank": 75,
+      "imdb_id": null,
+      "title": "Blade Runner",
+      "year": 1982
+    },
+    {
+      "rank": 76,
+      "imdb_id": null,
+      "title": "Toy Story",
+      "year": 1995
+    },
+    {
+      "rank": 77,
+      "imdb_id": "tt0110912",
+      "title": "Pulp Fiction",
+      "year": 1994
+    },
+    {
+      "rank": 78,
+      "imdb_id": "tt0099685",
+      "title": "Goodfellas",
+      "year": 1990
+    },
+    {
+      "rank": 79,
+      "imdb_id": null,
+      "title": "Do the Right Thing",
+      "year": 1989
+    },
+    {
+      "rank": 80,
+      "imdb_id": null,
+      "title": "The Last Picture Show",
+      "year": 1971
+    },
+    {
+      "rank": 81,
+      "imdb_id": null,
+      "title": "Sophie's Choice",
+      "year": 1982
+    },
+    {
+      "rank": 82,
+      "imdb_id": null,
+      "title": "A Night at the Opera",
+      "year": 1935
+    },
+    {
+      "rank": 83,
+      "imdb_id": null,
+      "title": "Fargo",
+      "year": 1996
+    },
+    {
+      "rank": 84,
+      "imdb_id": "tt0167260",
+      "title": "The Lord of the Rings: The Return of the King",
+      "year": 2003
+    },
+    {
+      "rank": 85,
+      "imdb_id": null,
+      "title": "Titanic",
+      "year": 1997
+    },
+    {
+      "rank": 86,
+      "imdb_id": "tt0133093",
+      "title": "The Matrix",
+      "year": 1999
+    },
+    {
+      "rank": 87,
+      "imdb_id": "tt0468569",
+      "title": "The Dark Knight",
+      "year": 2008
+    },
+    {
+      "rank": 88,
+      "imdb_id": "tt0137523",
+      "title": "Fight Club",
+      "year": 1999
+    },
+    {
+      "rank": 89,
+      "imdb_id": "tt0088763",
+      "title": "Back to the Future",
+      "year": 1985
+    },
+    {
+      "rank": 90,
+      "imdb_id": "tt0078748",
+      "title": "Alien",
+      "year": 1979
+    },
+    {
+      "rank": 91,
+      "imdb_id": "tt0081505",
+      "title": "The Shining",
+      "year": 1980
+    },
+    {
+      "rank": 92,
+      "imdb_id": "tt0110357",
+      "title": "The Lion King",
+      "year": 1994
+    },
+    {
+      "rank": 93,
+      "imdb_id": "tt0169547",
+      "title": "American Beauty",
+      "year": 1999
+    },
+    {
+      "rank": 94,
+      "imdb_id": "tt0172495",
+      "title": "Gladiator",
+      "year": 2000
+    },
+    {
+      "rank": 95,
+      "imdb_id": "tt0407887",
+      "title": "The Departed",
+      "year": 2006
+    },
+    {
+      "rank": 96,
+      "imdb_id": null,
+      "title": "No Country for Old Men",
+      "year": 2007
+    },
+    {
+      "rank": 97,
+      "imdb_id": null,
+      "title": "There Will Be Blood",
+      "year": 2007
+    },
+    {
+      "imdb_id": null,
+      "title": "The Apartment",
+      "year": 1960,
+      "rank": 98
+    },
+    {
+      "rank": 99,
+      "imdb_id": null,
+      "title": "Intolerance",
+      "year": 1916
+    },
+    {
+      "rank": 100,
+      "imdb_id": null,
+      "title": "Yankee Doodle Dandy",
+      "year": 1942
+    }
+  ]
+}

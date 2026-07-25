@@ -1,9 +1,21 @@
-# iSiTSCENE v0.10.5
+# iSiTSCENE v0.11.0
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.10.5
+## New in v0.11.0
+
+- Replaces fragile IMDb webpage scraping with bundled, versioned movie lists.
+- Includes IMDb Top 100, IMDb Top 250, Academy Award Best Picture Winners, AFI 100 Years…100 Movies, and Studio Ghibli Feature Films.
+- Imports all bundled lists automatically on first launch.
+- Adds independent Reload Bundled List controls.
+- Displays both the list data date and the local SQLite cache timestamp.
+- Adds overview cards showing owned count and completion percentage for every list.
+- Matches by IMDb ID first and title/year as a fallback where a bundled entry lacks an IMDb ID.
+- Keeps manual IMDb overrides authoritative during ownership matching.
+- Advances the automatic SQLite schema to version 13.
+
+## New in v0.11.0
 
 - Fixes IMDb Top 100 synchronization after IMDb removed the page structure previously expected by the importer.
 - Uses IMDb's official Top 250 chart and caches its first 100 ranked movies.
@@ -13,7 +25,7 @@ folder name exactly matches a release registered in SRRDB.
 - Preserves the previous cache when IMDb is unavailable or changes its page again.
 - No database migration is required.
 
-## New in v0.10.5
+## New in v0.11.0
 
 - Adds **Movie Lists** with an IMDb Top 100 collection-completion view.
 - Uses a manual Sync button and caches the list in SQLite.
@@ -22,7 +34,7 @@ folder name exactly matches a release registered in SRRDB.
 - Shows All, Owned, and Missing views plus completion statistics.
 - Keeps the previous cache intact if a synchronization fails.
 
-## New in v0.10.5
+## New in v0.11.0
 
 - Adds **Duplicate Finder** for different releases of the same movie.
 - Stores IMDb IDs directly on release records and reuses them in later scans.

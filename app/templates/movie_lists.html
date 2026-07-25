@@ -1,73 +1,94 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="heading upgrade-heading">
+<section class="heading">
   <div>
     <h1>Movie Lists</h1>
-    <p>Compare your locally cached IMDb metadata against curated movie lists.</p>
-  </div>
-  <div class="scan-control-block">
-    <div class="upgrade-actions">
-      <form method="post" action="/movie-lists/imdb-top-100/sync">
-        <button {% if sync and sync.status == 'running' %}disabled{% endif %}>
-          {% if sync and sync.status == 'running' %}Sync Running{% else %}Sync IMDb Top 100{% endif %}
-        </button>
-      </form>
-    </div>
-    <p class="last-successful-scan">
-      Cache date: <strong>{% if movie_list and movie_list.updated_at %}{{ format_datetime(movie_list.updated_at, true) }}{% else %}Never{% endif %}</strong>
-    </p>
+    <p>Compare your collection against locally bundled, versioned movie lists.</p>
   </div>
 </section>
 
-{% if sync and sync.status == 'failed' %}
-<section class="notice error">Last synchronization failed: {{ sync.error_message }}</section>
-{% elif sync and sync.status == 'running' %}
-<section class="notice">IMDb Top 100 synchronization is running. This page will refresh automatically.</section>
+{% if request.query_params.get("reloaded") %}
+<section class="notice success">Bundled list reloaded successfully.</section>
+{% elif sync and sync.status == "failed" %}
+<section class="notice error">The last bundled-list import failed: {{ sync.error_message }}</section>
 {% endif %}
 
+<section class="movie-list-grid">
+  {% for summary in summaries %}
+  <a class="movie-list-card {% if summary.list.key == list_key %}active{% endif %}"
+     href="/movie-lists?list_key={{ summary.list.key }}">
+    <h2>{{ summary.list.name }}</h2>
+    <strong>{{ summary.owned }} / {{ summary.total }}</strong>
+    <span>{{ summary.completion }}% complete</span>
+    <small>Data as of {{ format_date(summary.list.data_updated_at) }}</small>
+  </a>
+  {% endfor %}
+</section>
+
+{% if movie_list %}
+<section class="panel movie-list-header">
+  <div>
+    <h2>{{ movie_list.name }}</h2>
+    <p>{{ movie_list.description }}</p>
+    <div class="list-date-row">
+      <span>List data date: <strong>{{ format_date(movie_list.data_updated_at) }}</strong></span>
+      <span>Cached locally: <strong>{{ format_datetime(movie_list.updated_at, true) if movie_list.updated_at else "Never" }}</strong></span>
+      <span>Version: <strong>{{ movie_list.list_version or "—" }}</strong></span>
+      <span>Source: <a href="{{ movie_list.source_url }}" target="_blank" rel="noopener">{{ movie_list.source_name }}</a></span>
+    </div>
+  </div>
+  <form method="post" action="/movie-lists/{{ movie_list.key }}/reload"
+        onsubmit="return confirm('Reload this list from the bundled application snapshot?');">
+    <button>Reload Bundled List</button>
+  </form>
+</section>
+
 <section class="cards">
-  <div class="card"><strong>{{ total }}</strong><span>Cached Titles</span></div>
+  <div class="card"><strong>{{ total }}</strong><span>Titles</span></div>
   <div class="card good"><strong>{{ owned }}</strong><span>Owned</span></div>
   <div class="card warn"><strong>{{ missing }}</strong><span>Missing</span></div>
   <div class="card"><strong>{{ completion }}%</strong><span>Complete</span></div>
 </section>
 
 <form class="filters" method="get">
+  <input type="hidden" name="list_key" value="{{ list_key }}">
   <select name="view">
-    <option value="all" {% if view == 'all' %}selected{% endif %}>All Movies</option>
-    <option value="owned" {% if view == 'owned' %}selected{% endif %}>Owned Only</option>
-    <option value="missing" {% if view == 'missing' %}selected{% endif %}>Missing Only</option>
+    <option value="all" {% if view == "all" %}selected{% endif %}>All Movies</option>
+    <option value="owned" {% if view == "owned" %}selected{% endif %}>Owned Only</option>
+    <option value="missing" {% if view == "missing" %}selected{% endif %}>Missing Only</option>
   </select>
   <input name="q" value="{{ q }}" placeholder="Search title or year">
   <button>Filter</button>
 </form>
 
 <section class="panel">
-  <h2>IMDb Top 100 Movies</h2>
-  {% if not rows %}
-    <div class="empty-state"><h2>No cached list yet</h2><p>Use Sync IMDb Top 100 to download and cache the list locally.</p></div>
-  {% else %}
   <div class="table-scroll">
     <table>
-      <thead><tr><th>Rank</th><th>Movie</th><th>Year</th><th>IMDb Rating</th><th>Status</th><th>Owned Release</th></tr></thead>
+      <thead>
+        <tr><th>Rank</th><th>Movie</th><th>Year</th><th>Status</th><th>Match</th><th>Owned Release</th></tr>
+      </thead>
       <tbody>
       {% for row in rows %}
         <tr>
           <td>#{{ row.item.rank }}</td>
-          <td><a href="https://www.imdb.com/title/{{ row.item.imdb_id }}/" target="_blank" rel="noopener">{{ row.item.title }}</a></td>
+          <td>
+            {% if row.item.imdb_id %}
+            <a href="https://www.imdb.com/title/{{ row.item.imdb_id }}/" target="_blank" rel="noopener">{{ row.item.title }}</a>
+            {% else %}
+            {{ row.item.title }}
+            {% endif %}
+          </td>
           <td>{{ row.item.year }}</td>
-          <td>{{ row.item.rating if row.item.rating is not none else '—' }}</td>
-          <td><span class="badge {{ 'verified' if row.release else 'unverified' }}">{{ 'Owned' if row.release else 'Missing' }}</span></td>
-          <td>{{ row.release.folder_name if row.release else '—' }}</td>
+          <td><span class="badge {{ "verified" if row.release else "unverified" }}">{{ "Owned" if row.release else "Missing" }}</span></td>
+          <td>{{ row.match_method or "—" }}</td>
+          <td>{{ row.release.folder_name if row.release else "—" }}</td>
         </tr>
+      {% else %}
+        <tr><td colspan="6">No movies match this filter.</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
-  {% endif %}
 </section>
-
-{% if sync and sync.status == 'running' %}
-<script>setTimeout(() => location.reload(), 2500);</script>
 {% endif %}
 {% endblock %}

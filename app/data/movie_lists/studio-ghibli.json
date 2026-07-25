@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "key": "studio-ghibli",
+  "name": "Studio Ghibli Feature Films",
+  "description": "Studio Ghibli feature-film collection.",
+  "source_name": "Studio Ghibli",
+  "source_url": "https://www.ghibli.jp/works/",
+  "list_version": "2026-07-25",
+  "data_updated_at": "2026-07-25",
+  "item_count": 24,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0087544",
+      "title": "Nausicaä of the Valley of the Wind",
+      "year": 1984
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0092067",
+      "title": "Castle in the Sky",
+      "year": 1986
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0095327",
+      "title": "Grave of the Fireflies",
+      "year": 1988
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0096283",
+      "title": "My Neighbor Totoro",
+      "year": 1988
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0097814",
+      "title": "Kiki's Delivery Service",
+      "year": 1989
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt0102587",
+      "title": "Only Yesterday",
+      "year": 1991
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt0104652",
+      "title": "Porco Rosso",
+      "year": 1992
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt0110008",
+      "title": "Pom Poko",
+      "year": 1994
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt0113824",
+      "title": "Whisper of the Heart",
+      "year": 1995
+    },
+    {
+      "rank": 10,
+      "imdb_id": "tt0119698",
+      "title": "Princess Mononoke",
+      "year": 1997
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt0206013",
+      "title": "My Neighbors the Yamadas",
+      "year": 1999
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt0245429",
+      "title": "Spirited Away",
+      "year": 2001
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt0347618",
+      "title": "The Cat Returns",
+      "year": 2002
+    },
+    {
+      "rank": 14,
+      "imdb_id": "tt0347149",
+      "title": "Howl's Moving Castle",
+      "year": 2004
+    },
+    {
+      "rank": 15,
+      "imdb_id": "tt0495596",
+      "title": "Tales from Earthsea",
+      "year": 2006
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt0876563",
+      "title": "Ponyo",
+      "year": 2008
+    },
+    {
+      "rank": 17,
+      "imdb_id": "tt1568921",
+      "title": "The Secret World of Arrietty",
+      "year": 2010
+    },
+    {
+      "rank": 18,
+      "imdb_id": "tt1798188",
+      "title": "From Up on Poppy Hill",
+      "year": 2011
+    },
+    {
+      "rank": 19,
+      "imdb_id": "tt2013293",
+      "title": "The Wind Rises",
+      "year": 2013
+    },
+    {
+      "rank": 20,
+      "imdb_id": "tt2576852",
+      "title": "The Tale of the Princess Kaguya",
+      "year": 2013
+    },
+    {
+      "rank": 21,
+      "imdb_id": "tt3398268",
+      "title": "When Marnie Was There",
+      "year": 2014
+    },
+    {
+      "rank": 22,
+      "imdb_id": "tt5184298",
+      "title": "The Red Turtle",
+      "year": 2016
+    },
+    {
+      "rank": 23,
+      "imdb_id": "tt6587046",
+      "title": "Earwig and the Witch",
+      "year": 2020
+    },
+    {
+      "rank": 24,
+      "imdb_id": null,
+      "title": "The Boy and the Heron",
+      "year": 2023
+    }
+  ]
+}

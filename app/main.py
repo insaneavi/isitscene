@@ -41,7 +41,7 @@ from .duplicate_scanner import (
     run_duplicate_scan,
 )
 from .srrdb import parse_release_name
-from .movie_lists import sync_imdb_top_100
+from .movie_lists import ensure_bundled_lists, import_bundled_list
 
 logging.basicConfig(level=logging.INFO)
 
@@ -69,6 +69,7 @@ def refresh_scheduler() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    ensure_bundled_lists()
     recover_interrupted_scan()
     recover_interrupted_upgrade_scan()
     recover_interrupted_duplicate_scan()
@@ -757,23 +758,63 @@ def review_duplicate(group_key: str, review_status: str = Form(...), comment: st
 
 
 @app.get("/movie-lists", response_class=HTMLResponse)
-def movie_lists_page(request: Request, view: str = "all", q: str = ""):
+def movie_lists_page(
+    request: Request,
+    list_key: str = "imdb-top-100",
+    view: str = "all",
+    q: str = "",
+):
     db = SessionLocal()
     try:
-        movie_list = db.get(MovieList, "imdb-top-100")
-        sync = db.get(MovieListSync, "imdb-top-100")
+        lists = db.scalars(select(MovieList).order_by(MovieList.name)).all()
+        available_keys = {item.key for item in lists}
+        if list_key not in available_keys and lists:
+            list_key = lists[0].key
+
+        movie_list = db.get(MovieList, list_key)
+        sync = db.get(MovieListSync, list_key)
         items = db.scalars(
             select(MovieListItem)
-            .where(MovieListItem.list_key == "imdb-top-100")
+            .where(MovieListItem.list_key == list_key)
             .order_by(MovieListItem.rank)
         ).all()
+
         releases = db.scalars(
-            select(Release).where(Release.is_present.is_(True), Release.imdb_id.is_not(None))
+            select(Release).where(Release.is_present.is_(True))
         ).all()
         owned_by_imdb = {}
+        owned_by_title_year = {}
         for release in releases:
-            owned_by_imdb.setdefault(release.imdb_id, release)
-        all_rows = [{"item": item, "release": owned_by_imdb.get(item.imdb_id)} for item in items]
+            if release.imdb_id:
+                owned_by_imdb.setdefault(release.imdb_id, release)
+            title = (release.movie_title or movie_title_from_release_name(
+                release.matched_release or release.folder_name
+            )).casefold().strip()
+            year = release.movie_year
+            if not year:
+                parsed = parse_release_name(
+                    release.matched_release or release.folder_name
+                )
+                year = parsed.year
+            if title and year:
+                owned_by_title_year.setdefault((title, str(year)), release)
+
+        all_rows = []
+        for item in items:
+            release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
+            match_method = "IMDb" if release else None
+            if release is None:
+                release = owned_by_title_year.get(
+                    (item.title.casefold().strip(), str(item.year))
+                )
+                if release:
+                    match_method = "Title/year"
+            all_rows.append({
+                "item": item,
+                "release": release,
+                "match_method": match_method,
+            })
+
         total = len(all_rows)
         owned = sum(1 for row in all_rows if row["release"])
         missing = total - owned
@@ -784,24 +825,66 @@ def movie_lists_page(request: Request, view: str = "all", q: str = ""):
             rows = [row for row in rows if not row["release"]]
         if q:
             query = q.casefold().strip()
-            rows = [row for row in rows if query in row["item"].title.casefold() or query == str(row["item"].year)]
+            rows = [
+                row for row in rows
+                if query in row["item"].title.casefold()
+                or query == str(row["item"].year)
+            ]
+
+        summaries = []
+        for available in lists:
+            list_items = db.scalars(
+                select(MovieListItem).where(
+                    MovieListItem.list_key == available.key
+                )
+            ).all()
+            list_owned = 0
+            for item in list_items:
+                release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
+                if not release:
+                    release = owned_by_title_year.get(
+                        (item.title.casefold().strip(), str(item.year))
+                    )
+                if release:
+                    list_owned += 1
+            summaries.append({
+                "list": available,
+                "total": len(list_items),
+                "owned": list_owned,
+                "completion": round(
+                    (list_owned / len(list_items) * 100), 1
+                ) if list_items else 0,
+            })
+
         return templates.TemplateResponse(
-            request=request, name="movie_lists.html",
+            request=request,
+            name="movie_lists.html",
             context={
-                "movie_list": movie_list, "sync": sync, "rows": rows,
-                "total": total, "owned": owned, "missing": missing,
+                "lists": lists,
+                "summaries": summaries,
+                "movie_list": movie_list,
+                "sync": sync,
+                "rows": rows,
+                "total": total,
+                "owned": owned,
+                "missing": missing,
                 "completion": round((owned / total * 100), 1) if total else 0,
-                "view": view, "q": q,
+                "view": view,
+                "q": q,
+                "list_key": list_key,
             },
         )
     finally:
         db.close()
 
 
-@app.post("/movie-lists/imdb-top-100/sync")
-def sync_movie_list(background_tasks: BackgroundTasks):
-    background_tasks.add_task(sync_imdb_top_100)
-    return RedirectResponse("/movie-lists?syncing=1", status_code=303)
+@app.post("/movie-lists/{list_key}/reload")
+def reload_movie_list(list_key: str):
+    import_bundled_list(list_key)
+    return RedirectResponse(
+        f"/movie-lists?list_key={list_key}&reloaded=1",
+        status_code=303,
+    )
 
 
 @app.get("/settings", response_class=HTMLResponse)

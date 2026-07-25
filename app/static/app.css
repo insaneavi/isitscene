@@ -929,3 +929,70 @@ a.card { text-decoration:none; color:inherit; }
     width: 100%;
   }
 }
+
+
+.movie-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.movie-list-card {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.movie-list-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(86, 211, 100, 0.18);
+}
+
+.movie-list-card h2 {
+  font-size: 1rem;
+}
+
+.movie-list-card strong {
+  font-size: 1.45rem;
+}
+
+.movie-list-card span,
+.movie-list-card small {
+  color: var(--muted);
+}
+
+.movie-list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.movie-list-header p {
+  color: var(--muted);
+}
+
+.list-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+.list-date-row strong {
+  color: var(--text);
+}
+
+@media(max-width:760px) {
+  .movie-list-header { flex-direction: column; }
+  .movie-list-header form,
+  .movie-list-header button { width: 100%; }
+}

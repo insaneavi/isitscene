@@ -1,6 +1,17 @@
 # Changelog
 
-## v0.10.5
+## v0.11.0
+
+- Added five bundled, versioned movie lists.
+- Removed runtime IMDb HTML scraping.
+- Added per-list data dates, cache timestamps, versions, and sources.
+- Added automatic first-run imports and manual bundled-list reloads.
+- Added list overview completion cards and generic list selection.
+- Added title/year fallback matching for entries without IMDb IDs.
+- Added schema version 13 and automatic migration.
+
+
+## v0.11.0
 
 - Fixed IMDb Top 100 synchronization against the current IMDb chart page.
 - Switched to the official Top 250 chart and imports the first 100 ranked titles.
@@ -9,7 +20,7 @@
 - No database changes.
 
 
-## v0.10.5
+## v0.11.0
 
 - Added a reusable Movie Lists section with an IMDb Top 100 list.
 - Added manual synchronization; the application never repeatedly refreshes the list automatically.
@@ -20,7 +31,7 @@
 - Added schema version 11.
 
 
-## v0.10.5
+## v0.11.0
 
 - Added Duplicate Finder with confirmed IMDb groups and cautious title/year fallback groups.
 - Added persistent IMDb metadata caching on every release to avoid repeated SRRDB lookups.
