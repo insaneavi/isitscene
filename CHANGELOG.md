@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.1
+
+- Fixed bundled lists containing title/year-only entries on databases where the legacy IMDb ID column remains non-nullable.
+- Added automatic retry for failed bundled-list imports during application startup.
+- Restores Pixar, Disney Animated Classics, and Studio Ghibli on upgraded installations.
+- No database changes.
+
+
 ## v0.12.0
 
 - Added Pixar Feature Films.

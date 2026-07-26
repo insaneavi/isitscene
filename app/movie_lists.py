@@ -89,7 +89,7 @@ def import_bundled_list(list_key: str) -> None:
                 MovieListItem(
                     list_key=list_key,
                     rank=int(item["rank"]),
-                    imdb_id=item.get("imdb_id"),
+                    imdb_id=item.get("imdb_id") or "",
                     title=item["title"].strip(),
                     year=int(item["year"]),
                     rating=item.get("rating"),
@@ -120,9 +120,16 @@ def ensure_bundled_lists() -> None:
     db = SessionLocal()
     try:
         existing = set(db.scalars(select(MovieList.key)).all())
+        failed = set(
+            db.scalars(
+                select(MovieListSync.list_key).where(
+                    MovieListSync.status == "failed"
+                )
+            ).all()
+        )
     finally:
         db.close()
 
     for key in bundled_list_keys():
-        if key not in existing:
+        if key not in existing or key in failed:
             import_bundled_list(key)
