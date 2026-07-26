@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "key": "marvel-cinematic-universe",
+  "name": "Marvel Cinematic Universe",
+  "description": "MCU theatrical films from Iron Man through The Fantastic Four: First Steps. Series are excluded.",
+  "source_name": "Marvel",
+  "source_url": "https://www.marvel.com/movies",
+  "list_version": "2026-07-26",
+  "data_updated_at": "2026-07-26",
+  "item_count": 37,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0371746",
+      "title": "Iron Man",
+      "year": 2008
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0800080",
+      "title": "The Incredible Hulk",
+      "year": 2008
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt1228705",
+      "title": "Iron Man 2",
+      "year": 2010
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0800369",
+      "title": "Thor",
+      "year": 2011
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0458339",
+      "title": "Captain America: The First Avenger",
+      "year": 2011
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt0848228",
+      "title": "The Avengers",
+      "year": 2012
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt1300854",
+      "title": "Iron Man 3",
+      "year": 2013
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt1981115",
+      "title": "Thor: The Dark World",
+      "year": 2013
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt1843866",
+      "title": "Captain America: The Winter Soldier",
+      "year": 2014
+    },
+    {
+      "rank": 10,
+      "imdb_id": "tt2015381",
+      "title": "Guardians of the Galaxy",
+      "year": 2014
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt2395427",
+      "title": "Avengers: Age of Ultron",
+      "year": 2015
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt0478970",
+      "title": "Ant-Man",
+      "year": 2015
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt3498820",
+      "title": "Captain America: Civil War",
+      "year": 2016
+    },
+    {
+      "rank": 14,
+      "imdb_id": "tt1211837",
+      "title": "Doctor Strange",
+      "year": 2016
+    },
+    {
+      "rank": 15,
+      "imdb_id": "tt3896198",
+      "title": "Guardians of the Galaxy Vol. 2",
+      "year": 2017
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt2250912",
+      "title": "Spider-Man: Homecoming",
+      "year": 2017
+    },
+    {
+      "rank": 17,
+      "imdb_id": "tt3501632",
+      "title": "Thor: Ragnarok",
+      "year": 2017
+    },
+    {
+      "rank": 18,
+      "imdb_id": "tt1825683",
+      "title": "Black Panther",
+      "year": 2018
+    },
+    {
+      "rank": 19,
+      "imdb_id": "tt4154756",
+      "title": "Avengers: Infinity War",
+      "year": 2018
+    },
+    {
+      "rank": 20,
+      "imdb_id": "tt5095030",
+      "title": "Ant-Man and the Wasp",
+      "year": 2018
+    },
+    {
+      "rank": 21,
+      "imdb_id": "tt4154664",
+      "title": "Captain Marvel",
+      "year": 2019
+    },
+    {
+      "rank": 22,
+      "imdb_id": "tt4154796",
+      "title": "Avengers: Endgame",
+      "year": 2019
+    },
+    {
+      "rank": 23,
+      "imdb_id": "tt6320628",
+      "title": "Spider-Man: Far From Home",
+      "year": 2019
+    },
+    {
+      "rank": 24,
+      "imdb_id": "tt3480822",
+      "title": "Black Widow",
+      "year": 2021
+    },
+    {
+      "rank": 25,
+      "imdb_id": "tt9376612",
+      "title": "Shang-Chi and the Legend of the Ten Rings",
+      "year": 2021
+    },
+    {
+      "rank": 26,
+      "imdb_id": "tt9032400",
+      "title": "Eternals",
+      "year": 2021
+    },
+    {
+      "rank": 27,
+      "imdb_id": "tt10872600",
+      "title": "Spider-Man: No Way Home",
+      "year": 2021
+    },
+    {
+      "rank": 28,
+      "imdb_id": "tt9419884",
+      "title": "Doctor Strange in the Multiverse of Madness",
+      "year": 2022
+    },
+    {
+      "rank": 29,
+      "imdb_id": "tt10648342",
+      "title": "Thor: Love and Thunder",
+      "year": 2022
+    },
+    {
+      "rank": 30,
+      "imdb_id": "tt9114286",
+      "title": "Black Panther: Wakanda Forever",
+      "year": 2022
+    },
+    {
+      "rank": 31,
+      "imdb_id": "tt10954600",
+      "title": "Ant-Man and the Wasp: Quantumania",
+      "year": 2023
+    },
+    {
+      "rank": 32,
+      "imdb_id": "tt6791350",
+      "title": "Guardians of the Galaxy Vol. 3",
+      "year": 2023
+    },
+    {
+      "rank": 33,
+      "imdb_id": "tt10676048",
+      "title": "The Marvels",
+      "year": 2023
+    },
+    {
+      "rank": 34,
+      "imdb_id": "tt6263850",
+      "title": "Deadpool & Wolverine",
+      "year": 2024
+    },
+    {
+      "rank": 35,
+      "imdb_id": "tt14513804",
+      "title": "Captain America: Brave New World",
+      "year": 2025
+    },
+    {
+      "rank": 36,
+      "imdb_id": "tt20969586",
+      "title": "Thunderbolts*",
+      "year": 2025
+    },
+    {
+      "rank": 37,
+      "imdb_id": "tt10676052",
+      "title": "The Fantastic Four: First Steps",
+      "year": 2025
+    }
+  ]
+}

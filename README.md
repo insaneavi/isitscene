@@ -1,9 +1,20 @@
-# iSiTSCENE v0.11.1
+# iSiTSCENE v0.12.0
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.11.1
+## New in v0.12.0
+
+- Adds Pixar Feature Films with 31 titles through Toy Story 5.
+- Adds Disney Animated Classics with 63 Walt Disney Animation Studios canon titles through Zootopia 2.
+- Adds the Marvel Cinematic Universe with 37 theatrical films through The Fantastic Four: First Steps.
+- Adds the official 15-film DC Animated Movie Universe continuity.
+- Refreshes the bundled Studio Ghibli snapshot date.
+- Each collection uses the existing owned/missing filters, completion cards, source date, version, and local cache timestamp.
+- New lists import automatically at application startup.
+- No database schema migration is required.
+
+## New in v0.12.0
 
 - Replaces fragile IMDb webpage scraping with bundled, versioned movie lists.
 - Includes IMDb Top 100, IMDb Top 250, Academy Award Best Picture Winners, AFI 100 Years…100 Movies, and Studio Ghibli Feature Films.
@@ -15,7 +26,7 @@ folder name exactly matches a release registered in SRRDB.
 - Keeps manual IMDb overrides authoritative during ownership matching.
 - Advances the automatic SQLite schema to version 13.
 
-## New in v0.11.1
+## New in v0.12.0
 
 - Fixes IMDb Top 100 synchronization after IMDb removed the page structure previously expected by the importer.
 - Uses IMDb's official Top 250 chart and caches its first 100 ranked movies.
@@ -25,7 +36,7 @@ folder name exactly matches a release registered in SRRDB.
 - Preserves the previous cache when IMDb is unavailable or changes its page again.
 - No database migration is required.
 
-## New in v0.11.1
+## New in v0.12.0
 
 - Adds **Movie Lists** with an IMDb Top 100 collection-completion view.
 - Uses a manual Sync button and caches the list in SQLite.
@@ -34,7 +45,7 @@ folder name exactly matches a release registered in SRRDB.
 - Shows All, Owned, and Missing views plus completion statistics.
 - Keeps the previous cache intact if a synchronization fails.
 
-## New in v0.11.1
+## New in v0.12.0
 
 - Adds **Duplicate Finder** for different releases of the same movie.
 - Stores IMDb IDs directly on release records and reuses them in later scans.

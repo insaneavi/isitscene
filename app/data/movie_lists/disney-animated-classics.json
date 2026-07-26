@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "key": "disney-animated-classics",
+  "name": "Disney Animated Classics",
+  "description": "The Walt Disney Animation Studios feature-film canon through Zootopia 2.",
+  "source_name": "Walt Disney Animation Studios",
+  "source_url": "https://www.disneyanimation.com/films/",
+  "list_version": "2026-07-26",
+  "data_updated_at": "2026-07-26",
+  "item_count": 63,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0029583",
+      "title": "Snow White and the Seven Dwarfs",
+      "year": 1937
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0032910",
+      "title": "Pinocchio",
+      "year": 1940
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0032455",
+      "title": "Fantasia",
+      "year": 1940
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0033563",
+      "title": "Dumbo",
+      "year": 1941
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0034492",
+      "title": "Bambi",
+      "year": 1942
+    },
+    {
+      "rank": 6,
+      "imdb_id": null,
+      "title": "Saludos Amigos",
+      "year": 1942
+    },
+    {
+      "rank": 7,
+      "imdb_id": null,
+      "title": "The Three Caballeros",
+      "year": 1944
+    },
+    {
+      "rank": 8,
+      "imdb_id": null,
+      "title": "Make Mine Music",
+      "year": 1946
+    },
+    {
+      "rank": 9,
+      "imdb_id": null,
+      "title": "Fun and Fancy Free",
+      "year": 1947
+    },
+    {
+      "rank": 10,
+      "imdb_id": null,
+      "title": "Melody Time",
+      "year": 1948
+    },
+    {
+      "rank": 11,
+      "imdb_id": null,
+      "title": "The Adventures of Ichabod and Mr. Toad",
+      "year": 1949
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt0042332",
+      "title": "Cinderella",
+      "year": 1950
+    },
+    {
+      "rank": 13,
+      "imdb_id": null,
+      "title": "Alice in Wonderland",
+      "year": 1951
+    },
+    {
+      "rank": 14,
+      "imdb_id": null,
+      "title": "Peter Pan",
+      "year": 1953
+    },
+    {
+      "rank": 15,
+      "imdb_id": null,
+      "title": "Lady and the Tramp",
+      "year": 1955
+    },
+    {
+      "rank": 16,
+      "imdb_id": null,
+      "title": "Sleeping Beauty",
+      "year": 1959
+    },
+    {
+      "rank": 17,
+      "imdb_id": null,
+      "title": "One Hundred and One Dalmatians",
+      "year": 1961
+    },
+    {
+      "rank": 18,
+      "imdb_id": null,
+      "title": "The Sword in the Stone",
+      "year": 1963
+    },
+    {
+      "rank": 19,
+      "imdb_id": null,
+      "title": "The Jungle Book",
+      "year": 1967
+    },
+    {
+      "rank": 20,
+      "imdb_id": null,
+      "title": "The Aristocats",
+      "year": 1970
+    },
+    {
+      "rank": 21,
+      "imdb_id": null,
+      "title": "Robin Hood",
+      "year": 1973
+    },
+    {
+      "rank": 22,
+      "imdb_id": null,
+      "title": "The Many Adventures of Winnie the Pooh",
+      "year": 1977
+    },
+    {
+      "rank": 23,
+      "imdb_id": null,
+      "title": "The Rescuers",
+      "year": 1977
+    },
+    {
+      "rank": 24,
+      "imdb_id": null,
+      "title": "The Fox and the Hound",
+      "year": 1981
+    },
+    {
+      "rank": 25,
+      "imdb_id": null,
+      "title": "The Black Cauldron",
+      "year": 1985
+    },
+    {
+      "rank": 26,
+      "imdb_id": null,
+      "title": "The Great Mouse Detective",
+      "year": 1986
+    },
+    {
+      "rank": 27,
+      "imdb_id": null,
+      "title": "Oliver & Company",
+      "year": 1988
+    },
+    {
+      "rank": 28,
+      "imdb_id": null,
+      "title": "The Little Mermaid",
+      "year": 1989
+    },
+    {
+      "rank": 29,
+      "imdb_id": null,
+      "title": "The Rescuers Down Under",
+      "year": 1990
+    },
+    {
+      "rank": 30,
+      "imdb_id": null,
+      "title": "Beauty and the Beast",
+      "year": 1991
+    },
+    {
+      "rank": 31,
+      "imdb_id": null,
+      "title": "Aladdin",
+      "year": 1992
+    },
+    {
+      "rank": 32,
+      "imdb_id": "tt0110357",
+      "title": "The Lion King",
+      "year": 1994
+    },
+    {
+      "rank": 33,
+      "imdb_id": null,
+      "title": "Pocahontas",
+      "year": 1995
+    },
+    {
+      "rank": 34,
+      "imdb_id": null,
+      "title": "The Hunchback of Notre Dame",
+      "year": 1996
+    },
+    {
+      "rank": 35,
+      "imdb_id": null,
+      "title": "Hercules",
+      "year": 1997
+    },
+    {
+      "rank": 36,
+      "imdb_id": null,
+      "title": "Mulan",
+      "year": 1998
+    },
+    {
+      "rank": 37,
+      "imdb_id": null,
+      "title": "Tarzan",
+      "year": 1999
+    },
+    {
+      "rank": 38,
+      "imdb_id": null,
+      "title": "Fantasia 2000",
+      "year": 1999
+    },
+    {
+      "rank": 39,
+      "imdb_id": null,
+      "title": "Dinosaur",
+      "year": 2000
+    },
+    {
+      "rank": 40,
+      "imdb_id": null,
+      "title": "Atlantis: The Lost Empire",
+      "year": 2001
+    },
+    {
+      "rank": 41,
+      "imdb_id": null,
+      "title": "Lilo & Stitch",
+      "year": 2002
+    },
+    {
+      "rank": 42,
+      "imdb_id": null,
+      "title": "Treasure Planet",
+      "year": 2002
+    },
+    {
+      "rank": 43,
+      "imdb_id": null,
+      "title": "Brother Bear",
+      "year": 2003
+    },
+    {
+      "rank": 44,
+      "imdb_id": null,
+      "title": "Home on the Range",
+      "year": 2004
+    },
+    {
+      "rank": 45,
+      "imdb_id": null,
+      "title": "Chicken Little",
+      "year": 2005
+    },
+    {
+      "rank": 46,
+      "imdb_id": null,
+      "title": "Meet the Robinsons",
+      "year": 2007
+    },
+    {
+      "rank": 47,
+      "imdb_id": null,
+      "title": "Bolt",
+      "year": 2008
+    },
+    {
+      "rank": 48,
+      "imdb_id": null,
+      "title": "The Princess and the Frog",
+      "year": 2009
+    },
+    {
+      "rank": 49,
+      "imdb_id": null,
+      "title": "Tangled",
+      "year": 2010
+    },
+    {
+      "rank": 50,
+      "imdb_id": null,
+      "title": "Winnie the Pooh",
+      "year": 2011
+    },
+    {
+      "rank": 51,
+      "imdb_id": null,
+      "title": "Wreck-It Ralph",
+      "year": 2012
+    },
+    {
+      "rank": 52,
+      "imdb_id": null,
+      "title": "Frozen",
+      "year": 2013
+    },
+    {
+      "rank": 53,
+      "imdb_id": null,
+      "title": "Big Hero 6",
+      "year": 2014
+    },
+    {
+      "rank": 54,
+      "imdb_id": null,
+      "title": "Zootopia",
+      "year": 2016
+    },
+    {
+      "rank": 55,
+      "imdb_id": null,
+      "title": "Moana",
+      "year": 2016
+    },
+    {
+      "rank": 56,
+      "imdb_id": null,
+      "title": "Ralph Breaks the Internet",
+      "year": 2018
+    },
+    {
+      "rank": 57,
+      "imdb_id": null,
+      "title": "Frozen II",
+      "year": 2019
+    },
+    {
+      "rank": 58,
+      "imdb_id": null,
+      "title": "Raya and the Last Dragon",
+      "year": 2021
+    },
+    {
+      "rank": 59,
+      "imdb_id": null,
+      "title": "Encanto",
+      "year": 2021
+    },
+    {
+      "rank": 60,
+      "imdb_id": null,
+      "title": "Strange World",
+      "year": 2022
+    },
+    {
+      "rank": 61,
+      "imdb_id": null,
+      "title": "Wish",
+      "year": 2023
+    },
+    {
+      "rank": 62,
+      "imdb_id": null,
+      "title": "Moana 2",
+      "year": 2024
+    },
+    {
+      "rank": 63,
+      "imdb_id": null,
+      "title": "Zootopia 2",
+      "year": 2025
+    }
+  ]
+}

@@ -1,6 +1,16 @@
 # Changelog
 
-## v0.11.1
+## v0.12.0
+
+- Added Pixar Feature Films.
+- Added Disney Animated Classics.
+- Added Marvel Cinematic Universe theatrical films.
+- Added the official DC Animated Movie Universe continuity.
+- Refreshed the Studio Ghibli bundled-list snapshot metadata.
+- No database changes.
+
+
+## v0.12.0
 
 - Added five bundled, versioned movie lists.
 - Removed runtime IMDb HTML scraping.
@@ -11,7 +21,7 @@
 - Added schema version 13 and automatic migration.
 
 
-## v0.11.1
+## v0.12.0
 
 - Fixed IMDb Top 100 synchronization against the current IMDb chart page.
 - Switched to the official Top 250 chart and imports the first 100 ranked titles.
@@ -20,7 +30,7 @@
 - No database changes.
 
 
-## v0.11.1
+## v0.12.0
 
 - Added a reusable Movie Lists section with an IMDb Top 100 list.
 - Added manual synchronization; the application never repeatedly refreshes the list automatically.
@@ -31,7 +41,7 @@
 - Added schema version 11.
 
 
-## v0.11.1
+## v0.12.0
 
 - Added Duplicate Finder with confirmed IMDb groups and cautious title/year fallback groups.
 - Added persistent IMDb metadata caching on every release to avoid repeated SRRDB lookups.

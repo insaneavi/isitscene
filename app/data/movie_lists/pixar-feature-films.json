@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "key": "pixar-feature-films",
+  "name": "Pixar Feature Films",
+  "description": "Pixar feature films released through July 2026, ordered by release date.",
+  "source_name": "Pixar Animation Studios",
+  "source_url": "https://www.pixar.com/feature-films/",
+  "list_version": "2026-07-26",
+  "data_updated_at": "2026-07-26",
+  "item_count": 31,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0114709",
+      "title": "Toy Story",
+      "year": 1995
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0120623",
+      "title": "A Bug's Life",
+      "year": 1998
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0120363",
+      "title": "Toy Story 2",
+      "year": 1999
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0198781",
+      "title": "Monsters, Inc.",
+      "year": 2001
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0266543",
+      "title": "Finding Nemo",
+      "year": 2003
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt0317705",
+      "title": "The Incredibles",
+      "year": 2004
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt0317219",
+      "title": "Cars",
+      "year": 2006
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt0382932",
+      "title": "Ratatouille",
+      "year": 2007
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt0910970",
+      "title": "WALL·E",
+      "year": 2008
+    },
+    {
+      "rank": 10,
+      "imdb_id": "tt1049413",
+      "title": "Up",
+      "year": 2009
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt0435761",
+      "title": "Toy Story 3",
+      "year": 2010
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt1216475",
+      "title": "Cars 2",
+      "year": 2011
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt1217209",
+      "title": "Brave",
+      "year": 2012
+    },
+    {
+      "rank": 14,
+      "imdb_id": "tt1453405",
+      "title": "Monsters University",
+      "year": 2013
+    },
+    {
+      "rank": 15,
+      "imdb_id": "tt2096673",
+      "title": "Inside Out",
+      "year": 2015
+    },
+    {
+      "rank": 16,
+      "imdb_id": "tt1979388",
+      "title": "The Good Dinosaur",
+      "year": 2015
+    },
+    {
+      "rank": 17,
+      "imdb_id": "tt2277860",
+      "title": "Finding Dory",
+      "year": 2016
+    },
+    {
+      "rank": 18,
+      "imdb_id": "tt3606752",
+      "title": "Cars 3",
+      "year": 2017
+    },
+    {
+      "rank": 19,
+      "imdb_id": "tt2380307",
+      "title": "Coco",
+      "year": 2017
+    },
+    {
+      "rank": 20,
+      "imdb_id": "tt3606756",
+      "title": "Incredibles 2",
+      "year": 2018
+    },
+    {
+      "rank": 21,
+      "imdb_id": "tt1979376",
+      "title": "Toy Story 4",
+      "year": 2019
+    },
+    {
+      "rank": 22,
+      "imdb_id": "tt7146812",
+      "title": "Onward",
+      "year": 2020
+    },
+    {
+      "rank": 23,
+      "imdb_id": "tt2948372",
+      "title": "Soul",
+      "year": 2020
+    },
+    {
+      "rank": 24,
+      "imdb_id": "tt12801262",
+      "title": "Luca",
+      "year": 2021
+    },
+    {
+      "rank": 25,
+      "imdb_id": "tt8097030",
+      "title": "Turning Red",
+      "year": 2022
+    },
+    {
+      "rank": 26,
+      "imdb_id": "tt10298810",
+      "title": "Lightyear",
+      "year": 2022
+    },
+    {
+      "rank": 27,
+      "imdb_id": "tt15789038",
+      "title": "Elemental",
+      "year": 2023
+    },
+    {
+      "rank": 28,
+      "imdb_id": "tt22022452",
+      "title": "Inside Out 2",
+      "year": 2024
+    },
+    {
+      "rank": 29,
+      "imdb_id": "tt4900148",
+      "title": "Elio",
+      "year": 2025
+    },
+    {
+      "rank": 30,
+      "imdb_id": null,
+      "title": "Hoppers",
+      "year": 2026
+    },
+    {
+      "rank": 31,
+      "imdb_id": null,
+      "title": "Toy Story 5",
+      "year": 2026
+    }
+  ]
+}

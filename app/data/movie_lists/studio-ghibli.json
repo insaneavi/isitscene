@@ -2,11 +2,11 @@
   "schema_version": 1,
   "key": "studio-ghibli",
   "name": "Studio Ghibli Feature Films",
-  "description": "Studio Ghibli feature-film collection.",
+  "description": "Studio Ghibli feature films through The Boy and the Heron.",
   "source_name": "Studio Ghibli",
   "source_url": "https://www.ghibli.jp/works/",
-  "list_version": "2026-07-25",
-  "data_updated_at": "2026-07-25",
+  "list_version": "2026-07-26",
+  "data_updated_at": "2026-07-26",
   "item_count": 24,
   "items": [
     {
