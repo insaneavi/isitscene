@@ -12,7 +12,7 @@ from fastapi import BackgroundTasks, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 
 from .config import APP_NAME, APP_VERSION, BUILD_DATE, GIT_COMMIT, DATABASE_VERSION
 from .database import (
@@ -889,11 +889,95 @@ def reload_movie_list(list_key: str):
 
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="settings.html",
-        context={"settings": get_settings()},
-    )
+    db = SessionLocal()
+    try:
+        removed_release_count = db.scalar(
+            select(func.count())
+            .select_from(Release)
+            .where(Release.is_present.is_(False))
+        ) or 0
+        return templates.TemplateResponse(
+            request=request,
+            name="settings.html",
+            context={
+                "settings": get_settings(),
+                "removed_release_count": removed_release_count,
+            },
+        )
+    finally:
+        db.close()
+
+
+@app.post("/settings/purge-removed")
+def purge_removed_inventory(
+    confirmation: str = Form(""),
+):
+    if confirmation.strip().upper() != "PURGE":
+        return RedirectResponse(
+            "/settings?purge_error=confirmation",
+            status_code=303,
+        )
+
+    db = SessionLocal()
+    try:
+        active_progress = (
+            db.get(ScanProgress, 1),
+            db.get(UpgradeProgress, 1),
+            db.get(DuplicateProgress, 1),
+        )
+        if any(progress and progress.is_running for progress in active_progress):
+            return RedirectResponse(
+                "/settings?purge_error=scan_running",
+                status_code=303,
+            )
+
+        removed_ids = list(
+            db.scalars(
+                select(Release.id).where(Release.is_present.is_(False))
+            ).all()
+        )
+        if not removed_ids:
+            return RedirectResponse(
+                "/settings?purged=0",
+                status_code=303,
+            )
+
+        upgrade_result_ids = list(
+            db.scalars(
+                select(UpgradeResult.id).where(
+                    UpgradeResult.release_id.in_(removed_ids)
+                )
+            ).all()
+        )
+        if upgrade_result_ids:
+            db.execute(
+                delete(UpgradeCandidate).where(
+                    UpgradeCandidate.upgrade_result_id.in_(upgrade_result_ids)
+                )
+            )
+        db.execute(
+            delete(UpgradeResult).where(
+                UpgradeResult.release_id.in_(removed_ids)
+            )
+        )
+        db.execute(
+            delete(Release).where(Release.id.in_(removed_ids))
+        )
+        db.commit()
+
+        return RedirectResponse(
+            f"/settings?purged={len(removed_ids)}",
+            status_code=303,
+        )
+    except Exception:
+        db.rollback()
+        logging.exception("Unable to purge removed inventory records")
+        return RedirectResponse(
+            "/settings?purge_error=failed",
+            status_code=303,
+        )
+    finally:
+        db.close()
 
 
 @app.post("/settings")
