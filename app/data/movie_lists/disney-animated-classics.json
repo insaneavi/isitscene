@@ -5,8 +5,8 @@
   "description": "The Walt Disney Animation Studios feature-film canon through Zootopia 2.",
   "source_name": "Walt Disney Animation Studios",
   "source_url": "https://www.disneyanimation.com/films/",
-  "list_version": "2026-07-26.2",
-  "data_updated_at": "2026-07-26",
+  "list_version": "2026-07-27.3",
+  "data_updated_at": "2026-07-27",
   "item_count": 63,
   "items": [
     {
@@ -107,9 +107,12 @@
     },
     {
       "rank": 17,
-      "imdb_id": null,
+      "imdb_id": "tt0055254",
       "title": "One Hundred and One Dalmatians",
-      "year": 1961
+      "year": 1961,
+      "aliases": [
+        "101 Dalmatians"
+      ]
     },
     {
       "rank": 18,

@@ -1,0 +1,66 @@
+{
+  "key": "middle-earth-six-films",
+  "name": "Middle-earth: The Hobbit & The Lord of the Rings",
+  "description": "All six Peter Jackson Middle-earth films.",
+  "source_name": "IMDb",
+  "source_url": "https://www.imdb.com/",
+  "list_version": "2026-07-27.1",
+  "item_count": 6,
+  "data_updated_at": "2026-07-27",
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0903624",
+      "title": "The Hobbit: An Unexpected Journey",
+      "year": 2012,
+      "aliases": [
+        "Hobbit An Unexpected Journey"
+      ]
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt1170358",
+      "title": "The Hobbit: The Desolation of Smaug",
+      "year": 2013,
+      "aliases": [
+        "Hobbit The Desolation of Smaug"
+      ]
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt2310332",
+      "title": "The Hobbit: The Battle of the Five Armies",
+      "year": 2014,
+      "aliases": [
+        "Hobbit The Battle of the Five Armies"
+      ]
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt0120737",
+      "title": "The Lord of the Rings: The Fellowship of the Ring",
+      "year": 2001,
+      "aliases": [
+        "Lord of the Rings The Fellowship of the Ring"
+      ]
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt0167261",
+      "title": "The Lord of the Rings: The Two Towers",
+      "year": 2002,
+      "aliases": [
+        "Lord of the Rings The Two Towers"
+      ]
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt0167260",
+      "title": "The Lord of the Rings: The Return of the King",
+      "year": 2003,
+      "aliases": [
+        "Lord of the Rings The Return of the King"
+      ]
+    }
+  ]
+}

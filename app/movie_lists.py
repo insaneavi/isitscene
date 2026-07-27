@@ -54,6 +54,21 @@ def _validate(payload: dict) -> None:
             )
         title_years.add(title_year)
 
+        aliases = item.get("aliases", [])
+        if not isinstance(aliases, list):
+            raise ValueError(f"Aliases for {title} must be a list.")
+        seen_aliases: set[str] = set()
+        for alias in aliases:
+            alias_text = str(alias).strip()
+            normalized_alias = alias_text.casefold()
+            if not alias_text:
+                raise ValueError(f"Bundled list contains an empty alias for {title}.")
+            if normalized_alias == title.casefold():
+                raise ValueError(f"Primary title repeated as alias: {title}.")
+            if normalized_alias in seen_aliases:
+                raise ValueError(f"Duplicate alias for {title}: {alias_text}.")
+            seen_aliases.add(normalized_alias)
+
         imdb_id = item.get("imdb_id")
         if imdb_id:
             if not re.fullmatch(r"tt\d{7,10}", imdb_id):
@@ -115,6 +130,7 @@ def import_bundled_list(list_key: str) -> None:
                     imdb_id=item.get("imdb_id") or "",
                     title=item["title"].strip(),
                     year=int(item["year"]),
+                    aliases_json=json.dumps(item.get("aliases", [])),
                     rating=item.get("rating"),
                 )
             )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from collections import defaultdict
@@ -106,6 +107,14 @@ def rebuild_movie_list_cache() -> None:
         for item in items:
             release = None
             method = None
+            try:
+                aliases = json.loads(item.aliases_json or "[]")
+            except (TypeError, json.JSONDecodeError):
+                aliases = []
+            normalized_aliases = [
+                normalize_title(alias) for alias in aliases
+                if normalize_title(alias)
+            ]
 
             if item.imdb_id:
                 release = by_imdb.get(item.imdb_id)
@@ -122,9 +131,26 @@ def rebuild_movie_list_cache() -> None:
                     method = "Title/year"
 
             if release is None:
+                for alias in normalized_aliases:
+                    release = by_title_year.get((alias, str(item.year)))
+                    if release:
+                        method = "Alias/year"
+                        break
+
+            if release is None:
                 release = unique_titles.get(normalized_item)
                 if release:
                     method = "Unique title"
+
+            if release is None:
+                alias_matches = {
+                    unique_titles[alias].id: unique_titles[alias]
+                    for alias in normalized_aliases
+                    if alias in unique_titles
+                }
+                if len(alias_matches) == 1:
+                    release = next(iter(alias_matches.values()))
+                    method = "Unique alias"
 
             if release is None and normalized_item:
                 best_score = 0.0

@@ -1,0 +1,140 @@
+{
+  "key": "star-wars-theatrical-films",
+  "name": "Star Wars Theatrical Films",
+  "description": "The theatrical Star Wars films through 2026.",
+  "source_name": "IMDb",
+  "source_url": "https://www.imdb.com/",
+  "list_version": "2026-07-27.1",
+  "item_count": 13,
+  "data_updated_at": "2026-07-27",
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "tt0120915",
+      "title": "Star Wars: Episode I - The Phantom Menace",
+      "year": 1999,
+      "aliases": [
+        "Star Wars Episode I The Phantom Menace",
+        "The Phantom Menace"
+      ]
+    },
+    {
+      "rank": 2,
+      "imdb_id": "tt0121765",
+      "title": "Star Wars: Episode II - Attack of the Clones",
+      "year": 2002,
+      "aliases": [
+        "Star Wars Episode II Attack of the Clones",
+        "Attack of the Clones"
+      ]
+    },
+    {
+      "rank": 3,
+      "imdb_id": "tt0121766",
+      "title": "Star Wars: Episode III - Revenge of the Sith",
+      "year": 2005,
+      "aliases": [
+        "Star Wars Episode III Revenge of the Sith",
+        "Revenge of the Sith"
+      ]
+    },
+    {
+      "rank": 4,
+      "imdb_id": "tt1185834",
+      "title": "Star Wars: The Clone Wars",
+      "year": 2008,
+      "aliases": [
+        "The Clone Wars"
+      ]
+    },
+    {
+      "rank": 5,
+      "imdb_id": "tt3778644",
+      "title": "Solo: A Star Wars Story",
+      "year": 2018,
+      "aliases": [
+        "Solo"
+      ]
+    },
+    {
+      "rank": 6,
+      "imdb_id": "tt3748528",
+      "title": "Rogue One: A Star Wars Story",
+      "year": 2016,
+      "aliases": [
+        "Rogue One"
+      ]
+    },
+    {
+      "rank": 7,
+      "imdb_id": "tt0076759",
+      "title": "Star Wars: Episode IV - A New Hope",
+      "year": 1977,
+      "aliases": [
+        "Star Wars",
+        "Star Wars Episode IV A New Hope",
+        "A New Hope"
+      ]
+    },
+    {
+      "rank": 8,
+      "imdb_id": "tt0080684",
+      "title": "Star Wars: Episode V - The Empire Strikes Back",
+      "year": 1980,
+      "aliases": [
+        "Star Wars Episode V The Empire Strikes Back",
+        "The Empire Strikes Back"
+      ]
+    },
+    {
+      "rank": 9,
+      "imdb_id": "tt0086190",
+      "title": "Star Wars: Episode VI - Return of the Jedi",
+      "year": 1983,
+      "aliases": [
+        "Star Wars Episode VI Return of the Jedi",
+        "Return of the Jedi"
+      ]
+    },
+    {
+      "rank": 10,
+      "imdb_id": "tt2488496",
+      "title": "Star Wars: Episode VII - The Force Awakens",
+      "year": 2015,
+      "aliases": [
+        "Star Wars Episode VII The Force Awakens",
+        "The Force Awakens"
+      ]
+    },
+    {
+      "rank": 11,
+      "imdb_id": "tt2527336",
+      "title": "Star Wars: Episode VIII - The Last Jedi",
+      "year": 2017,
+      "aliases": [
+        "Star Wars Episode VIII The Last Jedi",
+        "The Last Jedi"
+      ]
+    },
+    {
+      "rank": 12,
+      "imdb_id": "tt2527338",
+      "title": "Star Wars: Episode IX - The Rise of Skywalker",
+      "year": 2019,
+      "aliases": [
+        "Star Wars Episode IX The Rise of Skywalker",
+        "The Rise of Skywalker"
+      ]
+    },
+    {
+      "rank": 13,
+      "imdb_id": "tt30825738",
+      "title": "Star Wars: The Mandalorian and Grogu",
+      "year": 2026,
+      "aliases": [
+        "The Mandalorian and Grogu",
+        "Mandalorian and Grogu"
+      ]
+    }
+  ]
+}

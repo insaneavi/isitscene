@@ -257,6 +257,7 @@ class MovieListItem(Base):
     imdb_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     title: Mapped[str] = mapped_column(String, nullable=False, index=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
+    aliases_json: Mapped[str] = mapped_column(Text, default="[]")
     rating: Mapped[float | None] = mapped_column(nullable=True)
 
 
@@ -400,6 +401,9 @@ def _migrate_schema() -> None:
     _add_column_if_missing("movie_lists", "source_name", "VARCHAR NOT NULL DEFAULT ''")
     _add_column_if_missing("movie_lists", "list_version", "VARCHAR NOT NULL DEFAULT ''")
     _add_column_if_missing("movie_lists", "data_updated_at", "DATETIME")
+    _add_column_if_missing(
+        "movie_list_items", "aliases_json", "TEXT NOT NULL DEFAULT '[]'"
+    )
 
     with engine.begin() as connection:
         connection.execute(
