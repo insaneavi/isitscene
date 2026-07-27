@@ -119,7 +119,10 @@ def import_bundled_list(list_key: str) -> None:
 def ensure_bundled_lists() -> None:
     db = SessionLocal()
     try:
-        existing = set(db.scalars(select(MovieList.key)).all())
+        existing = {
+            movie_list.key: movie_list.list_version
+            for movie_list in db.scalars(select(MovieList)).all()
+        }
         failed = set(
             db.scalars(
                 select(MovieListSync.list_key).where(
@@ -131,5 +134,20 @@ def ensure_bundled_lists() -> None:
         db.close()
 
     for key in bundled_list_keys():
-        if key not in existing or key in failed:
+        path = BUNDLED_LIST_PATH / f"{key}.json"
+        try:
+            bundled_version = str(
+                json.loads(path.read_text(encoding="utf-8")).get(
+                    "list_version", ""
+                )
+            )
+        except Exception:
+            log.exception("Unable to inspect bundled movie list %s", key)
+            continue
+
+        if (
+            key not in existing
+            or key in failed
+            or existing.get(key, "") != bundled_version
+        ):
             import_bundled_list(key)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from difflib import SequenceMatcher
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from urllib.parse import quote_plus
@@ -133,6 +134,58 @@ _RELEASE_TECH_PATTERN = re.compile(
     r"h264|h265|hevc|xvid|av1)"
     r"(?=$|[._\s-])"
 )
+
+
+def normalize_movie_title(value: str) -> str:
+    """Normalize punctuation and spacing for conservative title matching."""
+    value = value.casefold()
+    value = value.replace("&", " and ")
+    value = re.sub(r"['’]", "", value)
+    value = re.sub(r"[^a-z0-9]+", " ", value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def _unique_title_matches(releases: list[Release]) -> dict[str, Release]:
+    grouped: dict[str, list[Release]] = {}
+    for release in releases:
+        raw_title = release.movie_title or movie_title_from_release_name(
+            release.matched_release or release.folder_name
+        )
+        normalized = normalize_movie_title(raw_title)
+        if normalized:
+            grouped.setdefault(normalized, []).append(release)
+    return {
+        title: matches[0]
+        for title, matches in grouped.items()
+        if len(matches) == 1
+    }
+
+
+def _fuzzy_unique_title_match(
+    item_title: str,
+    unique_release_titles: dict[str, Release],
+) -> Release | None:
+    """Return only a single, extremely close title match."""
+    normalized_item = normalize_movie_title(item_title)
+    if not normalized_item:
+        return None
+
+    scores = sorted(
+        (
+            SequenceMatcher(None, normalized_item, release_title).ratio(),
+            release_title,
+            release,
+        )
+        for release_title, release in unique_release_titles.items()
+    )
+    if not scores:
+        return None
+
+    best_score, _, best_release = scores[-1]
+    second_score = scores[-2][0] if len(scores) > 1 else 0.0
+    if best_score >= 0.98 and best_score > second_score:
+        return best_release
+    return None
 
 
 def movie_title_from_release_name(folder_name: str) -> str:
@@ -784,12 +837,14 @@ def movie_lists_page(
         ).all()
         owned_by_imdb = {}
         owned_by_title_year = {}
+        unique_release_titles = _unique_title_matches(releases)
         for release in releases:
             if release.imdb_id:
                 owned_by_imdb.setdefault(release.imdb_id, release)
-            title = (release.movie_title or movie_title_from_release_name(
+            raw_title = release.movie_title or movie_title_from_release_name(
                 release.matched_release or release.folder_name
-            )).casefold().strip()
+            )
+            title = normalize_movie_title(raw_title)
             year = release.movie_year
             if not year:
                 parsed = parse_release_name(
@@ -799,16 +854,34 @@ def movie_lists_page(
             if title and year:
                 owned_by_title_year.setdefault((title, str(year)), release)
 
+        def match_list_item(item: MovieListItem):
+            release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
+            if release:
+                return release, "IMDb"
+
+            normalized_title = normalize_movie_title(item.title)
+            release = owned_by_title_year.get(
+                (normalized_title, str(item.year))
+            )
+            if release:
+                return release, "Title/year"
+
+            release = unique_release_titles.get(normalized_title)
+            if release:
+                return release, "Unique title"
+
+            release = _fuzzy_unique_title_match(
+                item.title,
+                unique_release_titles,
+            )
+            if release:
+                return release, "Close title"
+
+            return None, None
+
         all_rows = []
         for item in items:
-            release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
-            match_method = "IMDb" if release else None
-            if release is None:
-                release = owned_by_title_year.get(
-                    (item.title.casefold().strip(), str(item.year))
-                )
-                if release:
-                    match_method = "Title/year"
+            release, match_method = match_list_item(item)
             all_rows.append({
                 "item": item,
                 "release": release,
@@ -840,11 +913,7 @@ def movie_lists_page(
             ).all()
             list_owned = 0
             for item in list_items:
-                release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
-                if not release:
-                    release = owned_by_title_year.get(
-                        (item.title.casefold().strip(), str(item.year))
-                    )
+                release, _ = match_list_item(item)
                 if release:
                     list_owned += 1
             summaries.append({

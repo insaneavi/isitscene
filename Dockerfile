@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ARG APP_VERSION=0.12.1
+ARG APP_VERSION=0.12.2
 ARG BUILD_DATE=development
 ARG GIT_COMMIT=development
 

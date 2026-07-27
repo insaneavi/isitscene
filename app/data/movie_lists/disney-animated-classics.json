@@ -5,7 +5,7 @@
   "description": "The Walt Disney Animation Studios feature-film canon through Zootopia 2.",
   "source_name": "Walt Disney Animation Studios",
   "source_url": "https://www.disneyanimation.com/films/",
-  "list_version": "2026-07-26",
+  "list_version": "2026-07-26.2",
   "data_updated_at": "2026-07-26",
   "item_count": 63,
   "items": [
@@ -233,7 +233,7 @@
     },
     {
       "rank": 38,
-      "imdb_id": null,
+      "imdb_id": "tt0120910",
       "title": "Fantasia 2000",
       "year": 1999
     },
@@ -245,13 +245,13 @@
     },
     {
       "rank": 40,
-      "imdb_id": null,
+      "imdb_id": "tt0230011",
       "title": "Atlantis: The Lost Empire",
       "year": 2001
     },
     {
       "rank": 41,
-      "imdb_id": null,
+      "imdb_id": "tt0275847",
       "title": "Lilo & Stitch",
       "year": 2002
     },
@@ -281,13 +281,13 @@
     },
     {
       "rank": 46,
-      "imdb_id": null,
+      "imdb_id": "tt0396555",
       "title": "Meet the Robinsons",
       "year": 2007
     },
     {
       "rank": 47,
-      "imdb_id": null,
+      "imdb_id": "tt0397892",
       "title": "Bolt",
       "year": 2008
     },
@@ -311,13 +311,13 @@
     },
     {
       "rank": 51,
-      "imdb_id": null,
+      "imdb_id": "tt1772341",
       "title": "Wreck-It Ralph",
       "year": 2012
     },
     {
       "rank": 52,
-      "imdb_id": null,
+      "imdb_id": "tt2294629",
       "title": "Frozen",
       "year": 2013
     },
@@ -353,7 +353,7 @@
     },
     {
       "rank": 58,
-      "imdb_id": null,
+      "imdb_id": "tt5109280",
       "title": "Raya and the Last Dragon",
       "year": 2021
     },
@@ -365,13 +365,13 @@
     },
     {
       "rank": 60,
-      "imdb_id": null,
+      "imdb_id": "tt10298840",
       "title": "Strange World",
       "year": 2022
     },
     {
       "rank": 61,
-      "imdb_id": null,
+      "imdb_id": "tt11304740",
       "title": "Wish",
       "year": 2023
     },
