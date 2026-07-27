@@ -5,8 +5,8 @@
   "description": "Studio Ghibli feature films through The Boy and the Heron.",
   "source_name": "Studio Ghibli",
   "source_url": "https://www.ghibli.jp/works/",
-  "list_version": "2026-07-26",
-  "data_updated_at": "2026-07-26",
+  "list_version": "2026-07-27.2",
+  "data_updated_at": "2026-07-27",
   "item_count": 24,
   "items": [
     {
@@ -143,13 +143,13 @@
     },
     {
       "rank": 23,
-      "imdb_id": "tt6587046",
+      "imdb_id": "tt12441478",
       "title": "Earwig and the Witch",
       "year": 2020
     },
     {
       "rank": 24,
-      "imdb_id": null,
+      "imdb_id": "tt6587046",
       "title": "The Boy and the Heron",
       "year": 2023
     }

@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 APP_NAME = "iSiTSCENE"
-APP_VERSION = os.getenv("APP_VERSION", "0.13.0")
+APP_VERSION = os.getenv("APP_VERSION", "0.13.1")
 BUILD_DATE = os.getenv("BUILD_DATE", "development")
 GIT_COMMIT = os.getenv("GIT_COMMIT", "development")
 DATABASE_VERSION = 14

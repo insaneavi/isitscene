@@ -32,16 +32,39 @@ def _validate(payload: dict) -> None:
         raise ValueError("Bundled list item count is invalid.")
 
     ranks: set[int] = set()
+    imdb_ids: dict[str, str] = {}
+    title_years: set[tuple[str, int]] = set()
+
     for item in items:
         rank = int(item["rank"])
         if rank in ranks:
             raise ValueError("Bundled list contains duplicate ranks.")
         ranks.add(rank)
-        if not str(item.get("title", "")).strip():
+
+        title = str(item.get("title", "")).strip()
+        if not title:
             raise ValueError("Bundled list contains an empty title.")
+
+        year = int(item["year"])
+        title_year = (title.casefold(), year)
+        if title_year in title_years:
+            raise ValueError(
+                f"Bundled list contains duplicate title/year: "
+                f"{title} ({year})"
+            )
+        title_years.add(title_year)
+
         imdb_id = item.get("imdb_id")
-        if imdb_id and not re.fullmatch(r"tt\d{7,10}", imdb_id):
-            raise ValueError(f"Invalid IMDb ID: {imdb_id}")
+        if imdb_id:
+            if not re.fullmatch(r"tt\d{7,10}", imdb_id):
+                raise ValueError(f"Invalid IMDb ID: {imdb_id}")
+            previous_title = imdb_ids.get(imdb_id)
+            if previous_title:
+                raise ValueError(
+                    f"Bundled list assigns IMDb ID {imdb_id} to both "
+                    f"{previous_title} and {title}."
+                )
+            imdb_ids[imdb_id] = title
 
 
 def import_bundled_list(list_key: str) -> None:
