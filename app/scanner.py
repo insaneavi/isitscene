@@ -418,6 +418,8 @@ async def _scan_async() -> None:
 
 def run_scan() -> None:
     asyncio.run(_scan_async())
+    from .movie_list_cache import rebuild_movie_list_cache
+    rebuild_movie_list_cache()
 
 
 def _start_library_refresh() -> int:
@@ -673,3 +675,5 @@ async def _refresh_library_changes_async() -> None:
 def refresh_library_changes() -> None:
     """Refresh inventory and verify only newly discovered folders."""
     asyncio.run(_refresh_library_changes_async())
+    from .movie_list_cache import rebuild_movie_list_cache
+    rebuild_movie_list_cache()

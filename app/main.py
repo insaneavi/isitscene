@@ -17,7 +17,7 @@ from sqlalchemy import delete, func, select
 
 from .config import APP_NAME, APP_VERSION, BUILD_DATE, GIT_COMMIT, DATABASE_VERSION
 from .database import (
-    DuplicateProgress, DuplicateReview, DuplicateScan, MovieList, MovieListItem, MovieListSync, Release, ScanProgress,
+    DuplicateProgress, DuplicateReview, DuplicateScan, MovieList, MovieListCacheState, MovieListItem, MovieListMatch, MovieListSync, Release, ScanProgress,
     ScanRun, SessionLocal, UpgradeCandidate, UpgradeProgress, UpgradeResult,
     UpgradeScan, init_db,
 )
@@ -43,6 +43,7 @@ from .duplicate_scanner import (
 )
 from .srrdb import parse_release_name
 from .movie_lists import ensure_bundled_lists, import_bundled_list
+from .movie_list_cache import rebuild_movie_list_cache
 
 logging.basicConfig(level=logging.INFO)
 
@@ -71,6 +72,7 @@ def refresh_scheduler() -> None:
 async def lifespan(app: FastAPI):
     init_db()
     ensure_bundled_lists()
+    rebuild_movie_list_cache()
     recover_interrupted_scan()
     recover_interrupted_upgrade_scan()
     recover_interrupted_duplicate_scan()
@@ -826,71 +828,58 @@ def movie_lists_page(
 
         movie_list = db.get(MovieList, list_key)
         sync = db.get(MovieListSync, list_key)
+        cache_state = db.get(MovieListCacheState, 1)
+
         items = db.scalars(
             select(MovieListItem)
             .where(MovieListItem.list_key == list_key)
             .order_by(MovieListItem.rank)
         ).all()
+        item_ids = [item.id for item in items]
 
-        releases = db.scalars(
-            select(Release).where(Release.is_present.is_(True))
-        ).all()
-        owned_by_imdb = {}
-        owned_by_title_year = {}
-        unique_release_titles = _unique_title_matches(releases)
-        for release in releases:
-            if release.imdb_id:
-                owned_by_imdb.setdefault(release.imdb_id, release)
-            raw_title = release.movie_title or movie_title_from_release_name(
-                release.matched_release or release.folder_name
-            )
-            title = normalize_movie_title(raw_title)
-            year = release.movie_year
-            if not year:
-                parsed = parse_release_name(
-                    release.matched_release or release.folder_name
-                )
-                year = parsed.year
-            if title and year:
-                owned_by_title_year.setdefault((title, str(year)), release)
+        matches = {}
+        if item_ids:
+            matches = {
+                match.item_id: match
+                for match in db.scalars(
+                    select(MovieListMatch).where(
+                        MovieListMatch.item_id.in_(item_ids)
+                    )
+                ).all()
+            }
 
-        def match_list_item(item: MovieListItem):
-            release = owned_by_imdb.get(item.imdb_id) if item.imdb_id else None
-            if release:
-                return release, "IMDb"
-
-            normalized_title = normalize_movie_title(item.title)
-            release = owned_by_title_year.get(
-                (normalized_title, str(item.year))
-            )
-            if release:
-                return release, "Title/year"
-
-            release = unique_release_titles.get(normalized_title)
-            if release:
-                return release, "Unique title"
-
-            release = _fuzzy_unique_title_match(
-                item.title,
-                unique_release_titles,
-            )
-            if release:
-                return release, "Close title"
-
-            return None, None
+        release_ids = {
+            match.release_id
+            for match in matches.values()
+            if match.release_id is not None
+        }
+        releases = {}
+        if release_ids:
+            releases = {
+                release.id: release
+                for release in db.scalars(
+                    select(Release).where(Release.id.in_(release_ids))
+                ).all()
+            }
 
         all_rows = []
         for item in items:
-            release, match_method = match_list_item(item)
+            match = matches.get(item.id)
+            release = (
+                releases.get(match.release_id)
+                if match and match.release_id is not None
+                else None
+            )
             all_rows.append({
                 "item": item,
                 "release": release,
-                "match_method": match_method,
+                "match_method": match.match_method if match else None,
             })
 
         total = len(all_rows)
         owned = sum(1 for row in all_rows if row["release"])
         missing = total - owned
+
         rows = all_rows
         if view == "owned":
             rows = [row for row in rows if row["release"]]
@@ -904,25 +893,35 @@ def movie_lists_page(
                 or query == str(row["item"].year)
             ]
 
+        summary_counts = {
+            key: {"total": 0, "owned": 0}
+            for key in available_keys
+        }
+        for item_list_key, release_id in db.execute(
+            select(
+                MovieListMatch.list_key,
+                MovieListMatch.release_id,
+            )
+        ).all():
+            if item_list_key in summary_counts:
+                summary_counts[item_list_key]["total"] += 1
+                if release_id is not None:
+                    summary_counts[item_list_key]["owned"] += 1
+
         summaries = []
         for available in lists:
-            list_items = db.scalars(
-                select(MovieListItem).where(
-                    MovieListItem.list_key == available.key
-                )
-            ).all()
-            list_owned = 0
-            for item in list_items:
-                release, _ = match_list_item(item)
-                if release:
-                    list_owned += 1
+            counts = summary_counts.get(
+                available.key,
+                {"total": 0, "owned": 0},
+            )
             summaries.append({
                 "list": available,
-                "total": len(list_items),
-                "owned": list_owned,
+                "total": counts["total"],
+                "owned": counts["owned"],
                 "completion": round(
-                    (list_owned / len(list_items) * 100), 1
-                ) if list_items else 0,
+                    counts["owned"] / counts["total"] * 100,
+                    1,
+                ) if counts["total"] else 0,
             })
 
         return templates.TemplateResponse(
@@ -933,6 +932,7 @@ def movie_lists_page(
                 "summaries": summaries,
                 "movie_list": movie_list,
                 "sync": sync,
+                "cache_state": cache_state,
                 "rows": rows,
                 "total": total,
                 "owned": owned,
@@ -1033,6 +1033,7 @@ def purge_removed_inventory(
             delete(Release).where(Release.id.in_(removed_ids))
         )
         db.commit()
+        rebuild_movie_list_cache()
 
         return RedirectResponse(
             f"/settings?purged={len(removed_ids)}",
@@ -1134,6 +1135,9 @@ def update_release_imdb(
                 db.commit()
     finally:
         db.close()
+
+    if not error_code:
+        rebuild_movie_list_cache()
 
     separator = "&" if "?" in safe_destination else "?"
     if error_code:

@@ -32,7 +32,8 @@
     <p>{{ movie_list.description }}</p>
     <div class="list-date-row">
       <span>List data date: <strong>{{ format_date(movie_list.data_updated_at) }}</strong></span>
-      <span>Cached locally: <strong>{{ format_datetime(movie_list.updated_at, true) if movie_list.updated_at else "Never" }}</strong></span>
+      <span>List cached locally: <strong>{{ format_datetime(movie_list.updated_at, true) if movie_list.updated_at else "Never" }}</strong></span>
+      <span>Ownership cache: <strong>{{ format_datetime(cache_state.rebuilt_at, true) if cache_state and cache_state.rebuilt_at else "Not built" }}</strong></span>
       <span>Version: <strong>{{ movie_list.list_version or "—" }}</strong></span>
       <span>Source: <a href="{{ movie_list.source_url }}" target="_blank" rel="noopener">{{ movie_list.source_name }}</a></span>
     </div>

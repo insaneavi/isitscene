@@ -4,10 +4,10 @@ import os
 from pathlib import Path
 
 APP_NAME = "iSiTSCENE"
-APP_VERSION = os.getenv("APP_VERSION", "0.12.2")
+APP_VERSION = os.getenv("APP_VERSION", "0.13.0")
 BUILD_DATE = os.getenv("BUILD_DATE", "development")
 GIT_COMMIT = os.getenv("GIT_COMMIT", "development")
-DATABASE_VERSION = 13
+DATABASE_VERSION = 14
 MOVIES_PATH = Path(os.getenv("MOVIES_PATH", "/movies"))
 DATA_PATH = Path(os.getenv("DATA_PATH", "/config"))
 DATABASE_PATH = DATA_PATH / "isitscene.db"

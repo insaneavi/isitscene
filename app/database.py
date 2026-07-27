@@ -271,6 +271,25 @@ class MovieListSync(Base):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class MovieListMatch(Base):
+    __tablename__ = "movie_list_matches"
+
+    item_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    list_key: Mapped[str] = mapped_column(String, index=True)
+    release_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    match_method: Mapped[str | None] = mapped_column(String, nullable=True)
+    matched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class MovieListCacheState(Base):
+    __tablename__ = "movie_list_cache_state"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    rebuilt_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    item_count: Mapped[int] = mapped_column(Integer, default=0)
+    owned_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
 class AppSetting(Base):
     __tablename__ = "settings"
 
@@ -422,6 +441,9 @@ def init_db() -> None:
             changed = True
         if db.get(DuplicateProgress, 1) is None:
             db.add(DuplicateProgress(id=1))
+            changed = True
+        if db.get(MovieListCacheState, 1) is None:
+            db.add(MovieListCacheState(id=1))
             changed = True
 
         # Reuse IMDb IDs already discovered by Collection Upgrade.

@@ -32,6 +32,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=0.12.2
+            APP_VERSION=0.13.0
             BUILD_DATE=${{ github.event.repository.updated_at }}
             GIT_COMMIT=${{ github.sha }}

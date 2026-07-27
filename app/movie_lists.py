@@ -101,6 +101,9 @@ def import_bundled_list(list_key: str) -> None:
         sync.item_count = len(payload["items"])
         sync.error_message = None
         db.commit()
+
+        from .movie_list_cache import rebuild_movie_list_cache
+        rebuild_movie_list_cache()
     except Exception as exc:
         db.rollback()
         sync = db.get(MovieListSync, list_key)
