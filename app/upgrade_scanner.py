@@ -7,6 +7,38 @@ from .settings_service import get_settings
 from .srrdb import ScanCancelled, find_uhd_upgrades_by_imdb, lookup_imdb_id
 logger=logging.getLogger(__name__); _upgrade_lock=threading.Lock(); _stop_event=threading.Event()
 
+def is_imdb_metadata_missing_error(error):
+    if not error:
+        return False
+    value=str(error).casefold()
+    return (
+        "did not contain a recognizable imdb id" in value
+        or "no recognizable imdb id" in value
+        or "imdb metadata missing" in value
+    )
+
+def reclassify_upgrade_metadata_errors():
+    """Correct older cached rows that were mislabeled as transport/API errors."""
+    db=SessionLocal()
+    try:
+        changed=False
+        for result in db.scalars(
+            select(UpgradeResult).where(UpgradeResult.status=="api_error")
+        ).all():
+            if is_imdb_metadata_missing_error(result.error_message):
+                result.status="imdb_metadata_missing"
+                changed=True
+        for release in db.scalars(
+            select(Release).where(Release.imdb_lookup_status=="api_error")
+        ).all():
+            if is_imdb_metadata_missing_error(release.imdb_error_message):
+                release.imdb_lookup_status="metadata_missing"
+                changed=True
+        if changed:
+            db.commit()
+    finally:
+        db.close()
+
 def _eligible(name):
     f=name.casefold(); return ("bluray" in f or "blu-ray" in f) and not any(x in f for x in ("web-dl","webrip",".web."," web ")) and not any(x in f for x in ("2160p",".uhd.","ultrahd"))
 def _progress(db):
@@ -61,11 +93,12 @@ async def _run():
                 imdb_id=release.imdb_id if release.imdb_source_release==current else None
             error=None
             if not release.imdb_manual_override and not imdb_id and not (release.imdb_lookup_status=="unavailable" and release.imdb_source_release==current):
-                imdb_id,error=await lookup_imdb_id(current,delay,_stop_event.is_set); release.imdb_id=imdb_id; release.imdb_srrdb_id=imdb_id; release.imdb_source_release=current; release.imdb_checked_at=datetime.utcnow(); release.imdb_error_message=error; release.imdb_lookup_status="api_error" if error else ("found" if imdb_id else "unavailable")
+                imdb_id,error=await lookup_imdb_id(current,delay,_stop_event.is_set); release.imdb_id=imdb_id; release.imdb_srrdb_id=imdb_id; release.imdb_source_release=current; release.imdb_checked_at=datetime.utcnow(); release.imdb_error_message=error; release.imdb_lookup_status=("metadata_missing" if is_imdb_metadata_missing_error(error) else "api_error") if error else ("found" if imdb_id else "unavailable")
             candidates=[]
             if imdb_id and not error: candidates,error=await find_uhd_upgrades_by_imdb(imdb_id,delay,_stop_event.is_set)
             result.imdb_id=imdb_id; result.checked_at=datetime.utcnow(); result.error_message=error; result.candidate_count=len(candidates)
-            if error: result.status="api_error"; p.api_error_count+=1
+            if error and is_imdb_metadata_missing_error(error): result.status="imdb_metadata_missing"; p.imdb_missing_count+=1
+            elif error: result.status="api_error"; p.api_error_count+=1
             elif not imdb_id: result.status="imdb_unavailable"; p.imdb_missing_count+=1
             elif candidates:
                 result.status="upgrade_available"; p.upgrades_found+=1

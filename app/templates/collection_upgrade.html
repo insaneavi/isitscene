@@ -6,6 +6,7 @@
     <p>Find strict Scene UHD upgrades for present, verified Blu-ray releases. A candidate must contain all three tags: <strong>2160p</strong>, <strong>UHD</strong>, and <strong>x265</strong>.</p>
   </div>
   <div class="scan-control-block">
+    <a class="button-link secondary-button" href="/imdb-metadata-review">Review Missing IMDb Metadata</a>
     <div class="upgrade-actions" id="upgrade-actions">
       <form method="post" action="/upgrade/start">
         <button id="upgrade-start-button" type="submit"
@@ -58,7 +59,7 @@
 <section class="upgrade-progress" id="upgrade-progress">
   <div class="progress-title"><strong id="upgrade-message">{{ progress.message if progress and progress.message else 'No upgrade scan has run yet.' }}</strong><span id="upgrade-count">{{ progress.processed_count if progress else 0 }} / {{ progress.total_count if progress else 0 }}</span></div>
   <progress id="upgrade-bar" max="{{ progress.total_count if progress and progress.total_count else 1 }}" value="{{ progress.processed_count if progress else 0 }}"></progress>
-  <div class="upgrade-stats"><span>Upgrades: <b id="upgrade-found">{{ progress.upgrades_found if progress else 0 }}</b></span><span>No UHD: <b id="upgrade-none">{{ progress.no_upgrade_count if progress else 0 }}</b></span><span>IMDb unavailable: <b id="upgrade-imdb">{{ progress.imdb_missing_count if progress else 0 }}</b></span><span>API errors: <b id="upgrade-errors">{{ progress.api_error_count if progress else 0 }}</b></span></div>
+  <div class="upgrade-stats"><span>Upgrades: <b id="upgrade-found">{{ progress.upgrades_found if progress else 0 }}</b></span><span>No UHD: <b id="upgrade-none">{{ progress.no_upgrade_count if progress else 0 }}</b></span><span>IMDb metadata issues: <b id="upgrade-imdb">{{ progress.imdb_missing_count if progress else 0 }}</b></span><span>True API errors: <b id="upgrade-errors">{{ progress.api_error_count if progress else 0 }}</b></span></div>
   <div class="current-release" id="upgrade-current">{{ progress.current_release if progress and progress.current_release else '' }}</div>
 </section>
 
@@ -68,8 +69,10 @@
     <option value="">All statuses</option>
     <option value="upgrade_available" {% if status == 'upgrade_available' %}selected{% endif %}>Upgrade Available</option>
     <option value="no_upgrade" {% if status == 'no_upgrade' %}selected{% endif %}>No UHD Found</option>
+    <option value="imdb_metadata_missing" {% if status == 'imdb_metadata_missing' %}selected{% endif %}>IMDb Metadata Missing</option>
     <option value="imdb_unavailable" {% if status == 'imdb_unavailable' %}selected{% endif %}>IMDb Unavailable</option>
-    <option value="api_error" {% if status == 'api_error' %}selected{% endif %}>API Error</option>
+    <option value="metadata_resolved" {% if status == 'metadata_resolved' %}selected{% endif %}>Metadata Resolved</option>
+    <option value="api_error" {% if status == 'api_error' %}selected{% endif %}>True API Error</option>
   </select>
   <button type="submit">Filter</button>
 </form>

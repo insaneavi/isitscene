@@ -1,9 +1,9 @@
-# iSiTSCENE v0.14.0
+# iSiTSCENE v0.15.0
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.14.0
+## New in v0.15.0
 
 - Fixes Pixar, Disney Animated Classics, and Studio Ghibli failing to import on upgraded SQLite databases.
 - Stores a blank compatibility value when a bundled title intentionally uses title/year fallback instead of an IMDb ID.

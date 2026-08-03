@@ -30,6 +30,7 @@ from .scanner import (
 from .settings_service import get_settings, save_settings
 from .upgrade_scanner import (
     recover_interrupted_upgrade_scan,
+    reclassify_upgrade_metadata_errors,
     request_upgrade_stop,
     reset_upgrade_scan_state,
     run_upgrade_scan,
@@ -75,6 +76,7 @@ async def lifespan(app: FastAPI):
     rebuild_movie_list_cache()
     recover_interrupted_scan()
     recover_interrupted_upgrade_scan()
+    reclassify_upgrade_metadata_errors()
     recover_interrupted_duplicate_scan()
     scheduler.start()
     refresh_scheduler()
@@ -583,6 +585,215 @@ def update_collection_review(
 
     return RedirectResponse(destination, status_code=303)
 
+
+
+@app.get("/imdb-metadata-review", response_class=HTMLResponse)
+def imdb_metadata_review(
+    request: Request,
+    q: str = "",
+    status: str = "needs_review",
+):
+    db = SessionLocal()
+    try:
+        statement = (
+            select(UpgradeResult, Release)
+            .join(Release, Release.id == UpgradeResult.release_id)
+            .where(Release.is_present.is_(True))
+            .order_by(UpgradeResult.current_release)
+        )
+        if status == "needs_review":
+            statement = statement.where(
+                UpgradeResult.status.in_(
+                    ["imdb_metadata_missing", "imdb_unavailable", "api_error"]
+                )
+            )
+        elif status == "metadata_missing":
+            statement = statement.where(
+                UpgradeResult.status == "imdb_metadata_missing"
+            )
+        elif status == "unavailable":
+            statement = statement.where(
+                UpgradeResult.status == "imdb_unavailable"
+            )
+        elif status == "api_error":
+            statement = statement.where(
+                UpgradeResult.status == "api_error"
+            )
+        elif status == "manual":
+            statement = statement.where(
+                Release.imdb_manual_override.is_(True)
+            )
+
+        if q:
+            statement = statement.where(
+                UpgradeResult.current_release.ilike(f"%{q}%")
+            )
+
+        records = db.execute(statement).all()
+        rows = []
+        for result, release in records:
+            parsed = parse_release_name(
+                release.matched_release or release.folder_name
+            )
+            title = release.movie_title or movie_title_from_release_name(
+                release.matched_release or release.folder_name
+            )
+            year = release.movie_year or parsed.year
+            search_terms = f"{title} {year or ''}".strip()
+            rows.append({
+                "result": result,
+                "release": release,
+                "title": title,
+                "year": year,
+                "imdb_search_url": (
+                    "https://www.imdb.com/find/?q="
+                    + quote_plus(search_terms)
+                    + "&s=tt&ttype=ft"
+                ),
+            })
+
+        counts = {
+            "metadata_missing": db.scalar(
+                select(func.count()).select_from(UpgradeResult).where(
+                    UpgradeResult.status == "imdb_metadata_missing"
+                )
+            ) or 0,
+            "unavailable": db.scalar(
+                select(func.count()).select_from(UpgradeResult).where(
+                    UpgradeResult.status == "imdb_unavailable"
+                )
+            ) or 0,
+            "api_error": db.scalar(
+                select(func.count()).select_from(UpgradeResult).where(
+                    UpgradeResult.status == "api_error"
+                )
+            ) or 0,
+            "manual": db.scalar(
+                select(func.count()).select_from(Release).where(
+                    Release.is_present.is_(True),
+                    Release.imdb_manual_override.is_(True),
+                )
+            ) or 0,
+        }
+
+        return templates.TemplateResponse(
+            request=request,
+            name="imdb_metadata_review.html",
+            context={
+                "rows": rows,
+                "q": q,
+                "status": status,
+                "counts": counts,
+            },
+        )
+    finally:
+        db.close()
+
+
+@app.post("/imdb-metadata-review/save")
+async def save_imdb_metadata_review(request: Request):
+    form = await request.form()
+    return_q = str(form.get("q", ""))
+    return_status = str(form.get("status", "needs_review"))
+    saved = 0
+    invalid = 0
+
+    db = SessionLocal()
+    try:
+        for key, raw_value in form.multi_items():
+            if not key.startswith("imdb_"):
+                continue
+            try:
+                release_id = int(key.removeprefix("imdb_"))
+            except ValueError:
+                continue
+
+            value = str(raw_value).strip().lower()
+            if not value:
+                continue
+            if not re.fullmatch(r"tt\d{7,10}", value):
+                invalid += 1
+                continue
+
+            release = db.get(Release, release_id)
+            if release is None or not release.is_present:
+                continue
+
+            if not release.imdb_manual_override:
+                release.imdb_srrdb_id = release.imdb_id
+            release.imdb_id = value
+            release.imdb_manual_override = True
+            release.imdb_manual_updated_at = datetime.utcnow()
+            release.imdb_lookup_status = "manual"
+            release.imdb_error_message = None
+
+            result = db.scalar(
+                select(UpgradeResult).where(
+                    UpgradeResult.release_id == release.id
+                )
+            )
+            if result is not None:
+                result.imdb_id = value
+                result.status = "metadata_resolved"
+                result.error_message = None
+                result.checked_at = datetime.utcnow()
+            saved += 1
+
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+    if saved:
+        rebuild_movie_list_cache()
+
+    from urllib.parse import urlencode
+    params = {
+        "status": return_status,
+        "q": return_q,
+        "saved": saved,
+    }
+    if invalid:
+        params["invalid"] = invalid
+    return RedirectResponse(
+        "/imdb-metadata-review?" + urlencode(params),
+        status_code=303,
+    )
+
+
+@app.post("/imdb-metadata-review/{release_id}/clear")
+def clear_imdb_metadata_review_override(release_id: int):
+    db = SessionLocal()
+    try:
+        release = db.get(Release, release_id)
+        if release is not None:
+            release.imdb_id = release.imdb_srrdb_id
+            release.imdb_manual_override = False
+            release.imdb_manual_updated_at = datetime.utcnow()
+            release.imdb_lookup_status = (
+                "found" if release.imdb_id else "not_checked"
+            )
+            release.imdb_error_message = None
+            result = db.scalar(
+                select(UpgradeResult).where(
+                    UpgradeResult.release_id == release.id
+                )
+            )
+            if result is not None:
+                result.imdb_id = release.imdb_id
+                result.status = (
+                    "not_checked" if release.imdb_id else "imdb_unavailable"
+                )
+            db.commit()
+    finally:
+        db.close()
+    rebuild_movie_list_cache()
+    return RedirectResponse(
+        "/imdb-metadata-review?status=manual",
+        status_code=303,
+    )
 
 
 @app.get("/collection-upgrade", response_class=HTMLResponse)

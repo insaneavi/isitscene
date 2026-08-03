@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.14.0
+## v0.15.0
 
 - Fixed bundled lists containing title/year-only entries on databases where the legacy IMDb ID column remains non-nullable.
 - Added automatic retry for failed bundled-list imports during application startup.

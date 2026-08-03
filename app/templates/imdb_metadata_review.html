@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="heading review-heading">
+  <div>
+    <h1>IMDb Metadata Review</h1>
+    <p>Correct releases where SRRDB did not provide usable IMDb metadata. Enter several IDs and save them together.</p>
+  </div>
+  <a class="button-link" href="/collection-upgrade">Back to Collection Upgrade</a>
+</section>
+
+{% if request.query_params.get("saved") %}
+<section class="notice success">
+  Saved {{ request.query_params.get("saved") }} IMDb correction{% if request.query_params.get("saved") != "1" %}s{% endif %}.
+  The next Collection Upgrade scan will use these manual overrides.
+</section>
+{% endif %}
+{% if request.query_params.get("invalid") %}
+<section class="notice error">
+  Skipped {{ request.query_params.get("invalid") }} invalid value{% if request.query_params.get("invalid") != "1" %}s{% endif %}. IMDb IDs must look like tt1234567.
+</section>
+{% endif %}
+
+<section class="cards metadata-review-cards">
+  <div class="card warn"><strong>{{ counts.metadata_missing }}</strong><span>Metadata Missing</span></div>
+  <div class="card"><strong>{{ counts.unavailable }}</strong><span>IMDb Unavailable</span></div>
+  <div class="card bad"><strong>{{ counts.api_error }}</strong><span>True API Errors</span></div>
+  <div class="card good"><strong>{{ counts.manual }}</strong><span>Manual Overrides</span></div>
+</section>
+
+<form class="filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Search release">
+  <select name="status">
+    <option value="needs_review" {% if status == "needs_review" %}selected{% endif %}>All Needing Review</option>
+    <option value="metadata_missing" {% if status == "metadata_missing" %}selected{% endif %}>Metadata Missing</option>
+    <option value="unavailable" {% if status == "unavailable" %}selected{% endif %}>IMDb Unavailable</option>
+    <option value="api_error" {% if status == "api_error" %}selected{% endif %}>True API Errors</option>
+    <option value="manual" {% if status == "manual" %}selected{% endif %}>Manual Overrides</option>
+  </select>
+  <button>Filter</button>
+</form>
+
+<form method="post" action="/imdb-metadata-review/save">
+  <input type="hidden" name="q" value="{{ q }}">
+  <input type="hidden" name="status" value="{{ status }}">
+
+  <div class="bulk-review-toolbar">
+    <span><strong>{{ rows|length }}</strong> release{% if rows|length != 1 %}s{% endif %} in this view</span>
+    <button type="submit">Save All Entered IMDb IDs</button>
+  </div>
+
+  <section class="metadata-review-list">
+  {% for row in rows %}
+    <article class="metadata-review-card">
+      <div class="metadata-review-main">
+        <div class="release-name">{{ row.result.current_release }}</div>
+        <div class="metadata-review-details">
+          <span>Parsed title: <strong>{{ row.title or "Unknown" }}</strong></span>
+          <span>Year: <strong>{{ row.year or "Unknown" }}</strong></span>
+          <span>Status: <strong>{{ row.result.status.replace("_", " ").title() }}</strong></span>
+        </div>
+        {% if row.result.error_message %}
+        <p class="error">{{ row.result.error_message }}</p>
+        {% endif %}
+      </div>
+
+      <div class="metadata-review-actions">
+        <a class="secondary-button button-link" href="{{ row.imdb_search_url }}" target="_blank" rel="noopener">Search IMDb</a>
+        <input
+          name="imdb_{{ row.release.id }}"
+          value="{{ row.release.imdb_id or '' }}"
+          placeholder="tt1234567"
+          pattern="tt[0-9]{7,10}"
+          autocomplete="off"
+          aria-label="IMDb ID for {{ row.result.current_release }}"
+        >
+        {% if row.release.imdb_manual_override %}
+        <span class="badge manual-override">Manual override</span>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    <section class="empty-state">
+      <h2>No releases match this review filter</h2>
+      <p>Metadata corrections already saved will appear under Manual Overrides.</p>
+    </section>
+  {% endfor %}
+  </section>
+
+  {% if rows %}
+  <div class="bulk-review-footer">
+    <button type="submit">Save All Entered IMDb IDs</button>
+  </div>
+  {% endif %}
+</form>
+
+{% if status == "manual" %}
+<section class="panel manual-override-help">
+  <p>To remove an override, use the Releases page or the individual release controls in Duplicate Finder.</p>
+</section>
+{% endif %}
+{% endblock %}

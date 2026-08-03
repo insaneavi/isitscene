@@ -1078,3 +1078,108 @@ a.card { text-decoration:none; color:inherit; }
     width: 100%;
   }
 }
+
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.review-heading {
+  align-items: flex-start;
+}
+
+.metadata-review-cards {
+  margin-bottom: 18px;
+}
+
+.bulk-review-toolbar,
+.bulk-review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.metadata-review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.metadata-review-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+}
+
+.metadata-review-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 18px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.metadata-review-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.metadata-review-actions input {
+  width: 145px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: monospace;
+  padding: 9px;
+}
+
+.badge.imdb_metadata_missing,
+.badge.imdb_unavailable {
+  background: rgba(214, 153, 37, .18);
+  color: #f0bd55;
+}
+
+.badge.metadata_resolved {
+  background: rgba(46, 160, 67, .18);
+  color: #66e083;
+}
+
+@media (max-width: 800px) {
+  .metadata-review-card {
+    grid-template-columns: 1fr;
+  }
+
+  .metadata-review-actions {
+    justify-content: flex-start;
+  }
+
+  .metadata-review-actions input,
+  .metadata-review-actions a {
+    width: 100%;
+  }
+
+  .bulk-review-toolbar,
+  .bulk-review-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bulk-review-toolbar button,
+  .bulk-review-footer button {
+    width: 100%;
+  }
+}
