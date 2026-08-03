@@ -1446,3 +1446,156 @@ a.card { text-decoration:none; color:inherit; }
     min-height: auto;
   }
 }
+
+
+/* IMDb Metadata Review v3 */
+.metadata-review-grid {
+  gap: 16px;
+}
+
+.metadata-review-card-v3 {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-left: 4px solid #64748b;
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+}
+
+.metadata-review-card-v3.status-imdb_metadata_missing,
+.metadata-review-card-v3.status-imdb_unavailable {
+  border-left-color: #d6a126;
+}
+
+.metadata-review-card-v3.status-api_error {
+  border-left-color: #f85149;
+}
+
+.metadata-review-card-v3.status-metadata_resolved {
+  border-left-color: #2db45f;
+}
+
+.metadata-review-card-v3:hover {
+  border-top-color: rgba(120, 140, 165, .8);
+  border-right-color: rgba(120, 140, 165, .8);
+  border-bottom-color: rgba(120, 140, 165, .8);
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 16px 18px;
+}
+
+.review-card-header .release-name {
+  margin-top: 6px;
+  font-size: .9rem;
+  line-height: 1.4;
+}
+
+.review-card-divider {
+  height: 1px;
+  background: var(--line);
+}
+
+.review-card-body {
+  display: grid;
+  grid-template-columns: minmax(170px, .8fr) minmax(220px, 1fr) minmax(260px, 1.4fr);
+  gap: 22px;
+  padding: 16px 18px;
+}
+
+.review-info-block {
+  min-width: 0;
+}
+
+.review-info-block .review-column-label {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.review-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.review-error-block {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.review-error-message,
+.review-muted-message {
+  margin: 0;
+  line-height: 1.45;
+  font-size: .8rem;
+}
+
+.review-muted-message {
+  color: var(--muted);
+}
+
+.review-card-footer {
+  display: grid;
+  grid-template-columns: 110px minmax(220px, 340px);
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px 16px;
+  background: rgba(255, 255, 255, .018);
+}
+
+.review-card-footer label {
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.review-card-footer input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: monospace;
+  font-size: .95rem;
+  letter-spacing: .03em;
+  padding: 10px 12px;
+}
+
+.review-search-button {
+  min-width: 118px;
+}
+
+@media (max-width: 900px) {
+  .review-card-body {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .review-error-block {
+    padding-left: 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .review-card-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .review-card-header {
+    flex-direction: column;
+  }
+
+  .review-search-button {
+    width: 100%;
+  }
+}

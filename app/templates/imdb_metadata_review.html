@@ -93,35 +93,12 @@
 
   <section class="metadata-review-grid">
   {% for row in rows %}
-    <article class="metadata-review-card-v2">
-      <div class="review-release-column">
-        <span class="review-column-label">Release</span>
-        <div class="release-name">{{ row.result.current_release }}</div>
-        {% if row.result.error_message %}
-        <p class="review-error-message">{{ row.result.error_message }}</p>
-        {% endif %}
-      </div>
-
-      <div class="review-metadata-column">
-        <span class="review-column-label">Parsed Metadata</span>
-        <div class="review-metadata-value">
-          <strong>{{ row.title or "Unknown title" }}</strong>
-          <span>{{ row.year or "Unknown year" }}</span>
+    <article class="metadata-review-card-v3 status-{{ row.result.status }}">
+      <div class="review-card-header">
+        <div>
+          <span class="review-column-label">Release</span>
+          <div class="release-name">{{ row.result.current_release }}</div>
         </div>
-      </div>
-
-      <div class="review-status-column">
-        <span class="review-column-label">Status</span>
-        <span class="badge {{ row.result.status }}">
-          {{ row.result.status.replace("_", " ").title() }}
-        </span>
-        {% if row.release.imdb_manual_override %}
-        <span class="badge manual-override">Manual override</span>
-        {% endif %}
-      </div>
-
-      <div class="review-action-column">
-        <span class="review-column-label">IMDb Lookup</span>
         <a class="button-link secondary-button review-search-button"
            href="{{ row.imdb_search_url }}"
            target="_blank"
@@ -130,7 +107,42 @@
         </a>
       </div>
 
-      <div class="review-id-column">
+      <div class="review-card-divider"></div>
+
+      <div class="review-card-body">
+        <div class="review-info-block">
+          <span class="review-column-label">Status</span>
+          <div class="review-badge-row">
+            <span class="badge {{ row.result.status }}">
+              {{ row.result.status.replace("_", " ").title() }}
+            </span>
+            {% if row.release.imdb_manual_override %}
+            <span class="badge manual-override">Manual override</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="review-info-block">
+          <span class="review-column-label">Parsed Movie</span>
+          <div class="review-metadata-value">
+            <strong>{{ row.title or "Unknown title" }}</strong>
+            <span>{{ row.year or "Unknown year" }}</span>
+          </div>
+        </div>
+
+        <div class="review-info-block review-error-block">
+          <span class="review-column-label">SRRDB Result</span>
+          {% if row.result.error_message %}
+          <p class="review-error-message">{{ row.result.error_message }}</p>
+          {% else %}
+          <p class="review-muted-message">No additional error message.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="review-card-divider"></div>
+
+      <div class="review-card-footer">
         <label for="imdb-{{ row.release.id }}">IMDb ID</label>
         <input
           id="imdb-{{ row.release.id }}"
