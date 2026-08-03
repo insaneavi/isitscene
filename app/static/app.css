@@ -1183,3 +1183,266 @@ a.card { text-decoration:none; color:inherit; }
     width: 100%;
   }
 }
+
+
+/* IMDb Metadata Review v2 */
+.review-page-heading {
+  margin-bottom: 18px;
+}
+
+.metadata-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.metadata-summary-card {
+  display: grid;
+  gap: 6px;
+  min-height: 112px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.metadata-summary-card:hover,
+.metadata-summary-card.active {
+  border-color: var(--accent);
+  background: rgba(86, 211, 100, 0.055);
+}
+
+.metadata-summary-card.danger:hover,
+.metadata-summary-card.danger.active {
+  border-color: #ff8a8a;
+  background: rgba(248, 81, 73, 0.07);
+}
+
+.metadata-summary-card.good:hover,
+.metadata-summary-card.good.active {
+  border-color: #66e083;
+}
+
+.metadata-summary-card strong {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.metadata-summary-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.summary-label {
+  color: #c8d2df;
+  font-weight: 700;
+}
+
+.metadata-filter-panel {
+  margin-bottom: 16px;
+  padding: 14px;
+}
+
+.metadata-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(210px, 280px) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.metadata-filter-grid label {
+  display: grid;
+  gap: 6px;
+}
+
+.metadata-filter-grid label > span,
+.review-column-label,
+.review-id-column label {
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.metadata-filter-grid input,
+.metadata-filter-grid select,
+.review-id-column input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 9px 11px;
+}
+
+.sticky-review-toolbar {
+  position: sticky;
+  top: 56px;
+  z-index: 12;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(14, 20, 27, .96);
+  backdrop-filter: blur(8px);
+}
+
+.metadata-review-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.metadata-review-card-v2 {
+  display: grid;
+  grid-template-columns:
+    minmax(300px, 2fr)
+    minmax(180px, .95fr)
+    minmax(150px, .75fr)
+    minmax(125px, .65fr)
+    minmax(150px, .75fr);
+  gap: 16px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.metadata-review-card-v2:hover {
+  border-color: rgba(93, 115, 140, .85);
+  background: rgba(255, 255, 255, .025);
+}
+
+.review-release-column,
+.review-metadata-column,
+.review-status-column,
+.review-action-column,
+.review-id-column {
+  min-width: 0;
+}
+
+.review-release-column .release-name {
+  margin-top: 6px;
+  font-size: .86rem;
+  line-height: 1.35;
+}
+
+.review-error-message {
+  margin: 8px 0 0;
+  color: #ff8f8f;
+  font-size: .76rem;
+  line-height: 1.35;
+}
+
+.review-metadata-value {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.review-metadata-value strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-metadata-value span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.review-status-column {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+}
+
+.review-action-column {
+  display: grid;
+  gap: 7px;
+}
+
+.review-search-button {
+  min-height: 38px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.review-id-column {
+  display: grid;
+  gap: 7px;
+}
+
+.review-id-column input {
+  font-family: monospace;
+  letter-spacing: .02em;
+}
+
+.bulk-review-footer {
+  margin-top: 14px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.metadata-empty-state {
+  margin-top: 0;
+}
+
+.manual-override-help {
+  margin-top: 18px;
+}
+
+.manual-override-help p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 1200px) {
+  .metadata-review-card-v2 {
+    grid-template-columns: minmax(280px, 1.7fr) minmax(170px, 1fr) minmax(140px, .8fr);
+  }
+
+  .review-action-column,
+  .review-id-column {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .metadata-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metadata-filter-grid,
+  .metadata-review-card-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .review-metadata-value strong {
+    white-space: normal;
+  }
+
+  .review-search-button,
+  .review-id-column input {
+    width: 100%;
+  }
+
+  .sticky-review-toolbar {
+    top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .metadata-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metadata-summary-card {
+    min-height: auto;
+  }
+}
