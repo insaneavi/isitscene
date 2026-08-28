@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="releases-page">
-  <section class="releases-heading">
+  <section class="releases-heading releases-heading-actions">
     <div>
       <h1>Releases</h1>
       <span>{{ items|length }} records</span>
     </div>
+    <a class="button-link export-xlsx-button" href="/releases/export.xlsx">
+      Export All to Excel
+    </a>
   </section>
 
   {% if request.query_params.get("imdb_saved") %}

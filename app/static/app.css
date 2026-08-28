@@ -1599,3 +1599,36 @@ a.card { text-decoration:none; color:inherit; }
     width: 100%;
   }
 }
+
+
+.releases-heading-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.export-xlsx-button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid rgba(86, 211, 100, .55);
+  border-radius: 7px;
+  background: rgba(86, 211, 100, .10);
+  color: #8cf59a;
+  font-weight: 700;
+}
+
+.export-xlsx-button:hover {
+  background: rgba(86, 211, 100, .18);
+}
+
+@media (max-width: 760px) {
+  .releases-heading-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .export-xlsx-button {
+    width: 100%;
+  }
+}
