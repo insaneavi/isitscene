@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel whats-new-header">
+  <div><h1>What's New</h1><p>Scene discoveries and recent U.S. theatrical releases. Discovery never changes inventory.</p>
+  <small>Last refresh: {{ cache.updated_at or "Not yet refreshed" }}</small></div>
+  <form method="post" action="/whats-new/refresh"><button type="submit">Refresh Feeds</button></form>
+</section>
+{% if feed_status.running %}<section class="notice">Refresh is running. Reload this page in a few minutes.</section>{% endif %}
+{% for error in cache.errors or [] %}<section class="notice error">{{ error }}</section>{% endfor %}
+{% for key, category in categories.items() %}
+<section class="panel whats-new-section">
+  <h2>Latest 50 SRRDB — {{ category.label }}</h2>
+  <p>Sorted by SRRDB release date; MULTI and GERMAN excluded.</p>
+  <div class="whats-new-scroll"><table><thead><tr><th>Scene Release</th><th>Release Date</th><th>Collection</th></tr></thead><tbody>
+  {% for item in scene[key] %}
+    <tr><td><a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.name }}</a></td><td>{{ item.date or "Unknown" }}</td><td><span class="badge {{ 'present' if item.owned else 'removed' }}">{{ "Owned" if item.owned else "Missing" }}</span></td></tr>
+  {% else %}<tr><td colspan="3">No cached results. Click Refresh Feeds to fetch from SRRDB.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endfor %}
+<section class="panel whats-new-section">
+  <h2>Movies Released in the Past 12 Months</h2>
+  <p>Box Office Mojo domestic theatrical calendar (best-effort import). Matches are based on title and year.</p>
+  <div class="whats-new-scroll"><table><thead><tr><th>Movie</th><th>Theatrical Release Date</th><th>Scale</th><th>Collection</th></tr></thead><tbody>
+  {% for item in movies %}
+    <tr><td><a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></td><td>{{ item.date }}</td><td>{{ item.scale or "—" }}</td><td><span class="badge {{ 'present' if item.owned else 'removed' }}">{{ "Owned" if item.owned else "Missing" }}</span></td></tr>
+  {% else %}<tr><td colspan="4">No cached movies. Refresh to attempt a Box Office Mojo import.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

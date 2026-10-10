@@ -1632,3 +1632,12 @@ a.card { text-decoration:none; color:inherit; }
     width: 100%;
   }
 }
+
+.whats-new-header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px;padding:20px}
+.whats-new-header h1{margin:0 0 6px}.whats-new-header p{margin:0 0 8px}
+.whats-new-section{padding:20px;margin-bottom:18px}.whats-new-section h2{margin:0 0 8px}
+.whats-new-section p{margin:0 0 14px;color:#aab4c2}
+.whats-new-scroll{overflow-x:auto}.whats-new-scroll table{width:100%;border-collapse:collapse}
+.whats-new-scroll th,.whats-new-scroll td{padding:10px 12px;text-align:left;border-bottom:1px solid #334155}
+.whats-new-scroll td:first-child{overflow-wrap:anywhere}
+@media(max-width:720px){.whats-new-header{flex-direction:column;align-items:stretch}}

@@ -45,6 +45,7 @@ from .duplicate_scanner import (
     run_duplicate_scan,
 )
 from .srrdb import parse_release_name
+from .whats_new import CATEGORIES, read_cache, refresh as refresh_whats_new, status as whats_new_status
 from .movie_lists import ensure_bundled_lists, import_bundled_list
 from .movie_list_cache import rebuild_movie_list_cache
 
@@ -438,6 +439,43 @@ def scan_status():
         )
     finally:
         db.close()
+
+
+@app.get("/whats-new", response_class=HTMLResponse)
+def whats_new(request: Request):
+    cache = read_cache()
+    db = SessionLocal()
+    try:
+        inventory = db.scalars(select(Release).where(Release.is_present.is_(True))).all()
+        names = {r.folder_name.casefold() for r in inventory}
+        titles = {
+            (normalize_movie_title(r.movie_title or movie_title_from_release_name(r.folder_name)),
+             str(r.movie_year or ""))
+            for r in inventory
+        }
+        scene = {
+            key: [{**item, "owned": item["name"].casefold() in names}
+                  for item in cache.get("srrdb", {}).get(key, [])]
+            for key in CATEGORIES
+        }
+        movies = [
+            {**item, "owned": (normalize_movie_title(item.get("title", "")),
+                              item.get("date", "")[:4]) in titles}
+            for item in cache.get("movies", [])
+        ]
+        return templates.TemplateResponse(
+            request=request, name="whats_new.html",
+            context={"scene": scene, "movies": movies, "categories": CATEGORIES,
+                     "cache": cache, "feed_status": whats_new_status()},
+        )
+    finally:
+        db.close()
+
+
+@app.post("/whats-new/refresh")
+def whats_new_refresh(background_tasks: BackgroundTasks):
+    background_tasks.add_task(refresh_whats_new)
+    return RedirectResponse("/whats-new", status_code=303)
 
 
 @app.get("/releases", response_class=HTMLResponse)

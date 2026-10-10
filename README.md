@@ -1,9 +1,30 @@
-# iSiTSCENE v0.16.0
+## What's New (v0.17.0)
+
+The What's New page is a read-only discovery view. Click **Refresh Feeds** to
+populate its on-disk JSON cache at `/config/whats_new_cache.json`. The refresh
+runs as a background task; reload the page to see results.
+
+- SRRDB: latest 50 matching UHD BluRay 2160p x265 and 1080p BluRay x264
+  releases (the second category is a provisional default), excluding MULTI
+  and GERMAN, with SRRDB dates and exact folder-name ownership.
+- Box Office Mojo: best-effort parsing of weekly domestic theatrical calendars
+  for the preceding 365 days. Pages without recognizable individual release
+  dates are skipped rather than assigned an invented date. The site has no
+  supported public API and may reject or change its HTML; errors are displayed,
+  and the last successful cache is retained.
+- Movie ownership uses normalized title and year. No movie or release is added
+  to the inventory.
+
+The existing bundled Movie Lists are unchanged in this release. Refreshing
+their actual source data and verifying IDs requires a separate source-by-source
+update. No SQLite migration is required.
+
+# iSiTSCENE v0.17.0
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.16.0
+## New in v0.17.0
 
 - Fixes Pixar, Disney Animated Classics, and Studio Ghibli failing to import on upgraded SQLite databases.
 - Stores a blank compatibility value when a bundled title intentionally uses title/year fallback instead of an IMDb ID.
