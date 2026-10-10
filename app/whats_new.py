@@ -21,6 +21,8 @@ _lock = threading.Lock()
 _running = False
 ERROR = None
 
+EXCLUDED_RELEASE_TERMS = ("MULTI", "GERMAN", "DUAL", "SUBFRENCH", "ITALIAN", "JAPANESE", "FRENCH")
+
 CATEGORIES = {
     "uhd": {"label": "UHD BluRay 2160p x265", "resolution": "2160p", "source": "uhd", "codec": "x265"},
     "bluray": {"label": "BluRay 1080p x264", "resolution": "1080p", "source": "bluray", "codec": "x264"},
@@ -40,7 +42,7 @@ def _save(data):
 
 def _qualifies(name, category):
     upper = name.upper()
-    if "MULTI" in upper or "GERMAN" in upper:
+    if any(term in upper for term in EXCLUDED_RELEASE_TERMS):
         return False
     tokens = re.split(r"[._\s-]+", name.casefold())
     required = CATEGORIES[category]
@@ -76,47 +78,81 @@ def _fetch_srrdb(client, category):
     return found[:50]
 
 
+def _parse_calendar_page(html, cutoff, today):
+    """Parse date-header rows and the movie rows that follow them."""
+    soup = BeautifulSoup(html, "html.parser")
+    results = {}
+    current_date = None
+    date_re = re.compile(
+        r"\\b(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December)\\s+\\d{1,2},?\\s+20\\d{2}\\b"
+    )
+    for row in soup.select("tr"):
+        # Date rows are distinct from film rows; preserve the last date heading.
+        row_text = row.get_text(" ", strip=True)
+        cells = row.find_all(["th", "td"], recursive=False)
+        if not cells:
+            continue
+        date_match = date_re.fullmatch(row_text)
+        if date_match:
+            current_date = datetime.strptime(
+                date_match.group(0).replace(",", ""), "%B %d %Y"
+            ).date()
+            continue
+        if current_date is None or not cutoff <= current_date <= today:
+            continue
+        # The first cell contains the film title, followed by descriptive text.
+        first = cells[0]
+        link = first.select_one('a[href*="/release/"], a[href*="/title/"]')
+        if not link:
+            continue
+        title = link.get_text(" ", strip=True)
+        if not title:
+            continue
+        description = first.get_text(" ", strip=True)
+        if re.search(r"re-release|anniversary|special screening|remaster", description, re.I):
+            continue
+        href = link.get("href", "")
+        if not (href.startswith("/") or href.startswith("https://www.boxofficemojo.com/")):
+            continue
+        scale_text = cells[-1].get_text(" ", strip=True)
+        scale = "Wide" if scale_text == "Wide" else ("Limited" if scale_text == "Limited" else "")
+        key = (title.casefold(), current_date.isoformat())
+        results[key] = {
+            "title": title,
+            "date": current_date.isoformat(),
+            "scale": scale,
+            "url": ("https://www.boxofficemojo.com" + href if href.startswith("/") else href),
+        }
+    return results
+
+
 def _fetch_movies(client):
-    """Best-effort parsing of Box Office Mojo's monthly domestic calendar."""
+    """Read Box Office Mojo monthly domestic calendar, using dated heading rows."""
     today = date.today()
     cutoff = today - timedelta(days=365)
     cursor = date(cutoff.year, cutoff.month, 1)
     results = {}
+    failures = []
     while cursor <= today:
         url = f"https://www.boxofficemojo.com/calendar/{cursor.isoformat()}/"
-        response = client.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-        current_date = None
-        for row in soup.select("tr"):
-            row_text = row.get_text(" ", strip=True)
-            match = re.search(r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+20\d{2}\b", row_text)
-            if match:
-                try:
-                    current_date = datetime.strptime(match.group(0).replace(",", ""), "%B %d %Y").date()
-                except ValueError:
-                    current_date = None
-            if current_date is None or not cutoff <= current_date <= today:
-                continue
-            link = row.select_one('a[href*="/release/"], a[href*="/title/"]')
-            if not link:
-                continue
-            title = link.get_text(" ", strip=True)
-            if not title or re.search(r"re-release|anniversary|special screening", row_text, re.I):
-                continue
-            href = link.get("href", "")
-            if not href.startswith("/") and not href.startswith("https://"):
-                continue
-            key = (title.casefold(), current_date.isoformat())
-            results[key] = {
-                "title": title, "date": current_date.isoformat(),
-                "scale": "Wide" if re.search(r"\bWide\b", row_text) else ("Limited" if re.search(r"\bLimited\b", row_text) else ""),
-                "url": "https://www.boxofficemojo.com" + href if href.startswith("/") else href,
-            }
-        if cursor.month == 12:
-            cursor = date(cursor.year + 1, 1, 1)
-        else:
-            cursor = date(cursor.year, cursor.month + 1, 1)
+        try:
+            response = client.get(url)
+            response.raise_for_status()
+            parsed = _parse_calendar_page(response.text, cutoff, today)
+            results.update(parsed)
+            if not parsed:
+                failures.append(f"{cursor:%Y-%m}: no rows recognized")
+        except (httpx.HTTPError, ValueError) as exc:
+            failures.append(f"{cursor:%Y-%m}: {exc}")
+        cursor = date(cursor.year + (cursor.month == 12), cursor.month % 12 + 1, 1)
+    if not results:
+        raise ValueError(
+            "No movies parsed from Box Office Mojo calendar. "
+            + "; ".join(failures[:3])
+        )
+    if failures:
+        log.warning("Partial Box Office Mojo import: %s", "; ".join(failures))
     return sorted(results.values(), key=lambda item: item["date"], reverse=True)
 
 def refresh():
@@ -128,7 +164,7 @@ def refresh():
     try:
         cache = read_cache()
         errors = []
-        with httpx.Client(timeout=25, follow_redirects=True, headers={"User-Agent": "iSiTSCENE/0.17.1"}) as client:
+        with httpx.Client(timeout=25, follow_redirects=True, headers={"User-Agent": "iSiTSCENE/0.17.2"}) as client:
             for key in CATEGORIES:
                 try:
                     results = _fetch_srrdb(client, key)
