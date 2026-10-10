@@ -42,89 +42,82 @@ def _qualifies(name, category):
     upper = name.upper()
     if "MULTI" in upper or "GERMAN" in upper:
         return False
-    tokens = re.split(r"[._\\s-]+", name.casefold())
+    tokens = re.split(r"[._\s-]+", name.casefold())
     required = CATEGORIES[category]
     return all(required[k] in tokens for k in ("resolution", "source", "codec"))
 
+
 def _fetch_srrdb(client, category):
-    found = []
-    seen = set()
-    # Search API returns paginated results. Keep paging until 50 qualify.
-    for page in range(1, 21):
-        path = f"https://api.srrdb.com/v1/search/r:{CATEGORIES[category]['resolution']}/order:date-desc/page:{page}"
-        response = client.get(path)
+    found, seen = [], set()
+    for page in range(1, 31):
+        # SRRDB supports free-text search segments and order/page modifiers.
+        query = CATEGORIES[category]["resolution"]
+        url = f"https://api.srrdb.com/v1/search/{query}/order:date-desc/page:{page}"
+        response = client.get(url)
         response.raise_for_status()
         payload = response.json()
         entries = payload.get("results", []) if isinstance(payload, dict) else payload
-        if not isinstance(entries, list) or not entries:
+        if not isinstance(entries, list):
+            raise ValueError("SRRDB returned an unexpected search response")
+        if not entries:
             break
         for item in entries:
             if not isinstance(item, dict):
                 continue
             name = str(item.get("release") or item.get("name") or "")
-            if not name or name in seen or not _qualifies(name, category):
+            if not name or name.casefold() in seen or not _qualifies(name, category):
                 continue
-            seen.add(name)
-            found.append({
-                "name": name,
-                "date": str(item.get("date") or ""),
-                "url": "https://www.srrdb.com/release/details/" + quote(name, safe=""),
-            })
+            seen.add(name.casefold())
+            found.append({"name": name, "date": str(item.get("date") or ""),
+                          "url": "https://www.srrdb.com/release/details/" + quote(name, safe="")})
         if len(found) >= 50:
             break
-    found.sort(key=lambda r: r["date"], reverse=True)
+    found.sort(key=lambda item: item["date"], reverse=True)
     return found[:50]
 
-def _fetch_movies(client):
-    """Read weekly domestic calendar pages for the rolling previous year.
 
-    This is best-effort: Box Office Mojo does not publish a supported calendar API.
-    """
+def _fetch_movies(client):
+    """Best-effort parsing of Box Office Mojo's monthly domestic calendar."""
     today = date.today()
     cutoff = today - timedelta(days=365)
+    cursor = date(cutoff.year, cutoff.month, 1)
     results = {}
-    # Weekly calendar dates (include boundary weeks).
-    cursor = cutoff - timedelta(days=7)
     while cursor <= today:
-        url = "https://www.boxofficemojo.com/calendar/" + cursor.isoformat() + "/"
+        url = f"https://www.boxofficemojo.com/calendar/{cursor.isoformat()}/"
         response = client.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        # The site uses dated section headers followed by a release table.
+        current_date = None
         for row in soup.select("tr"):
+            row_text = row.get_text(" ", strip=True)
+            match = re.search(r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+20\d{2}\b", row_text)
+            if match:
+                try:
+                    current_date = datetime.strptime(match.group(0).replace(",", ""), "%B %d %Y").date()
+                except ValueError:
+                    current_date = None
+            if current_date is None or not cutoff <= current_date <= today:
+                continue
             link = row.select_one('a[href*="/release/"], a[href*="/title/"]')
-            if link is None:
+            if not link:
                 continue
             title = link.get_text(" ", strip=True)
-            if not title:
+            if not title or re.search(r"re-release|anniversary|special screening", row_text, re.I):
                 continue
-            cells = [c.get_text(" ", strip=True) for c in row.select("td")]
-            text = " ".join(cells)
-            date_match = re.search(r"\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+\\d{1,2},?\\s+20\\d{2}\\b", text)
-            if date_match:
-                try:
-                    released = datetime.strptime(date_match.group(0).replace(",", ""), "%B %d %Y").date()
-                except ValueError:
-                    try:
-                        released = datetime.strptime(date_match.group(0).replace(",", ""), "%b %d %Y").date()
-                    except ValueError:
-                        continue
-            else:
-                # Never invent a release date when the page omits it.
+            href = link.get("href", "")
+            if not href.startswith("/") and not href.startswith("https://"):
                 continue
-            if not cutoff <= released <= today:
-                continue
-            if re.search(r"re.release|anniversary|special screening", title, re.I):
-                continue
-            key = (title.casefold(), released.isoformat())
+            key = (title.casefold(), current_date.isoformat())
             results[key] = {
-                "title": title,
-                "date": released.isoformat(),
-                "scale": "Wide" if re.search(r"\\bWide\\b", text) else ("Limited" if re.search(r"\\bLimited\\b", text) else ""),
-                "url": "https://www.boxofficemojo.com" + link.get("href", "") if link.get("href", "").startswith("/") else link.get("href", ""),
+                "title": title, "date": current_date.isoformat(),
+                "scale": "Wide" if re.search(r"\bWide\b", row_text) else ("Limited" if re.search(r"\bLimited\b", row_text) else ""),
+                "url": "https://www.boxofficemojo.com" + href if href.startswith("/") else href,
             }
-        cursor += timedelta(days=7)
-    return sorted(results.values(), key=lambda m: m["date"], reverse=True)
+        if cursor.month == 12:
+            cursor = date(cursor.year + 1, 1, 1)
+        else:
+            cursor = date(cursor.year, cursor.month + 1, 1)
+    return sorted(results.values(), key=lambda item: item["date"], reverse=True)
 
 def refresh():
     global _running, ERROR
@@ -135,10 +128,14 @@ def refresh():
     try:
         cache = read_cache()
         errors = []
-        with httpx.Client(timeout=25, follow_redirects=True, headers={"User-Agent": "iSiTSCENE/0.17.0"}) as client:
+        with httpx.Client(timeout=25, follow_redirects=True, headers={"User-Agent": "iSiTSCENE/0.17.1"}) as client:
             for key in CATEGORIES:
                 try:
-                    cache.setdefault("srrdb", {})[key] = _fetch_srrdb(client, key)
+                    results = _fetch_srrdb(client, key)
+                    if results:
+                        cache.setdefault("srrdb", {})[key] = results
+                    else:
+                        errors.append(f"SRRDB {key}: no qualifying results; prior cache retained.")
                 except Exception as exc:
                     log.warning("What's New SRRDB %s refresh failed: %s", key, exc)
                     errors.append(f"SRRDB {key}: {exc}")

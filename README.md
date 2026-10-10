@@ -1,4 +1,4 @@
-## What's New (v0.17.0)
+## What's New (v0.17.1)
 
 The What's New page is a read-only discovery view. Click **Refresh Feeds** to
 populate its on-disk JSON cache at `/config/whats_new_cache.json`. The refresh
@@ -19,12 +19,12 @@ The existing bundled Movie Lists are unchanged in this release. Refreshing
 their actual source data and verifying IDs requires a separate source-by-source
 update. No SQLite migration is required.
 
-# iSiTSCENE v0.17.0
+# iSiTSCENE v0.17.1
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.17.0
+## New in v0.17.1
 
 - Fixes Pixar, Disney Animated Classics, and Studio Ghibli failing to import on upgraded SQLite databases.
 - Stores a blank compatibility value when a bundled title intentionally uses title/year fallback instead of an IMDb ID.

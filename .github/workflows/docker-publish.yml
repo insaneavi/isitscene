@@ -25,6 +25,9 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=tag
             type=sha
+      - name: Capture build timestamp
+        id: build_time
+        run: echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -32,6 +35,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=0.17.0
-            BUILD_DATE=${{ github.event.repository.updated_at }}
+            APP_VERSION=0.17.1
+            BUILD_DATE=${{ steps.build_time.outputs.timestamp }}
             GIT_COMMIT=${{ github.sha }}

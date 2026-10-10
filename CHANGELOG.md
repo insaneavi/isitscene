@@ -1,13 +1,20 @@
 # Changelog
 
-## v0.17.0
+## v0.17.1
+- Fixed over-escaped SRRDB filtering and calendar parsing regexes.
+- Improved SRRDB search paging and avoided overwriting successful cache with empty results.
+- Reworked Box Office Mojo calendar extraction using date headers and month pages.
+- GitHub Actions now stamps Docker builds with the actual UTC build time.
+- No database migration.
+
+## v0.17.1
 - Added What's New: two SRRDB release feeds with dates and ownership.
 - Added best-effort Box Office Mojo rolling-year discovery and cache.
 - Manual refresh, no inventory changes, no schema migration.
 - Second category provisionally BluRay 1080p x264.
 
 
-## v0.17.0
+## v0.17.1
 
 - Fixed bundled lists containing title/year-only entries on databases where the legacy IMDb ID column remains non-nullable.
 - Added automatic retry for failed bundled-list imports during application startup.
