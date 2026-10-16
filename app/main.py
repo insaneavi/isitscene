@@ -3,8 +3,9 @@ from __future__ import annotations
 import io
 import logging
 import re
+from collections import Counter
 from difflib import SequenceMatcher
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
@@ -45,7 +46,7 @@ from .duplicate_scanner import (
     run_duplicate_scan,
 )
 from .srrdb import parse_release_name
-from .whats_new import CATEGORIES, read_cache, refresh as refresh_whats_new, status as whats_new_status
+from .whats_new import CATEGORIES, read_cache, start_refresh as start_whats_new_refresh, status as whats_new_status, EXCLUDED_RELEASE_TERMS
 from .movie_lists import ensure_bundled_lists, import_bundled_list
 from .movie_list_cache import rebuild_movie_list_cache
 
@@ -357,12 +358,39 @@ def dashboard(request: Request):
         ).all()
 
         progress = db.get(ScanProgress, 1)
+        collection = db.scalars(select(Release).where(present)).all()
+        quality = Counter()
+        yearly = Counter()
+        monthly = Counter()
+        dated = []
+        for item in collection:
+            match = re.search(r"(?<![A-Za-z0-9])(2160p|1080p|720p|480p)(?![A-Za-z0-9])", item.folder_name, re.I)
+            quality[match.group(1).lower() if match else "other"] += 1
+            when = item.folder_modified_at
+            if when is not None:
+                yearly[str(when.year)] += 1
+                monthly[when.strftime("%Y-%m")] += 1
+                dated.append(item)
+        dated.sort(key=lambda item: item.folder_modified_at, reverse=True)
+        recent_cutoff = datetime.utcnow() - timedelta(days=30)
+        insights = {
+            "quality": [{"label": key, "count": quality[key]} for key in ("2160p", "1080p", "720p", "480p", "other")],
+            "yearly": [{"label": key, "count": value} for key, value in sorted(yearly.items())],
+            "monthly": [{"label": key, "count": value} for key, value in sorted(monthly.items())],
+            "collection_start": min((r.folder_modified_at for r in dated), default=None),
+            "busiest_year": max(yearly.items(), key=lambda pair: pair[1]) if yearly else None,
+            "busiest_month": max(monthly.items(), key=lambda pair: pair[1]) if monthly else None,
+            "last_30": sum(1 for r in dated if r.folder_modified_at >= recent_cutoff),
+            "recent_additions": dated[:10],
+            "dated_count": len(dated),
+        }
 
         return templates.TemplateResponse(
             request=request,
             name="dashboard.html",
             context={
                 "counts": counts,
+                "insights": insights,
                 "latest_scan": latest_scan,
                 "last_successful_scan": last_successful_scan,
                 "recent": recent,
@@ -466,15 +494,20 @@ def whats_new(request: Request):
         return templates.TemplateResponse(
             request=request, name="whats_new.html",
             context={"scene": scene, "movies": movies, "categories": CATEGORIES,
-                     "cache": cache, "feed_status": whats_new_status()},
+                     "cache": cache, "feed_status": whats_new_status(), "exclusions": EXCLUDED_RELEASE_TERMS},
         )
     finally:
         db.close()
 
 
+@app.get("/whats-new/status")
+def whats_new_live_status():
+    return JSONResponse(whats_new_status())
+
+
 @app.post("/whats-new/refresh")
-def whats_new_refresh(background_tasks: BackgroundTasks):
-    background_tasks.add_task(refresh_whats_new)
+def whats_new_refresh():
+    start_whats_new_refresh()
     return RedirectResponse("/whats-new", status_code=303)
 
 

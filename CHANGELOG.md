@@ -1,27 +1,41 @@
+## v0.17.4
+- Collection Insights dashboard: quality, historical folder modification activity, milestones, latest 30 days.
+- Database v16 adds folder_modified_at; scanner populates it without reading movie files.
+- What's New: 100 results per SRRDB category; added SPANISH and LATIN exclusions.
+- Live refresh progress endpoint, polling, and diagnostic logs for Box Office Mojo.
+- Box Office Mojo remains best-effort and may still fail due to unsupported HTML or access restrictions.
+
 # Changelog
 
-## v0.17.2
+## v0.17.4
+- Audited all 12 bundled movie lists for changes as of October 16, 2026.
+- Added Spider-Man: Brand New Day (2026, IMDb tt22084616) to the MCU theatrical list, now 38 films.
+- Other 11 bundled lists retained their previous data dates because no verified change was established.
+- No schema migration.
+
+
+## v0.17.4
 - Exclude DUAL, SUBFRENCH, ITALIAN, JAPANESE, and FRENCH from both SRRDB feeds (in addition to MULTI and GERMAN).
 - Fix Box Office Mojo calendar parsing by tracking separate release-date heading rows.
 - Handle individual calendar-month failures without discarding successful months.
 - No database migration.
 
 
-## v0.17.2
+## v0.17.4
 - Fixed over-escaped SRRDB filtering and calendar parsing regexes.
 - Improved SRRDB search paging and avoided overwriting successful cache with empty results.
 - Reworked Box Office Mojo calendar extraction using date headers and month pages.
 - GitHub Actions now stamps Docker builds with the actual UTC build time.
 - No database migration.
 
-## v0.17.2
+## v0.17.4
 - Added What's New: two SRRDB release feeds with dates and ownership.
 - Added best-effort Box Office Mojo rolling-year discovery and cache.
 - Manual refresh, no inventory changes, no schema migration.
 - Second category provisionally BluRay 1080p x264.
 
 
-## v0.17.2
+## v0.17.4
 
 - Fixed bundled lists containing title/year-only entries on databases where the legacy IMDb ID column remains non-nullable.
 - Added automatic retry for failed bundled-list imports during application startup.

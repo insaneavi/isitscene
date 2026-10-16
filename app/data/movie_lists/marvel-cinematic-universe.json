@@ -2,12 +2,12 @@
   "schema_version": 1,
   "key": "marvel-cinematic-universe",
   "name": "Marvel Cinematic Universe",
-  "description": "MCU theatrical films from Iron Man through The Fantastic Four: First Steps. Series are excluded.",
+  "description": "MCU theatrical films from Iron Man through Spider-Man: Brand New Day (2026). Series and unreleased films excluded.",
   "source_name": "Marvel",
   "source_url": "https://www.marvel.com/movies",
-  "list_version": "2026-07-26",
-  "data_updated_at": "2026-07-26",
-  "item_count": 37,
+  "list_version": "2026-10-16",
+  "data_updated_at": "2026-10-16",
+  "item_count": 38,
   "items": [
     {
       "rank": 1,
@@ -230,6 +230,12 @@
       "imdb_id": "tt10676052",
       "title": "The Fantastic Four: First Steps",
       "year": 2025
+    },
+    {
+      "rank": 38,
+      "imdb_id": "tt22084616",
+      "title": "Spider-Man: Brand New Day",
+      "year": 2026
     }
   ]
 }

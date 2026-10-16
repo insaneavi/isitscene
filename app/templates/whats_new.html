@@ -5,12 +5,38 @@
   <small>Last refresh: {{ cache.updated_at or "Not yet refreshed" }}</small></div>
   <form method="post" action="/whats-new/refresh"><button type="submit">Refresh Feeds</button></form>
 </section>
-{% if feed_status.running %}<section class="notice">Refresh is running. Reload this page in a few minutes.</section>{% endif %}
+<section class="panel feed-monitor" id="feed-monitor">
+  <div class="feed-head"><h2>Feed Refresh Monitor</h2><strong id="feed-phase">{{ feed_status.phase }}</strong></div>
+  <div class="feed-head"><span id="feed-count">{{ feed_status.completed }} / {{ feed_status.total }} sources</span><strong id="feed-percent">{{ feed_status.percent }}%</strong></div>
+  <div class="progress-track"><div id="feed-bar" class="progress-bar" style="width:{{ feed_status.percent }}%"></div></div>
+  <pre id="feed-log" class="feed-log">{% for entry in feed_status.logs %}[{{ entry.time }}] {{ entry.message }}
+{% endfor %}</pre>
+  <p id="feed-error" class="feed-error">{{ feed_status.error or '' }}</p>
+</section>
+<script>
+(function(){
+ let wasRunning={{ 'true' if feed_status.running else 'false' }};
+ async function poll(){
+  try{
+   const r=await fetch('/whats-new/status',{cache:'no-store'}); if(!r.ok)return;
+   const s=await r.json();
+   document.getElementById('feed-phase').textContent=s.phase;
+   document.getElementById('feed-count').textContent=s.completed+' / '+s.total+' sources';
+   document.getElementById('feed-percent').textContent=s.percent+'%';
+   document.getElementById('feed-bar').style.width=s.percent+'%';
+   document.getElementById('feed-log').textContent=(s.logs||[]).map(x=>'['+x.time+'] '+x.message).join('\n');
+   document.getElementById('feed-error').textContent=s.error||'';
+   if(wasRunning&&!s.running){location.reload();return;} wasRunning=s.running;
+  }catch(e){}
+ }
+ setInterval(poll,2000); poll();
+})();
+</script>
 {% for error in cache.errors or [] %}<section class="notice error">{{ error }}</section>{% endfor %}
 {% for key, category in categories.items() %}
 <section class="panel whats-new-section">
-  <h2>Latest 50 SRRDB — {{ category.label }}</h2>
-  <p>Sorted by SRRDB release date; MULTI and GERMAN excluded.</p>
+  <h2>Latest 100 SRRDB — {{ category.label }}</h2>
+  <p>Sorted by SRRDB release date; excluded: {{ exclusions | join(", ") }}.</p>
   <div class="whats-new-scroll"><table><thead><tr><th>Scene Release</th><th>Release Date</th><th>Collection</th></tr></thead><tbody>
   {% for item in scene[key] %}
     <tr><td><a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.name }}</a></td><td>{{ item.date or "Unknown" }}</td><td><span class="badge {{ 'present' if item.owned else 'removed' }}">{{ "Owned" if item.owned else "Missing" }}</span></td></tr>

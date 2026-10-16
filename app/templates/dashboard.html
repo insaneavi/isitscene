@@ -1,6 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
+<section class="insights-wrap">
+  <div class="insights-heading"><div><h1>Collection Insights</h1><p>Explore your collection by release quality and folder modification history.</p></div><span class="insights-pill">{{ counts.total }} releases</span></div>
+  <div class="insights-cards">
+    <div class="insights-card"><span>Total releases</span><strong>{{ counts.total }}</strong></div>
+    <div class="insights-card"><span>Collection started*</span><strong>{{ insights.collection_start.strftime('%b %Y') if insights.collection_start else 'Not recorded' }}</strong></div>
+    <div class="insights-card"><span>Modified in last 30 days*</span><strong>{{ insights.last_30 }}</strong></div>
+    <div class="insights-card"><span>Busiest year*</span><strong>{{ insights.busiest_year[0] if insights.busiest_year else '—' }}</strong><small>{{ insights.busiest_year[1] if insights.busiest_year else 0 }} releases</small></div>
+    <div class="insights-card"><span>Busiest month*</span><strong>{{ insights.busiest_month[0] if insights.busiest_month else '—' }}</strong><small>{{ insights.busiest_month[1] if insights.busiest_month else 0 }} releases</small></div>
+  </div>
+  <div class="insights-charts">
+    <section class="panel insights-panel"><h2>Release Quality</h2><canvas id="quality-chart" height="230" aria-label="Release quality breakdown"></canvas></section>
+    <section class="panel insights-panel"><div class="insights-heading"><h2>Collection Activity*</h2><select id="growth-mode"><option value="yearly">By year</option><option value="monthly">By month</option></select></div><canvas id="growth-chart" height="230" aria-label="Collection activity chart"></canvas></section>
+  </div>
+  <section class="panel insights-panel"><h2>10 Most Recently Modified Movie Folders*</h2><div class="insights-recent">{% for r in insights.recent_additions %}<div><span>{{ r.folder_name }}</span><time>{{ r.folder_modified_at.strftime('%Y-%m-%d') }}</time></div>{% else %}<p>No folder timestamps recorded yet. Run an inventory scan to populate this history.</p>{% endfor %}</div></section>
+  <p class="insights-note">* Historical activity uses movie folder modification dates, not confirmed acquisition dates. A rename, move, or file change can alter these dates. {{ insights.dated_count }} of {{ counts.total }} present releases have timestamps; run an inventory scan to update them.</p>
+</section>
+<script>
+(function(){
+ const quality={{ insights.quality|tojson }}, yearly={{ insights.yearly|tojson }}, monthly={{ insights.monthly|tojson }};
+ const palette=['#52d66d','#4688e8','#e6ac4d','#a379d8','#8094a8'];
+ function renderBars(canvas,rows){const c=canvas.getContext('2d'),w=canvas.clientWidth,h=canvas.height,dpr=window.devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;c.scale(dpr,dpr);c.clearRect(0,0,w,h);const max=Math.max(1,...rows.map(x=>x.count));const pad=32;const barWidth=Math.max(4,(w-pad*2)/Math.max(rows.length,1)*.65);rows.forEach((r,i)=>{const x=pad+i*(w-pad*2)/rows.length;const bh=(h-65)*r.count/max;c.fillStyle=palette[i%palette.length];c.fillRect(x,h-37-bh,barWidth,bh);c.fillStyle='#dce7f0';c.font='11px sans-serif';c.fillText(r.count,x,h-42-bh);c.fillStyle='#9eb1c4';c.save();c.translate(x,h-21);c.rotate(-.55);c.fillText(r.label,0,0);c.restore();});}
+ const q=document.getElementById('quality-chart'),g=document.getElementById('growth-chart'),mode=document.getElementById('growth-mode');
+ function redraw(){renderBars(q,quality);renderBars(g,mode.value==='monthly'?monthly:yearly);}
+ mode.addEventListener('change',redraw);window.addEventListener('resize',redraw);redraw();
+})();
+</script>
+
 <section class="heading">
   <div>
     <h1>Archive Health</h1>

@@ -154,6 +154,12 @@ def _inventory_archive(run_id: int) -> None:
         )
     ]
 
+    folder_mtimes = {}
+    for name in folder_names:
+        try:
+            folder_mtimes[name] = datetime.utcfromtimestamp((MOVIES_PATH / name).stat().st_mtime)
+        except OSError:
+            folder_mtimes[name] = None
     skipped_count = len(all_directories) - len(folder_names)
     now = datetime.utcnow()
     current = set(folder_names)
@@ -186,6 +192,7 @@ def _inventory_archive(run_id: int) -> None:
                     folder_name=name,
                     normalized_name=normalize(name),
                     first_seen=now,
+                    folder_modified_at=folder_mtimes.get(name),
                     last_seen=now,
                     is_present=True,
                     verification_status="pending",
@@ -194,6 +201,7 @@ def _inventory_archive(run_id: int) -> None:
                 db.add(release)
                 new_count += 1
             else:
+                release.folder_modified_at = folder_mtimes.get(name)
                 release.last_seen = now
                 release.is_present = True
 
@@ -473,6 +481,12 @@ def _refresh_inventory(run_id: int) -> list[int]:
         )
     ]
 
+    folder_mtimes = {}
+    for name in folder_names:
+        try:
+            folder_mtimes[name] = datetime.utcfromtimestamp((MOVIES_PATH / name).stat().st_mtime)
+        except OSError:
+            folder_mtimes[name] = None
     skipped_count = len(all_directories) - len(folder_names)
     current = set(folder_names)
     now = datetime.utcnow()
@@ -504,6 +518,7 @@ def _refresh_inventory(run_id: int) -> list[int]:
                     folder_name=name,
                     normalized_name=normalize(name),
                     first_seen=now,
+                    folder_modified_at=folder_mtimes.get(name),
                     last_seen=now,
                     is_present=True,
                     verification_status="pending",
@@ -513,6 +528,7 @@ def _refresh_inventory(run_id: int) -> list[int]:
                 db.flush()
                 new_ids.append(release.id)
             else:
+                release.folder_modified_at = folder_mtimes.get(name)
                 release.last_seen = now
                 release.is_present = True
 
