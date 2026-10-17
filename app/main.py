@@ -554,7 +554,7 @@ def collection_size_status():
 
 
 @app.get("/releases", response_class=HTMLResponse)
-def releases(request: Request, q: str = "", verification: str = "", inventory: str = "", release_type: str = "", page: int = 1):
+def releases(request: Request, q: str = "", verification: str = "", inventory: str = "", release_type: str = "", resolution: str = "", page: int = 1):
     from time import monotonic
     began = monotonic()
     page = max(1, page)
@@ -572,6 +572,15 @@ def releases(request: Request, q: str = "", verification: str = "", inventory: s
             ids = db.execute(select(Release.id, Release.folder_name)).all()
             matched = [id for id, name in ids if classify(name) == release_type]
             statement = statement.where(Release.id.in_(matched))
+        # Resolution matches a complete Scene token, not arbitrary text or release type.
+        if resolution in ("2160p", "1080p", "720p", "480p", "other"):
+            ids = db.execute(select(Release.id, Release.folder_name)).all()
+            resolution_re = re.compile(r"(?<![A-Za-z0-9])(2160p|1080p|720p|480p)(?![A-Za-z0-9])", re.I)
+            matched = [
+                release_id for release_id, name in ids
+                if ((match.group(1).lower() if (match := resolution_re.search(name)) else "other") == resolution)
+            ]
+            statement = statement.where(Release.id.in_(matched))
         total = db.scalar(select(func.count()).select_from(statement.subquery())) or 0
         pages = max(1, (total + page_size - 1) // page_size)
         page = min(page, pages)
@@ -580,6 +589,7 @@ def releases(request: Request, q: str = "", verification: str = "", inventory: s
         return templates.TemplateResponse(request=request, name="releases.html", context={
             "items": items, "q": q, "verification": verification, "inventory": inventory,
             "release_type": release_type, "release_types": TYPES, "classify_release": classify,
+            "resolution": resolution,
             "total": total, "page": page, "pages": pages,
         })
     finally: db.close()

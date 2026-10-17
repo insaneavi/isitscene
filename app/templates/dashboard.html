@@ -21,7 +21,7 @@
     <span id="size-job-status" role="status">Metadata-only background job; no movie files opened.</span>
     <progress id="size-job-progress" value="0" max="1" style="width:100%;margin-top:12px;display:none"></progress>
   </div>
-  <section class="panel insights-panel" style="margin-bottom:16px"><h2>Storage by Release Quality</h2><canvas id="size-quality-chart" height="230"></canvas></section>
+  <section class="panel insights-panel" style="margin-bottom:16px"><h2>Storage by Release Quality</h2><p class="insights-note">Click a bar to open matching releases. <a href="/releases?resolution=2160p">View 2160p releases →</a></p><canvas id="size-quality-chart" height="230"></canvas></section>
   <div class="insights-backfill panel" style="padding:14px;margin-bottom:14px">
     <strong>Folder timestamp coverage: {{ insights.dated_count }} / {{ counts.total }}</strong>
     <button type="button" id="backfill-dates" style="margin-left:14px">Backfill Folder Dates</button>
@@ -43,7 +43,33 @@
  const palette=['#52d66d','#4688e8','#e6ac4d','#a379d8','#8094a8'];
  function renderBars(canvas,rows){const c=canvas.getContext('2d'),w=canvas.clientWidth,h=canvas.height,dpr=window.devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;c.scale(dpr,dpr);c.clearRect(0,0,w,h);const max=Math.max(1,...rows.map(x=>x.count));const pad=32;const barWidth=Math.max(4,(w-pad*2)/Math.max(rows.length,1)*.65);rows.forEach((r,i)=>{const x=pad+i*(w-pad*2)/rows.length;const bh=(h-65)*r.count/max;c.fillStyle=palette[i%palette.length];c.fillRect(x,h-37-bh,barWidth,bh);c.fillStyle='#dce7f0';c.font='11px sans-serif';c.fillText(r.count,x,h-42-bh);c.fillStyle='#9eb1c4';c.save();c.translate(x,h-21);c.rotate(-.55);c.fillText(r.label,0,0);c.restore();});}
  const rt=document.getElementById('release-type-chart'),q=document.getElementById('quality-chart'),g=document.getElementById('growth-chart'),mode=document.getElementById('growth-mode');
- function redraw(){renderBars(document.getElementById("size-quality-chart"),sizes.map(x=>({label:x.label,count:Math.round(x.bytes/1000000000)})));renderBars(q,quality);renderBars(rt,releaseTypes);renderBars(g,mode.value==='monthly'?monthly:yearly);}
+ const storageChart=document.getElementById("size-quality-chart");
+ storageChart.title="Click a quality bar to view matching releases";
+ storageChart.style.cursor="pointer";
+ storageChart.setAttribute("aria-label","Storage by release quality. Click a bar to filter releases by resolution.");
+ storageChart.setAttribute("tabindex","0");
+ function openQuality(event){
+   const rect=storageChart.getBoundingClientRect();
+   const x=event.clientX-rect.left;
+   const w=storageChart.clientWidth;
+   const pad=32, slot=(w-pad*2)/sizes.length;
+   const index=Math.floor((x-pad)/slot);
+   if(index<0||index>=sizes.length)return;
+   const barWidth=Math.max(4,slot*.65);
+   if(x>pad+index*slot+barWidth)return;
+   const max=Math.max(1,...sizes.map(item=>Math.round(item.bytes/1000000000)));
+   const count=Math.round(sizes[index].bytes/1000000000);
+   const height=storageChart.height/(window.devicePixelRatio||1);
+   const top=height-37-(height-65)*count/max;
+   const y=event.clientY-rect.top;
+   if(y<top||y>height-37)return;
+   window.location.assign("/releases?resolution="+encodeURIComponent(sizes[index].label));
+ }
+ storageChart.addEventListener("click",openQuality);
+ storageChart.addEventListener("keydown",event=>{
+   if(event.key==="Enter"){window.location.assign("/releases?resolution=2160p");}
+ });
+ function redraw(){renderBars(storageChart,sizes.map(x=>({label:x.label,count:Math.round(x.bytes/1000000000)})));renderBars(q,quality);renderBars(rt,releaseTypes);renderBars(g,mode.value==='monthly'?monthly:yearly);}
  mode.addEventListener('change',redraw);window.addEventListener('resize',redraw);redraw();
 })();
 </script>

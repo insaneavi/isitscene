@@ -52,6 +52,12 @@
       <option value="">All release types</option>
       {% for kind in release_types %}<option value="{{ kind }}" {% if release_type == kind %}selected{% endif %}>{{ kind }}</option>{% endfor %}
     </select>
+    <select name="resolution" aria-label="Resolution">
+      <option value="">All resolutions</option>
+      {% for option in ["2160p", "1080p", "720p", "480p", "other"] %}
+      <option value="{{ option }}" {% if resolution == option %}selected{% endif %}>{{ option|upper if option == "other" else option }}</option>
+      {% endfor %}
+    </select>
     <button>Filter</button>
   </form>
 
