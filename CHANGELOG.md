@@ -1,3 +1,7 @@
+## v0.17.7 hotfix
+- Fix invalid Jinja closing tag on Releases page that caused HTTP 500.
+- Validate all HTML templates before packaging.
+
 ## v0.17.7\n- Storage by Release Quality chart bars link to matching Releases resolution filters.\n- Added persistent Resolution dropdown to Releases with 2160p, 1080p, 720p, 480p and Other options.\n- Fixed version in GitHub Actions build arguments.\n\n## v0.17.6
 - Collection size metadata scan with progress, totals, averages, largest release, and storage by quality.
 - Releases pagination (100 per page), shared release type filter and column, and query timing logs.
