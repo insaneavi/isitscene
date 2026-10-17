@@ -24,6 +24,7 @@ from .database import (
     ScanRun, SessionLocal, UpgradeCandidate, UpgradeProgress, UpgradeResult,
     UpgradeScan, init_db,
 )
+from .folder_dates import start as start_date_backfill, status as date_backfill_status
 from .scanner import (
     recover_interrupted_scan,
     refresh_library_changes,
@@ -360,12 +361,29 @@ def dashboard(request: Request):
         progress = db.get(ScanProgress, 1)
         collection = db.scalars(select(Release).where(present)).all()
         quality = Counter()
+        release_types = Counter()
         yearly = Counter()
         monthly = Counter()
         dated = []
         for item in collection:
             match = re.search(r"(?<![A-Za-z0-9])(2160p|1080p|720p|480p)(?![A-Za-z0-9])", item.folder_name, re.I)
             quality[match.group(1).lower() if match else "other"] += 1
+            name = item.folder_name.casefold()
+            if re.search(r"(?:^|[._ -])(?:web[._ -]?dl|webdl)(?:[._ -]|$)", name):
+                release_type = "WEB-DL"
+            elif re.search(r"(?:^|[._ -])webrip(?:[._ -]|$)", name):
+                release_type = "WEBRip"
+            elif re.search(r"(?:^|[._ -])(?:uhd|ultrahd)(?:[._ -]|$)", name) and re.search(r"bluray|bdrip|bdremux|remux", name):
+                release_type = "UHD BluRay"
+            elif re.search(r"(?:^|[._ -])(?:bluray|bdrip|brrip|bdremux|remux)(?:[._ -]|$)", name):
+                release_type = "BluRay"
+            elif re.search(r"(?:^|[._ -])(?:hdtv|pdtv)(?:[._ -]|$)", name):
+                release_type = "HDTV"
+            elif re.search(r"(?:^|[._ -])(?:dvdrip|dvd5|dvd9|dvd)(?:[._ -]|$)", name):
+                release_type = "DVD"
+            else:
+                release_type = "Other"
+            release_types[release_type] += 1
             when = item.folder_modified_at
             if when is not None:
                 yearly[str(when.year)] += 1
@@ -374,6 +392,8 @@ def dashboard(request: Request):
         dated.sort(key=lambda item: item.folder_modified_at, reverse=True)
         recent_cutoff = datetime.utcnow() - timedelta(days=30)
         insights = {
+            "release_types": [{"label": key, "count": release_types[key]} for key in ("UHD BluRay", "BluRay", "WEB-DL", "WEBRip", "HDTV", "DVD", "Other")],
+            "backfill": date_backfill_status(),
             "quality": [{"label": key, "count": quality[key]} for key in ("2160p", "1080p", "720p", "480p", "other")],
             "yearly": [{"label": key, "count": value} for key, value in sorted(yearly.items())],
             "monthly": [{"label": key, "count": value} for key, value in sorted(monthly.items())],
@@ -401,6 +421,17 @@ def dashboard(request: Request):
         )
     finally:
         db.close()
+
+
+@app.post("/api/folder-dates/backfill")
+def backfill_folder_dates():
+    started = start_date_backfill()
+    return JSONResponse({"started": started, **date_backfill_status()}, status_code=202 if started else 409)
+
+
+@app.get("/api/folder-dates/status")
+def folder_dates_status():
+    return date_backfill_status()
 
 
 @app.get("/api/scan-status")

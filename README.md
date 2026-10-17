@@ -1,4 +1,4 @@
-## Collection Insights (v0.17.4)
+## Collection Insights (v0.17.5)
 Run a fresh inventory scan after upgrading to populate folder modification timestamps. These are **not** guaranteed acquisition dates. The scanner only stats movie folders, never movie files. Existing first-seen timestamps remain unchanged. The dashboard charts are drawn locally without a third-party chart CDN.
 
 What's New now includes a live refresh log and progress bar; Box Office Mojo diagnostics display calendar response size, row count, and parsing outcomes. Its source remains best-effort.
@@ -7,7 +7,7 @@ What's New now includes a live refresh log and progress bar; Box Office Mojo dia
 
 All 12 bundled lists were inspected. Confirmed MCU update: Spider-Man: Brand New Day (2026) added with IMDb ID tt22084616, raising the MCU list from 37 to 38 films. Pixar already includes Hoppers and Toy Story 5; Star Wars already includes The Mandalorian and Grogu; Disney Animation already includes Zootopia 2. Historical AFI and completed franchise lists are unchanged. IMDb Top 100 and Top 250 are dynamic charts and were **not** re-scraped; their July 2026 ranking snapshots remain unchanged. All unchanged lists retain their original data dates.
 
-## What's New (v0.17.4)
+## What's New (v0.17.5)
 
 The What's New page is a read-only discovery view. Click **Refresh Feeds** to
 populate its on-disk JSON cache at `/config/whats_new_cache.json`. The refresh
@@ -28,12 +28,12 @@ The existing bundled Movie Lists are unchanged in this release. Refreshing
 their actual source data and verifying IDs requires a separate source-by-source
 update. No SQLite migration is required.
 
-# iSiTSCENE v0.17.4
+# iSiTSCENE v0.17.5
 
 iSiTSCENE inventories immediate movie-release folders and checks whether each
 folder name exactly matches a release registered in SRRDB.
 
-## New in v0.17.4
+## New in v0.17.5
 
 - Fixes Pixar, Disney Animated Classics, and Studio Ghibli failing to import on upgraded SQLite databases.
 - Stores a blank compatibility value when a bundled title intentionally uses title/year fallback instead of an IMDb ID.
@@ -279,3 +279,6 @@ git push
 ```
 
 After GitHub Actions succeeds, update the container in Unraid.
+
+## v0.17.5 dashboard
+On Dashboard select **Backfill Folder Dates** to read the modified timestamp of each inventoried folder from the `/movies` mount. No SRRDB calls or movie file reads occur. This can correct old inventory rows with empty timestamps. Folder modification time is not guaranteed to be the acquisition date.

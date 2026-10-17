@@ -10,21 +10,50 @@
     <div class="insights-card"><span>Busiest year*</span><strong>{{ insights.busiest_year[0] if insights.busiest_year else '—' }}</strong><small>{{ insights.busiest_year[1] if insights.busiest_year else 0 }} releases</small></div>
     <div class="insights-card"><span>Busiest month*</span><strong>{{ insights.busiest_month[0] if insights.busiest_month else '—' }}</strong><small>{{ insights.busiest_month[1] if insights.busiest_month else 0 }} releases</small></div>
   </div>
+  <div class="insights-backfill panel" style="padding:14px;margin-bottom:14px">
+    <strong>Folder timestamp coverage: {{ insights.dated_count }} / {{ counts.total }}</strong>
+    <button type="button" id="backfill-dates" style="margin-left:14px">Backfill Folder Dates</button>
+    <span id="backfill-status" role="status" style="margin-left:12px">Reads folder metadata only; no SRRDB verification.</span>
+    <progress id="backfill-progress" value="{{ insights.backfill.processed }}" max="{{ insights.backfill.total or 1 }}" style="width:100%;margin-top:12px;display:none"></progress>
+  </div>
   <div class="insights-charts">
     <section class="panel insights-panel"><h2>Release Quality</h2><canvas id="quality-chart" height="230" aria-label="Release quality breakdown"></canvas></section>
     <section class="panel insights-panel"><div class="insights-heading"><h2>Collection Activity*</h2><select id="growth-mode"><option value="yearly">By year</option><option value="monthly">By month</option></select></div><canvas id="growth-chart" height="230" aria-label="Collection activity chart"></canvas></section>
   </div>
+  <section class="panel insights-panel" style="margin-bottom:16px"><h2>Release Type Breakdown</h2><canvas id="release-type-chart" height="230" aria-label="Release type breakdown"></canvas></section>
   <section class="panel insights-panel"><h2>10 Most Recently Modified Movie Folders*</h2><div class="insights-recent">{% for r in insights.recent_additions %}<div><span>{{ r.folder_name }}</span><time>{{ r.folder_modified_at.strftime('%Y-%m-%d') }}</time></div>{% else %}<p>No folder timestamps recorded yet. Run an inventory scan to populate this history.</p>{% endfor %}</div></section>
   <p class="insights-note">* Historical activity uses movie folder modification dates, not confirmed acquisition dates. A rename, move, or file change can alter these dates. {{ insights.dated_count }} of {{ counts.total }} present releases have timestamps; run an inventory scan to update them.</p>
 </section>
 <script>
 (function(){
- const quality={{ insights.quality|tojson }}, yearly={{ insights.yearly|tojson }}, monthly={{ insights.monthly|tojson }};
+ const quality={{ insights.quality|tojson }}, releaseTypes={{ insights.release_types|tojson }}, yearly={{ insights.yearly|tojson }}, monthly={{ insights.monthly|tojson }};
  const palette=['#52d66d','#4688e8','#e6ac4d','#a379d8','#8094a8'];
  function renderBars(canvas,rows){const c=canvas.getContext('2d'),w=canvas.clientWidth,h=canvas.height,dpr=window.devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;c.scale(dpr,dpr);c.clearRect(0,0,w,h);const max=Math.max(1,...rows.map(x=>x.count));const pad=32;const barWidth=Math.max(4,(w-pad*2)/Math.max(rows.length,1)*.65);rows.forEach((r,i)=>{const x=pad+i*(w-pad*2)/rows.length;const bh=(h-65)*r.count/max;c.fillStyle=palette[i%palette.length];c.fillRect(x,h-37-bh,barWidth,bh);c.fillStyle='#dce7f0';c.font='11px sans-serif';c.fillText(r.count,x,h-42-bh);c.fillStyle='#9eb1c4';c.save();c.translate(x,h-21);c.rotate(-.55);c.fillText(r.label,0,0);c.restore();});}
- const q=document.getElementById('quality-chart'),g=document.getElementById('growth-chart'),mode=document.getElementById('growth-mode');
- function redraw(){renderBars(q,quality);renderBars(g,mode.value==='monthly'?monthly:yearly);}
+ const rt=document.getElementById('release-type-chart'),q=document.getElementById('quality-chart'),g=document.getElementById('growth-chart'),mode=document.getElementById('growth-mode');
+ function redraw(){renderBars(q,quality);renderBars(rt,releaseTypes);renderBars(g,mode.value==='monthly'?monthly:yearly);}
  mode.addEventListener('change',redraw);window.addEventListener('resize',redraw);redraw();
+})();
+</script>
+<script>
+(function(){
+ const button=document.getElementById('backfill-dates'),status=document.getElementById('backfill-status'),bar=document.getElementById('backfill-progress');
+ let timer;
+ async function poll(){
+  try{
+   const response=await fetch('/api/folder-dates/status',{cache:'no-store'});
+   const data=await response.json();
+   bar.style.display=data.running?'block':'none';bar.max=data.total||1;bar.value=data.processed||0;
+   button.disabled=!!data.running;
+   status.textContent=data.running?`Processing ${data.processed}/${data.total} folders; ${data.updated} updated`:(data.error?`Failed: ${data.error}`:`Last backfill: ${data.updated} updated, ${data.missing} unavailable`);
+   if(!data.running){clearInterval(timer);timer=null;if(data.updated>0) setTimeout(()=>location.reload(),700);}
+  }catch(err){status.textContent='Unable to fetch timestamp backfill status';clearInterval(timer);timer=null;button.disabled=false;}
+ }
+ button.addEventListener('click',async()=>{
+  button.disabled=true;status.textContent='Starting metadata backfill...';
+  try{await fetch('/api/folder-dates/backfill',{method:'POST'});await poll();if(!timer)timer=setInterval(poll,1200);}
+  catch(err){status.textContent='Could not start backfill';button.disabled=false;}
+ });
+ if({{ 'true' if insights.backfill.running else 'false' }}){poll();timer=setInterval(poll,1200);}
 })();
 </script>
 
