@@ -34,7 +34,7 @@ def _step(message):
     _log(message)
 
 
-EXCLUDED_RELEASE_TERMS = ("MULTI", "GERMAN", "DUAL", "SUBFRENCH", "ITALIAN", "JAPANESE", "FRENCH", "SPANISH", "LATIN")
+EXCLUDED_RELEASE_TERMS = ("MULTI", "GERMAN", "DUAL", "SUBFRENCH", "ITALIAN", "JAPANESE", "FRENCH", "SPANISH", "LATIN", "DUTCH")
 
 CATEGORIES = {
     "uhd": {"label": "UHD BluRay 2160p x265", "resolution": "2160p", "source": "uhd", "codec": "x265"},

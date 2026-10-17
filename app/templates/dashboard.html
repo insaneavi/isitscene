@@ -10,6 +10,18 @@
     <div class="insights-card"><span>Busiest year*</span><strong>{{ insights.busiest_year[0] if insights.busiest_year else '—' }}</strong><small>{{ insights.busiest_year[1] if insights.busiest_year else 0 }} releases</small></div>
     <div class="insights-card"><span>Busiest month*</span><strong>{{ insights.busiest_month[0] if insights.busiest_month else '—' }}</strong><small>{{ insights.busiest_month[1] if insights.busiest_month else 0 }} releases</small></div>
   </div>
+  <div class="insights-cards insights-size-cards">
+    <div class="insights-card"><span>Total Collection Size</span><strong>{{ '%.2f'|format(insights.size_total_bytes / 1000000000000) }} TB</strong><small>{{ insights.size_covered }} / {{ counts.total }} measured</small></div>
+    <div class="insights-card"><span>Average Release Size</span><strong>{{ '%.2f'|format(insights.size_average_bytes / 1000000000) }} GB</strong></div>
+    <div class="insights-card"><span>Largest Release</span><strong>{{ '%.2f'|format(insights.size_largest.folder_size_bytes / 1000000000) if insights.size_largest else '0' }} GB</strong><small>{{ insights.size_largest.folder_name if insights.size_largest else 'Not measured' }}</small></div>
+  </div>
+  <div class="panel" style="padding:14px;margin-bottom:14px">
+    <strong>Collection size coverage: {{ insights.size_covered }} / {{ counts.total }}</strong>
+    <button id="measure-sizes" type="button" style="margin-left:14px">Calculate Collection Size</button>
+    <span id="size-job-status" role="status">Metadata-only background job; no movie files opened.</span>
+    <progress id="size-job-progress" value="0" max="1" style="width:100%;margin-top:12px;display:none"></progress>
+  </div>
+  <section class="panel insights-panel" style="margin-bottom:16px"><h2>Storage by Release Quality</h2><canvas id="size-quality-chart" height="230"></canvas></section>
   <div class="insights-backfill panel" style="padding:14px;margin-bottom:14px">
     <strong>Folder timestamp coverage: {{ insights.dated_count }} / {{ counts.total }}</strong>
     <button type="button" id="backfill-dates" style="margin-left:14px">Backfill Folder Dates</button>
@@ -26,11 +38,12 @@
 </section>
 <script>
 (function(){
+ const sizes={{ insights.size_by_quality|tojson }};
  const quality={{ insights.quality|tojson }}, releaseTypes={{ insights.release_types|tojson }}, yearly={{ insights.yearly|tojson }}, monthly={{ insights.monthly|tojson }};
  const palette=['#52d66d','#4688e8','#e6ac4d','#a379d8','#8094a8'];
  function renderBars(canvas,rows){const c=canvas.getContext('2d'),w=canvas.clientWidth,h=canvas.height,dpr=window.devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;c.scale(dpr,dpr);c.clearRect(0,0,w,h);const max=Math.max(1,...rows.map(x=>x.count));const pad=32;const barWidth=Math.max(4,(w-pad*2)/Math.max(rows.length,1)*.65);rows.forEach((r,i)=>{const x=pad+i*(w-pad*2)/rows.length;const bh=(h-65)*r.count/max;c.fillStyle=palette[i%palette.length];c.fillRect(x,h-37-bh,barWidth,bh);c.fillStyle='#dce7f0';c.font='11px sans-serif';c.fillText(r.count,x,h-42-bh);c.fillStyle='#9eb1c4';c.save();c.translate(x,h-21);c.rotate(-.55);c.fillText(r.label,0,0);c.restore();});}
  const rt=document.getElementById('release-type-chart'),q=document.getElementById('quality-chart'),g=document.getElementById('growth-chart'),mode=document.getElementById('growth-mode');
- function redraw(){renderBars(q,quality);renderBars(rt,releaseTypes);renderBars(g,mode.value==='monthly'?monthly:yearly);}
+ function redraw(){renderBars(document.getElementById("size-quality-chart"),sizes.map(x=>({label:x.label,count:Math.round(x.bytes/1000000000)})));renderBars(q,quality);renderBars(rt,releaseTypes);renderBars(g,mode.value==='monthly'?monthly:yearly);}
  mode.addEventListener('change',redraw);window.addEventListener('resize',redraw);redraw();
 })();
 </script>
@@ -360,4 +373,21 @@
   window.setInterval(refreshProgress, 2000);
 })();
 </script>
+<script>
+(function(){
+const btn=document.getElementById('measure-sizes'), bar=document.getElementById('size-job-progress'), label=document.getElementById('size-job-status');
+let interval=null;
+async function poll(){
+ try{
+  const r=await fetch('/api/collection-size/status',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
+  const d=await r.json();btn.disabled=!!d.running;bar.style.display=d.running?'block':'none';bar.max=d.total||1;bar.value=d.processed||0;
+  label.textContent=d.running?`Scanning file metadata: ${d.processed}/${d.total}; ${d.measured} measured; ${d.errors} unavailable`:(d.error?'Error: '+d.error:`Last measurement: ${d.measured} folders, ${d.errors} unavailable`);
+  if(!d.running && interval){clearInterval(interval);interval=null;if(d.measured)location.reload();}
+ }catch(e){label.textContent='Status error: '+e.message;if(interval)clearInterval(interval);interval=null;btn.disabled=false;}
+}
+btn.addEventListener('click',async()=>{btn.disabled=true;label.textContent='Starting...';try{const r=await fetch('/api/collection-size/measure',{method:'POST'});if(!r.ok)throw Error('HTTP '+r.status);await poll();if(!interval)interval=setInterval(poll,1200);}catch(e){label.textContent=e.message;btn.disabled=false;}});
+if({{ 'true' if insights.size_job.running else 'false' }}){poll();interval=setInterval(poll,1200);}
+})();
+</script>
+
 {% endblock %}

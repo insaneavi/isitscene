@@ -42,6 +42,7 @@ class Release(Base):
     )
     status: Mapped[str] = mapped_column(String, default="pending", index=True)
     matched_release: Mapped[str | None] = mapped_column(String, nullable=True)
+    folder_size_bytes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     folder_modified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     first_seen: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     last_seen: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -325,6 +326,7 @@ def _add_column_if_missing(
 
 def _migrate_schema() -> None:
     _add_column_if_missing("releases", "folder_modified_at", "DATETIME")
+    _add_column_if_missing("releases", "folder_size_bytes", "INTEGER")
     _add_column_if_missing(
         "scan_runs",
         "skipped_folders",

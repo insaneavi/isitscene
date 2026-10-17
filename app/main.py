@@ -25,6 +25,8 @@ from .database import (
     UpgradeScan, init_db,
 )
 from .folder_dates import start as start_date_backfill, status as date_backfill_status
+from .folder_sizes import start as start_size_measurement, status as size_measurement_status
+from .release_types import classify, TYPES
 from .scanner import (
     recover_interrupted_scan,
     refresh_library_changes,
@@ -368,21 +370,7 @@ def dashboard(request: Request):
         for item in collection:
             match = re.search(r"(?<![A-Za-z0-9])(2160p|1080p|720p|480p)(?![A-Za-z0-9])", item.folder_name, re.I)
             quality[match.group(1).lower() if match else "other"] += 1
-            name = item.folder_name.casefold()
-            if re.search(r"(?:^|[._ -])(?:web[._ -]?dl|webdl)(?:[._ -]|$)", name):
-                release_type = "WEB-DL"
-            elif re.search(r"(?:^|[._ -])webrip(?:[._ -]|$)", name):
-                release_type = "WEBRip"
-            elif re.search(r"(?:^|[._ -])(?:uhd|ultrahd)(?:[._ -]|$)", name) and re.search(r"bluray|bdrip|bdremux|remux", name):
-                release_type = "UHD BluRay"
-            elif re.search(r"(?:^|[._ -])(?:bluray|bdrip|brrip|bdremux|remux)(?:[._ -]|$)", name):
-                release_type = "BluRay"
-            elif re.search(r"(?:^|[._ -])(?:hdtv|pdtv)(?:[._ -]|$)", name):
-                release_type = "HDTV"
-            elif re.search(r"(?:^|[._ -])(?:dvdrip|dvd5|dvd9|dvd)(?:[._ -]|$)", name):
-                release_type = "DVD"
-            else:
-                release_type = "Other"
+            release_type = classify(item.folder_name)
             release_types[release_type] += 1
             when = item.folder_modified_at
             if when is not None:
@@ -391,7 +379,20 @@ def dashboard(request: Request):
                 dated.append(item)
         dated.sort(key=lambda item: item.folder_modified_at, reverse=True)
         recent_cutoff = datetime.utcnow() - timedelta(days=30)
+        sized = [r for r in collection if r.folder_size_bytes is not None]
+        total_bytes = sum(r.folder_size_bytes for r in sized)
+        largest = max(sized, key=lambda r: r.folder_size_bytes, default=None)
+        size_by_quality = Counter()
+        for r in sized:
+            match = re.search(r"(?<![A-Za-z0-9])(2160p|1080p|720p|480p)(?![A-Za-z0-9])", r.folder_name, re.I)
+            size_by_quality[match.group(1).lower() if match else "other"] += r.folder_size_bytes
         insights = {
+            "size_total_bytes": total_bytes,
+            "size_covered": len(sized),
+            "size_average_bytes": total_bytes / len(sized) if sized else 0,
+            "size_largest": largest,
+            "size_by_quality": [{"label": key, "bytes": size_by_quality[key]} for key in ("2160p", "1080p", "720p", "480p", "other")],
+            "size_job": size_measurement_status(),
             "release_types": [{"label": key, "count": release_types[key]} for key in ("UHD BluRay", "BluRay", "WEB-DL", "WEBRip", "HDTV", "DVD", "Other")],
             "backfill": date_backfill_status(),
             "quality": [{"label": key, "count": quality[key]} for key in ("2160p", "1080p", "720p", "480p", "other")],
@@ -542,46 +543,46 @@ def whats_new_refresh():
     return RedirectResponse("/whats-new", status_code=303)
 
 
+@app.post("/api/collection-size/measure")
+def measure_collection_size():
+    started = start_size_measurement()
+    return JSONResponse({"started": started, **size_measurement_status()})
+
+@app.get("/api/collection-size/status")
+def collection_size_status():
+    return JSONResponse(size_measurement_status())
+
+
 @app.get("/releases", response_class=HTMLResponse)
-def releases(
-    request: Request,
-    q: str = "",
-    verification: str = "",
-    inventory: str = "",
-):
+def releases(request: Request, q: str = "", verification: str = "", inventory: str = "", release_type: str = "", page: int = 1):
+    from time import monotonic
+    began = monotonic()
+    page = max(1, page)
+    page_size = 100
     db = SessionLocal()
     try:
-        statement = select(Release).order_by(Release.folder_name)
-
-        if q:
-            statement = statement.where(
-                Release.folder_name.ilike(f"%{q}%")
-            )
-
-        if verification:
-            statement = statement.where(
-                Release.verification_status == verification
-            )
-
-        if inventory == "present":
-            statement = statement.where(Release.is_present.is_(True))
-        elif inventory == "removed":
-            statement = statement.where(Release.is_present.is_(False))
-
-        items = db.scalars(statement).all()
-
-        return templates.TemplateResponse(
-            request=request,
-            name="releases.html",
-            context={
-                "items": items,
-                "q": q,
-                "verification": verification,
-                "inventory": inventory,
-            },
-        )
-    finally:
-        db.close()
+        statement = select(Release)
+        if q: statement = statement.where(Release.folder_name.ilike(f"%{q}%"))
+        if verification: statement = statement.where(Release.verification_status == verification)
+        if inventory == "present": statement = statement.where(Release.is_present.is_(True))
+        elif inventory == "removed": statement = statement.where(Release.is_present.is_(False))
+        # Classification is based on folder naming conventions; apply before paging.
+        # This remains fast for typical personal collections (~thousands of folders).
+        if release_type in TYPES:
+            ids = db.execute(select(Release.id, Release.folder_name)).all()
+            matched = [id for id, name in ids if classify(name) == release_type]
+            statement = statement.where(Release.id.in_(matched))
+        total = db.scalar(select(func.count()).select_from(statement.subquery())) or 0
+        pages = max(1, (total + page_size - 1) // page_size)
+        page = min(page, pages)
+        items = db.scalars(statement.order_by(Release.folder_name).offset((page-1)*page_size).limit(page_size)).all()
+        logging.info("Releases page loaded in %.2fs: %s results, page %s", monotonic()-began, total, page)
+        return templates.TemplateResponse(request=request, name="releases.html", context={
+            "items": items, "q": q, "verification": verification, "inventory": inventory,
+            "release_type": release_type, "release_types": TYPES, "classify_release": classify,
+            "total": total, "page": page, "pages": pages,
+        })
+    finally: db.close()
 
 
 @app.get("/releases/export.xlsx")

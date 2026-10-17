@@ -4,7 +4,7 @@
   <section class="releases-heading releases-heading-actions">
     <div>
       <h1>Releases</h1>
-      <span>{{ items|length }} records</span>
+      <span>{{ total }} records</span>
     </div>
     <a class="button-link export-xlsx-button" href="/releases/export.xlsx">
       Export All to Excel
@@ -48,13 +48,23 @@
       </option>
     </select>
 
+    <select name="release_type" aria-label="Release type">
+      <option value="">All release types</option>
+      {% for kind in release_types %}<option value="{{ kind }}" {% if release_type == kind %}selected{% endif %}>{{ kind }}</option>{% endfor %}
+    </select>
     <button>Filter</button>
   </form>
 
+  <nav class="releases-pagination" aria-label="Release pages" style="margin:12px 0;display:flex;gap:14px;align-items:center">
+    {% if page > 1 %}<a href="{{ request.url.include_query_params(page=page-1) }}">← Previous</a>{% endif %}
+    <span>Page {{ page }} of {{ pages }} · 100 per page</span>
+    {% if page < pages %}<a href="{{ request.url.include_query_params(page=page+1) }}">Next →</a>{% endif %}
+  </nav>
   <section class="panel releases-table-panel">
     <table class="releases-table">
       <colgroup>
         <col class="release-column">
+        <col style="width:110px">
         <col class="inventory-column">
         <col class="verification-column">
         <col class="matched-column">
@@ -64,6 +74,7 @@
       <thead>
         <tr>
           <th>Release</th>
+          <th>Release Type</th>
           <th>Inventory</th>
           <th>Verification</th>
           <th>Matched Release</th>
@@ -80,6 +91,7 @@
                 <small class="error">{{ release.error_message }}</small>
               {% endif %}
             </td>
+            <td>{{ classify_release(release.folder_name) }}</td>
             <td>
               <span class="badge compact-badge {{ 'present' if release.is_present else 'removed' }}">
                 {{ "Present" if release.is_present else "Removed" }}
@@ -118,11 +130,11 @@
           </tr>
         {% else %}
           <tr>
-            <td class="releases-empty" colspan="6">No releases found.</td>
+            <td class="releases-empty" colspan="7">No releases found.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </section>
 </div>
-{% endblock %}
+{% endblock %>
