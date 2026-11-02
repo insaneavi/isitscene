@@ -1,3 +1,7 @@
+## v0.17.8.1 — Movie Lists hotfix
+- Fix HTTP 500 on /movie-lists caused by missing json import in app/main.py.
+- Retains all v0.17.8 movie list updates, including Godzilla and expanded DC collection.
+
 ## v0.17.8 — November 2, 2026
 - Added Godzilla Movies (Japan & US): 38 released feature films, including Japanese live-action, US productions and Japanese anime trilogy; excludes future titles.
 - Expanded DC Animated Feature Films from 15 to 64 entries, preserving the original DCAMU IMDb IDs.
