@@ -5,7 +5,7 @@
   "description": "Bundled 250-title IMDb reference snapshot.",
   "source_name": "IMDb",
   "source_url": "https://www.imdb.com/chart/top/",
-  "list_version": "2026-07-25",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-07-25",
   "item_count": 250,
   "items": [
@@ -1509,5 +1509,7 @@
       "title": "The Gold Rush",
       "year": 1925
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

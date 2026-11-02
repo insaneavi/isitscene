@@ -1422,6 +1422,15 @@ def movie_lists_page(
         if list_key not in available_keys and lists:
             list_key = lists[0].key
 
+        review_date = None
+        review_note = None
+        try:
+            from .movie_lists import BUNDLED_LIST_PATH
+            list_manifest = json.loads((BUNDLED_LIST_PATH / f"{list_key}.json").read_text(encoding="utf-8"))
+            review_date = list_manifest.get("last_reviewed_at")
+            review_note = list_manifest.get("review_note")
+        except (OSError, ValueError):
+            pass
         movie_list = db.get(MovieList, list_key)
         sync = db.get(MovieListSync, list_key)
         cache_state = db.get(MovieListCacheState, 1)
@@ -1537,6 +1546,8 @@ def movie_lists_page(
                 "view": view,
                 "q": q,
                 "list_key": list_key,
+                "review_date": review_date,
+                "review_note": review_note,
             },
         )
     finally:

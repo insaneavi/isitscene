@@ -1,3 +1,12 @@
+## v0.17.8 — November 2, 2026
+- Added Godzilla Movies (Japan & US): 38 released feature films, including Japanese live-action, US productions and Japanese anime trilogy; excludes future titles.
+- Expanded DC Animated Feature Films from 15 to 64 entries, preserving the original DCAMU IMDb IDs.
+- Reviewed all bundled movie-list manifests and recorded a separate last-reviewed date (2026-11-02).
+- Source data dates remain unchanged for older static/dynamic snapshots that were not fully re-sourced; IMDb Top 100/250 are NOT live 2026-11-02 rankings.
+- Movie Lists page displays the catalog review date separately from the source-data date.
+- Existing movie-list caches automatically reimport manifests when the bundled list version changes.
+- Some new DC/Godzilla entries do not yet have independently verified IMDb IDs and match by title/year/aliases.
+
 ## v0.17.7 hotfix
 - Fix invalid Jinja closing tag on Releases page that caused HTTP 500.
 - Validate all HTML templates before packaging.

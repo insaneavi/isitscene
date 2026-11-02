@@ -5,7 +5,7 @@
   "description": "MCU theatrical films from Iron Man through Spider-Man: Brand New Day (2026). Series and unreleased films excluded.",
   "source_name": "Marvel",
   "source_url": "https://www.marvel.com/movies",
-  "list_version": "2026-10-16",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-10-16",
   "item_count": 38,
   "items": [
@@ -237,5 +237,7 @@
       "title": "Spider-Man: Brand New Day",
       "year": 2026
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

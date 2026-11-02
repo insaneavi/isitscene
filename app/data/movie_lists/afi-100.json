@@ -5,7 +5,7 @@
   "description": "American Film Institute classics reference list.",
   "source_name": "American Film Institute",
   "source_url": "https://www.afi.com/afi-lists/",
-  "list_version": "2026-07-25",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-07-25",
   "item_count": 100,
   "items": [
@@ -609,5 +609,7 @@
       "title": "Yankee Doodle Dandy",
       "year": 1942
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

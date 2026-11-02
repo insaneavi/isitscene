@@ -5,7 +5,7 @@
   "description": "Chronological Best Picture winners.",
   "source_name": "Academy Awards",
   "source_url": "https://www.oscars.org/oscars/ceremonies",
-  "list_version": "2026-07-25",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-07-25",
   "item_count": 97,
   "items": [
@@ -591,5 +591,7 @@
       "title": "Anora",
       "year": 2024
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

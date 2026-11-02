@@ -5,7 +5,7 @@
   "description": "Pixar feature films released through July 2026, ordered by release date.",
   "source_name": "Pixar Animation Studios",
   "source_url": "https://www.pixar.com/feature-films/",
-  "list_version": "2026-07-26",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-07-26",
   "item_count": 31,
   "items": [
@@ -195,5 +195,7 @@
       "title": "Toy Story 5",
       "year": 2026
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

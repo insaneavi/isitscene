@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "key": "godzilla-feature-films",
+  "name": "Godzilla Movies (Japan & US)",
+  "description": "Released Godzilla theatrical features from Japan and the United States, including the three Japanese anime films. Excludes guest appearances, television, shorts and upcoming Godzilla Minus Zero (2026) / Godzilla x Kong: Supernova (2027). IMDb IDs omitted where not individually verified; title/year/aliases used for matching.",
+  "source_name": "Official Godzilla",
+  "source_url": "https://godzilla.com/blogs/movies",
+  "list_version": "2026-11-02",
+  "data_updated_at": "2026-11-02",
+  "item_count": 38,
+  "items": [
+    {
+      "rank": 1,
+      "imdb_id": "",
+      "title": "Godzilla",
+      "year": 1954,
+      "aliases": [
+        "Gojira"
+      ]
+    },
+    {
+      "rank": 2,
+      "imdb_id": "",
+      "title": "Godzilla Raids Again",
+      "year": 1955,
+      "aliases": [
+        "Gigantis the Fire Monster"
+      ]
+    },
+    {
+      "rank": 3,
+      "imdb_id": "",
+      "title": "King Kong vs. Godzilla",
+      "year": 1962
+    },
+    {
+      "rank": 4,
+      "imdb_id": "",
+      "title": "Mothra vs. Godzilla",
+      "year": 1964,
+      "aliases": [
+        "Godzilla vs. The Thing"
+      ]
+    },
+    {
+      "rank": 5,
+      "imdb_id": "",
+      "title": "Ghidorah, the Three-Headed Monster",
+      "year": 1964,
+      "aliases": [
+        "Ghidrah the Three-Headed Monster"
+      ]
+    },
+    {
+      "rank": 6,
+      "imdb_id": "",
+      "title": "Invasion of Astro-Monster",
+      "year": 1965,
+      "aliases": [
+        "Godzilla vs. Monster Zero"
+      ]
+    },
+    {
+      "rank": 7,
+      "imdb_id": "",
+      "title": "Ebirah, Horror of the Deep",
+      "year": 1966,
+      "aliases": [
+        "Godzilla vs. the Sea Monster"
+      ]
+    },
+    {
+      "rank": 8,
+      "imdb_id": "",
+      "title": "Son of Godzilla",
+      "year": 1967
+    },
+    {
+      "rank": 9,
+      "imdb_id": "",
+      "title": "Destroy All Monsters",
+      "year": 1968
+    },
+    {
+      "rank": 10,
+      "imdb_id": "",
+      "title": "All Monsters Attack",
+      "year": 1969,
+      "aliases": [
+        "Godzilla's Revenge"
+      ]
+    },
+    {
+      "rank": 11,
+      "imdb_id": "",
+      "title": "Godzilla vs. Hedorah",
+      "year": 1971,
+      "aliases": [
+        "Godzilla vs. the Smog Monster"
+      ]
+    },
+    {
+      "rank": 12,
+      "imdb_id": "",
+      "title": "Godzilla vs. Gigan",
+      "year": 1972,
+      "aliases": [
+        "Godzilla on Monster Island"
+      ]
+    },
+    {
+      "rank": 13,
+      "imdb_id": "",
+      "title": "Godzilla vs. Megalon",
+      "year": 1973
+    },
+    {
+      "rank": 14,
+      "imdb_id": "",
+      "title": "Godzilla vs. Mechagodzilla",
+      "year": 1974
+    },
+    {
+      "rank": 15,
+      "imdb_id": "",
+      "title": "Terror of Mechagodzilla",
+      "year": 1975
+    },
+    {
+      "rank": 16,
+      "imdb_id": "",
+      "title": "The Return of Godzilla",
+      "year": 1984,
+      "aliases": [
+        "Godzilla 1985"
+      ]
+    },
+    {
+      "rank": 17,
+      "imdb_id": "",
+      "title": "Godzilla vs. Biollante",
+      "year": 1989
+    },
+    {
+      "rank": 18,
+      "imdb_id": "",
+      "title": "Godzilla vs. King Ghidorah",
+      "year": 1991
+    },
+    {
+      "rank": 19,
+      "imdb_id": "",
+      "title": "Godzilla vs. Mothra",
+      "year": 1992,
+      "aliases": [
+        "Godzilla and Mothra: The Battle for Earth"
+      ]
+    },
+    {
+      "rank": 20,
+      "imdb_id": "",
+      "title": "Godzilla vs. Mechagodzilla II",
+      "year": 1993
+    },
+    {
+      "rank": 21,
+      "imdb_id": "",
+      "title": "Godzilla vs. SpaceGodzilla",
+      "year": 1994
+    },
+    {
+      "rank": 22,
+      "imdb_id": "",
+      "title": "Godzilla vs. Destoroyah",
+      "year": 1995,
+      "aliases": [
+        "Godzilla vs. Destroyah"
+      ]
+    },
+    {
+      "rank": 23,
+      "imdb_id": "",
+      "title": "Godzilla",
+      "year": 1998
+    },
+    {
+      "rank": 24,
+      "imdb_id": "",
+      "title": "Godzilla 2000: Millennium",
+      "year": 1999,
+      "aliases": [
+        "Godzilla 2000"
+      ]
+    },
+    {
+      "rank": 25,
+      "imdb_id": "",
+      "title": "Godzilla vs. Megaguirus",
+      "year": 2000
+    },
+    {
+      "rank": 26,
+      "imdb_id": "",
+      "title": "Godzilla, Mothra and King Ghidorah: Giant Monsters All-Out Attack",
+      "year": 2001,
+      "aliases": [
+        "Godzilla Mothra and King Ghidorah Giant Monsters All-Out Attack"
+      ]
+    },
+    {
+      "rank": 27,
+      "imdb_id": "",
+      "title": "Godzilla Against Mechagodzilla",
+      "year": 2002
+    },
+    {
+      "rank": 28,
+      "imdb_id": "",
+      "title": "Godzilla: Tokyo S.O.S.",
+      "year": 2003,
+      "aliases": [
+        "Godzilla Tokyo SOS"
+      ]
+    },
+    {
+      "rank": 29,
+      "imdb_id": "",
+      "title": "Godzilla: Final Wars",
+      "year": 2004
+    },
+    {
+      "rank": 30,
+      "imdb_id": "",
+      "title": "Godzilla",
+      "year": 2014
+    },
+    {
+      "rank": 31,
+      "imdb_id": "",
+      "title": "Shin Godzilla",
+      "year": 2016,
+      "aliases": [
+        "Shin Gojira"
+      ]
+    },
+    {
+      "rank": 32,
+      "imdb_id": "",
+      "title": "Godzilla: Planet of the Monsters",
+      "year": 2017
+    },
+    {
+      "rank": 33,
+      "imdb_id": "",
+      "title": "Godzilla: City on the Edge of Battle",
+      "year": 2018,
+      "aliases": [
+        "Godzilla: A City on the Edge of Battle"
+      ]
+    },
+    {
+      "rank": 34,
+      "imdb_id": "",
+      "title": "Godzilla: The Planet Eater",
+      "year": 2018
+    },
+    {
+      "rank": 35,
+      "imdb_id": "",
+      "title": "Godzilla: King of the Monsters",
+      "year": 2019
+    },
+    {
+      "rank": 36,
+      "imdb_id": "",
+      "title": "Godzilla vs. Kong",
+      "year": 2021
+    },
+    {
+      "rank": 37,
+      "imdb_id": "",
+      "title": "Godzilla Minus One",
+      "year": 2023,
+      "aliases": [
+        "Godzilla -1.0"
+      ]
+    },
+    {
+      "rank": 38,
+      "imdb_id": "",
+      "title": "Godzilla x Kong: The New Empire",
+      "year": 2024
+    }
+  ],
+  "last_reviewed_at": "2026-11-02"
+}

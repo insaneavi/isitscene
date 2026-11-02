@@ -1,103 +1,399 @@
 {
   "schema_version": 1,
   "key": "dc-animated-movie-universe",
-  "name": "DC Animated Movie Universe",
-  "description": "The official 15-film DCAMU continuity from The Flashpoint Paradox through Apokolips War.",
-  "source_name": "DC",
-  "source_url": "https://www.dc.com/blog/2020/05/29/age-of-apokolips-binging-d-cs-animated-movie-universe",
-  "list_version": "2026-07-26",
-  "data_updated_at": "2026-07-26",
-  "item_count": 15,
+  "name": "DC Animated Feature Films",
+  "description": "Released DC animated feature films including DCAMU, Tomorrowverse, DC Universe Animated Original Movies and selected standalone/theatrical features. No television episodes, shorts or unreleased titles. IMDb IDs retained for original DCAMU entries; other titles use title/year matching pending ID verification.",
+  "source_name": "DC / The World’s Finest",
+  "source_url": "https://dcanimated.com/dcam/",
+  "list_version": "2026-11-02",
+  "data_updated_at": "2026-11-02",
+  "item_count": 64,
   "items": [
     {
       "rank": 1,
+      "imdb_id": "",
+      "title": "Superman: Doomsday",
+      "year": 2007
+    },
+    {
+      "rank": 2,
+      "imdb_id": "",
+      "title": "Batman: Gotham Knight",
+      "year": 2008
+    },
+    {
+      "rank": 3,
+      "imdb_id": "",
+      "title": "Justice League: The New Frontier",
+      "year": 2008
+    },
+    {
+      "rank": 4,
+      "imdb_id": "",
+      "title": "Green Lantern: First Flight",
+      "year": 2009
+    },
+    {
+      "rank": 5,
+      "imdb_id": "",
+      "title": "Superman/Batman: Public Enemies",
+      "year": 2009
+    },
+    {
+      "rank": 6,
+      "imdb_id": "",
+      "title": "Wonder Woman",
+      "year": 2009
+    },
+    {
+      "rank": 7,
+      "imdb_id": "",
+      "title": "Batman: Under the Red Hood",
+      "year": 2010
+    },
+    {
+      "rank": 8,
+      "imdb_id": "",
+      "title": "Justice League: Crisis on Two Earths",
+      "year": 2010
+    },
+    {
+      "rank": 9,
+      "imdb_id": "",
+      "title": "Superman/Batman: Apocalypse",
+      "year": 2010
+    },
+    {
+      "rank": 10,
+      "imdb_id": "",
+      "title": "All-Star Superman",
+      "year": 2011
+    },
+    {
+      "rank": 11,
+      "imdb_id": "",
+      "title": "Batman: Year One",
+      "year": 2011
+    },
+    {
+      "rank": 12,
+      "imdb_id": "",
+      "title": "Green Lantern: Emerald Knights",
+      "year": 2011
+    },
+    {
+      "rank": 13,
+      "imdb_id": "",
+      "title": "Batman: The Dark Knight Returns, Part 1",
+      "year": 2012
+    },
+    {
+      "rank": 14,
+      "imdb_id": "",
+      "title": "Justice League: Doom",
+      "year": 2012
+    },
+    {
+      "rank": 15,
+      "imdb_id": "",
+      "title": "Superman vs. The Elite",
+      "year": 2012
+    },
+    {
+      "rank": 16,
+      "imdb_id": "",
+      "title": "Batman: The Dark Knight Returns, Part 2",
+      "year": 2013
+    },
+    {
+      "rank": 17,
       "imdb_id": "tt2820466",
       "title": "Justice League: The Flashpoint Paradox",
       "year": 2013
     },
     {
-      "rank": 2,
+      "rank": 18,
+      "imdb_id": "",
+      "title": "Superman: Unbound",
+      "year": 2013
+    },
+    {
+      "rank": 19,
+      "imdb_id": "",
+      "title": "Batman: Assault on Arkham",
+      "year": 2014
+    },
+    {
+      "rank": 20,
       "imdb_id": "tt3060952",
       "title": "Justice League: War",
       "year": 2014
     },
     {
-      "rank": 3,
+      "rank": 21,
       "imdb_id": "tt3139072",
       "title": "Son of Batman",
       "year": 2014
     },
     {
-      "rank": 4,
-      "imdb_id": "tt3878542",
-      "title": "Justice League: Throne of Atlantis",
-      "year": 2015
-    },
-    {
-      "rank": 5,
+      "rank": 22,
       "imdb_id": "tt4324274",
       "title": "Batman vs. Robin",
       "year": 2015
     },
     {
-      "rank": 6,
+      "rank": 23,
+      "imdb_id": "",
+      "title": "Justice League: Gods and Monsters",
+      "year": 2015
+    },
+    {
+      "rank": 24,
+      "imdb_id": "tt3878542",
+      "title": "Justice League: Throne of Atlantis",
+      "year": 2015
+    },
+    {
+      "rank": 25,
       "imdb_id": "tt4870838",
       "title": "Batman: Bad Blood",
       "year": 2016
     },
     {
-      "rank": 7,
+      "rank": 26,
+      "imdb_id": "",
+      "title": "Batman: Return of the Caped Crusaders",
+      "year": 2016
+    },
+    {
+      "rank": 27,
+      "imdb_id": "",
+      "title": "Batman: The Killing Joke",
+      "year": 2016
+    },
+    {
+      "rank": 28,
       "imdb_id": "tt5091548",
       "title": "Justice League vs. Teen Titans",
       "year": 2016
     },
     {
-      "rank": 8,
+      "rank": 29,
+      "imdb_id": "",
+      "title": "Batman and Harley Quinn",
+      "year": 2017
+    },
+    {
+      "rank": 30,
+      "imdb_id": "",
+      "title": "Batman vs. Two-Face",
+      "year": 2017
+    },
+    {
+      "rank": 31,
       "imdb_id": "tt2494376",
       "title": "Justice League Dark",
       "year": 2017
     },
     {
-      "rank": 9,
+      "rank": 32,
       "imdb_id": "tt6315800",
       "title": "Teen Titans: The Judas Contract",
       "year": 2017
     },
     {
-      "rank": 10,
+      "rank": 33,
+      "imdb_id": "",
+      "title": "Batman Ninja",
+      "year": 2018
+    },
+    {
+      "rank": 34,
+      "imdb_id": "",
+      "title": "Batman: Gotham by Gaslight",
+      "year": 2018
+    },
+    {
+      "rank": 35,
       "imdb_id": "tt7167602",
       "title": "Suicide Squad: Hell to Pay",
       "year": 2018
     },
     {
-      "rank": 11,
+      "rank": 36,
       "imdb_id": "tt7167658",
       "title": "The Death of Superman",
       "year": 2018
     },
     {
-      "rank": 12,
-      "imdb_id": "tt7167686",
-      "title": "Reign of the Supermen",
+      "rank": 37,
+      "imdb_id": "",
+      "title": "Batman vs. Teenage Mutant Ninja Turtles",
       "year": 2019
     },
     {
-      "rank": 13,
+      "rank": 38,
       "imdb_id": "tt8752440",
       "title": "Batman: Hush",
       "year": 2019
     },
     {
-      "rank": 14,
+      "rank": 39,
+      "imdb_id": "",
+      "title": "Justice League vs. the Fatal Five",
+      "year": 2019
+    },
+    {
+      "rank": 40,
+      "imdb_id": "tt7167686",
+      "title": "Reign of the Supermen",
+      "year": 2019
+    },
+    {
+      "rank": 41,
       "imdb_id": "tt8752498",
       "title": "Wonder Woman: Bloodlines",
       "year": 2019
     },
     {
-      "rank": 15,
+      "rank": 42,
       "imdb_id": "tt11079148",
       "title": "Justice League Dark: Apokolips War",
       "year": 2020
+    },
+    {
+      "rank": 43,
+      "imdb_id": "",
+      "title": "Superman: Man of Tomorrow",
+      "year": 2020
+    },
+    {
+      "rank": 44,
+      "imdb_id": "",
+      "title": "Superman: Red Son",
+      "year": 2020
+    },
+    {
+      "rank": 45,
+      "imdb_id": "",
+      "title": "Batman: Soul of the Dragon",
+      "year": 2021
+    },
+    {
+      "rank": 46,
+      "imdb_id": "",
+      "title": "Batman: The Long Halloween, Part One",
+      "year": 2021
+    },
+    {
+      "rank": 47,
+      "imdb_id": "",
+      "title": "Batman: The Long Halloween, Part Two",
+      "year": 2021
+    },
+    {
+      "rank": 48,
+      "imdb_id": "",
+      "title": "Injustice",
+      "year": 2021
+    },
+    {
+      "rank": 49,
+      "imdb_id": "",
+      "title": "Justice Society: World War II",
+      "year": 2021
+    },
+    {
+      "rank": 50,
+      "imdb_id": "",
+      "title": "Batman and Superman: Battle of the Super Sons",
+      "year": 2022
+    },
+    {
+      "rank": 51,
+      "imdb_id": "",
+      "title": "Catwoman: Hunted",
+      "year": 2022
+    },
+    {
+      "rank": 52,
+      "imdb_id": "",
+      "title": "Green Lantern: Beware My Power",
+      "year": 2022
+    },
+    {
+      "rank": 53,
+      "imdb_id": "",
+      "title": "Batman: The Doom That Came to Gotham",
+      "year": 2023
+    },
+    {
+      "rank": 54,
+      "imdb_id": "",
+      "title": "Justice League: Warworld",
+      "year": 2023
+    },
+    {
+      "rank": 55,
+      "imdb_id": "",
+      "title": "Legion of Super-Heroes",
+      "year": 2023
+    },
+    {
+      "rank": 56,
+      "imdb_id": "",
+      "title": "Merry Little Batman",
+      "year": 2023
+    },
+    {
+      "rank": 57,
+      "imdb_id": "",
+      "title": "Justice League: Crisis on Infinite Earths - Part One",
+      "year": 2024
+    },
+    {
+      "rank": 58,
+      "imdb_id": "",
+      "title": "Justice League: Crisis on Infinite Earths - Part Three",
+      "year": 2024
+    },
+    {
+      "rank": 59,
+      "imdb_id": "",
+      "title": "Justice League: Crisis on Infinite Earths - Part Two",
+      "year": 2024
+    },
+    {
+      "rank": 60,
+      "imdb_id": "",
+      "title": "Watchmen Chapter I",
+      "year": 2024
+    },
+    {
+      "rank": 61,
+      "imdb_id": "",
+      "title": "Watchmen Chapter II",
+      "year": 2024
+    },
+    {
+      "rank": 62,
+      "imdb_id": "",
+      "title": "Aztec Batman: Clash of Empires",
+      "year": 2025
+    },
+    {
+      "rank": 63,
+      "imdb_id": "",
+      "title": "Batman Ninja vs. Yakuza League",
+      "year": 2025
+    },
+    {
+      "rank": 64,
+      "imdb_id": "",
+      "title": "Batman: Knightfall - Part 1: Knightfall",
+      "year": 2026
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Expanded DC animated feature list reviewed November 2, 2026. Scope excludes TV episodes and unreleased films."
 }

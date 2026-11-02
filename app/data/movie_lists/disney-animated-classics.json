@@ -5,7 +5,7 @@
   "description": "The Walt Disney Animation Studios feature-film canon through Zootopia 2.",
   "source_name": "Walt Disney Animation Studios",
   "source_url": "https://www.disneyanimation.com/films/",
-  "list_version": "2026-07-27.3",
+  "list_version": "2026-11-02-reviewed",
   "data_updated_at": "2026-07-27",
   "item_count": 63,
   "items": [
@@ -390,5 +390,7 @@
       "title": "Zootopia 2",
       "year": 2025
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }

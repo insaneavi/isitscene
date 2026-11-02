@@ -30,8 +30,10 @@
   <div>
     <h2>{{ movie_list.name }}</h2>
     <p>{{ movie_list.description }}</p>
+    {% if review_note %}<small>{{ review_note }}</small>{% endif %}
     <div class="list-date-row">
-      <span>List data date: <strong>{{ format_date(movie_list.data_updated_at) }}</strong></span>
+      {% if review_date %}<span>Catalog reviewed: <strong>{{ review_date }}</strong></span>{% endif %}
+      <span>Source data date: <strong>{{ format_date(movie_list.data_updated_at) }}</strong></span>
       <span>List cached locally: <strong>{{ format_datetime(movie_list.updated_at, true) if movie_list.updated_at else "Never" }}</strong></span>
       <span>Ownership cache: <strong>{{ format_datetime(cache_state.rebuilt_at, true) if cache_state and cache_state.rebuilt_at else "Not built" }}</strong></span>
       <span>Version: <strong>{{ movie_list.list_version or "—" }}</strong></span>

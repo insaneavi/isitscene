@@ -282,3 +282,7 @@ After GitHub Actions succeeds, update the container in Unraid.
 
 ## v0.17.6 dashboard
 On Dashboard select **Backfill Folder Dates** to read the modified timestamp of each inventoried folder from the `/movies` mount. No SRRDB calls or movie file reads occur. This can correct old inventory rows with empty timestamps. Folder modification time is not guaranteed to be the acquisition date.
+
+
+### Movie Lists review dates (v0.17.8)
+The **Catalog reviewed** date means the bundled manifest was inspected on 2026-11-02; it does not mean a dynamic external ranking was freshly downloaded. **Source data date** preserves the snapshot's original freshness. Godzilla and expanded DC are dated 2026-11-02. Some entries rely on title/year matching rather than an unverified IMDb ID.

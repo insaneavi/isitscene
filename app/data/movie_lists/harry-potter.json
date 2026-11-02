@@ -4,7 +4,7 @@
   "description": "The eight-film Harry Potter series.",
   "source_name": "IMDb",
   "source_url": "https://www.imdb.com/",
-  "list_version": "2026-07-27.1",
+  "list_version": "2026-11-02-reviewed",
   "item_count": 8,
   "data_updated_at": "2026-07-27",
   "items": [
@@ -65,5 +65,7 @@
         "Harry Potter and the Deathly Hallows Part 2"
       ]
     }
-  ]
+  ],
+  "last_reviewed_at": "2026-11-02",
+  "review_note": "Catalog reviewed on 2026-11-02. Data-as-of date reflects the existing bundled source snapshot; dynamic rankings may differ from current live source."
 }
