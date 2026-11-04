@@ -1,3 +1,9 @@
+## v0.17.8.2 — Movie Lists IMDb matching fix
+- Add verified IMDb ID tt22769820 to Legion of Super-Heroes (2023) in the DC animated list, resolving the existing 2022 folder-year discrepancy.
+- Normalize IMDb identifiers before matching, and continue to prefer IMDb matching over title/year matching.
+- Automatically reimport the updated DC manifest and rebuild ownership matches on startup.
+- No changes to movie inventory or persistent database schema.
+
 ## v0.17.8.1 — Movie Lists hotfix
 - Fix HTTP 500 on /movie-lists caused by missing json import in app/main.py.
 - Retains all v0.17.8 movie list updates, including Godzilla and expanded DC collection.

@@ -5,7 +5,7 @@
   "description": "Released DC animated feature films including DCAMU, Tomorrowverse, DC Universe Animated Original Movies and selected standalone/theatrical features. No television episodes, shorts or unreleased titles. IMDb IDs retained for original DCAMU entries; other titles use title/year matching pending ID verification.",
   "source_name": "DC / The World’s Finest",
   "source_url": "https://dcanimated.com/dcam/",
-  "list_version": "2026-11-02",
+  "list_version": "2026-11-04.1",
   "data_updated_at": "2026-11-02",
   "item_count": 64,
   "items": [
@@ -335,7 +335,7 @@
     },
     {
       "rank": 55,
-      "imdb_id": "",
+      "imdb_id": "tt22769820",
       "title": "Legion of Super-Heroes",
       "year": 2023
     },
@@ -394,6 +394,6 @@
       "year": 2026
     }
   ],
-  "last_reviewed_at": "2026-11-02",
+  "last_reviewed_at": "2026-11-04",
   "review_note": "Expanded DC animated feature list reviewed November 2, 2026. Scope excludes TV episodes and unreleased films."
 }

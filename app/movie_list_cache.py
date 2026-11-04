@@ -54,6 +54,11 @@ def normalize_title(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+def normalize_imdb_id(value: str | None) -> str:
+    """Normalize saved IMDb identifiers before comparing list and release IDs."""
+    return (value or "").strip().casefold()
+
+
 def rebuild_movie_list_cache() -> None:
     """Rebuild all list ownership matches in one transaction."""
     db = SessionLocal()
@@ -73,8 +78,9 @@ def rebuild_movie_list_cache() -> None:
         title_groups: dict[str, list[Release]] = defaultdict(list)
 
         for release in releases:
-            if release.imdb_id:
-                by_imdb.setdefault(release.imdb_id, release)
+            imdb_id = normalize_imdb_id(release.imdb_id)
+            if imdb_id:
+                by_imdb.setdefault(imdb_id, release)
 
             raw_title = release.movie_title or title_from_release_name(
                 release.matched_release or release.folder_name
@@ -117,7 +123,7 @@ def rebuild_movie_list_cache() -> None:
             ]
 
             if item.imdb_id:
-                release = by_imdb.get(item.imdb_id)
+                release = by_imdb.get(normalize_imdb_id(item.imdb_id))
                 if release:
                     method = "IMDb"
 
